@@ -4,15 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Base Achats & Commercial — Fournisseurs & Sous-traitants · LAB</title>
- <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing:border-box; margin:0; padding:0; }
   :root {
     --sidebar:#1b2430; --sidebar-2:#222d3b; --sidebar-txt:#9aa7b6; --sidebar-actif:#2b82d9;
-    --accent:#2b82d9; --accent-fonce:#2266b3;
+    --accent:#2b82d9; --accent-fonce:#2266b3; --or:#f2a03d;
     --main:#f4f5f7; --card:#ffffff; --bord:#e6e8ec;
     --ink:#1f2937; --gris:#6b7280; --gris-clair:#9ca3af;
     --hero-1:#202b3a; --hero-2:#18212d; --hero-accent:#4a9fe0;
@@ -21,8 +20,6 @@
   }
   body { font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; color:var(--ink); background:var(--main); }
   .app { display:flex; min-height:100vh; }
-
-  /* ===== SIDEBAR ===== */
   .sidebar { width:232px; background:var(--sidebar); color:var(--sidebar-txt); display:flex; flex-direction:column; position:fixed; top:0; bottom:0; left:0; }
   .sb-logo { display:flex; align-items:center; gap:11px; padding:20px 20px 22px; }
   .sb-logo .mark { height:38px; width:38px; flex-shrink:0; }
@@ -38,7 +35,6 @@
   .sb-item.actif .badge { background:rgba(255,255,255,.22); color:#fff; }
   .sb-foot { padding:16px 22px; font-size:12px; color:#5c6b7d; border-top:1px solid #2a3644; line-height:1.5; }
 
-  /* ===== MAIN ===== */
   .main { flex:1; margin-left:232px; display:flex; flex-direction:column; min-width:0; }
   .topbar { display:flex; align-items:center; gap:16px; padding:22px 30px 18px; }
   .topbar h1 { font-size:23px; font-weight:700; letter-spacing:-.02em; }
@@ -58,7 +54,6 @@
   .dd-vide { padding:18px; text-align:center; color:var(--gris); font-size:13px; }
   .content { padding:4px 30px 100px; }
 
-  /* ===== Bannière ===== */
   .hero { position:relative; background:linear-gradient(135deg,var(--hero-1),var(--hero-2)); border-radius:16px; padding:26px 30px; color:#fff; overflow:hidden; margin-bottom:20px; }
   .hero .coin { position:absolute; width:26px; height:26px; border:2px solid var(--hero-accent); opacity:.8; }
   .hero .c-tl{top:14px;left:14px;border-right:none;border-bottom:none;} .hero .c-tr{top:14px;right:14px;border-left:none;border-bottom:none;}
@@ -72,7 +67,6 @@
   .kpi .lbl { font-size:12px; color:rgba(255,255,255,.55); display:flex; align-items:center; gap:6px; }
   .kpi .val { font-family:var(--mono); font-size:26px; font-weight:700; margin-top:5px; }
 
-  /* ===== Mini tableau de bord par onglet ===== */
   .tb-dash { display:grid; grid-template-columns:1fr 1.25fr; gap:16px; margin-bottom:20px; }
   .tb-stats { display:grid; grid-template-columns:1fr 1fr; gap:13px; }
   .stat { background:var(--card); border:1px solid var(--bord); border-radius:13px; padding:15px 17px; }
@@ -88,7 +82,6 @@
   .barre-ligne .piste { flex:1; background:#eef0f3; border-radius:6px; height:22px; }
   .barre-ligne .rempli { height:100%; background:var(--accent); border-radius:6px; display:flex; align-items:center; justify-content:flex-end; padding-right:8px; color:#fff; font-size:11.5px; font-weight:700; min-width:24px; font-family:var(--mono); }
 
-  /* ===== Toolbar ===== */
   .toolbar { display:flex; align-items:center; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
   select.filtre { padding:9px 13px; font-size:13.5px; border:1px solid var(--bord); border-radius:9px; background:#fff; }
   .filtre-recherche { position:relative; flex:1; min-width:170px; max-width:260px; }
@@ -103,7 +96,6 @@
   .btn-primaire { background:var(--accent); color:#fff; border-color:var(--accent); box-shadow:0 4px 12px rgba(43,130,217,.28); }
   .btn-primaire:hover { background:var(--accent-fonce); }
 
-  /* ===== Cartes ===== */
   .lot-groupe { margin-bottom:26px; }
   .lot-titre { display:flex; align-items:center; gap:10px; margin:6px 0 13px; }
   .lot-num { font-family:var(--mono); font-size:12px; color:#fff; background:var(--sidebar); padding:3px 9px; border-radius:6px; }
@@ -130,7 +122,31 @@
   .note { font-size:12px; color:var(--gris); border-top:1px solid #f1f2f4; padding-top:8px; margin-top:3px; }
   .vide { text-align:center; padding:70px 20px; color:var(--gris); } .vide svg { color:#d1d5db; margin-bottom:12px; }
 
-  /* ===== Vue tableau ===== */
+  /* Notes / étoiles */
+  .note-etoiles { display:inline-flex; gap:1px; vertical-align:middle; }
+  .note-etoiles svg { width:14px; height:14px; }
+  .note-txt { font-size:12px; color:var(--gris); margin-left:5px; }
+  .note-ligne { margin-top:6px; display:flex; align-items:center; }
+  .note-edit { display:flex; align-items:center; gap:2px; }
+  .note-edit .etoile-btn { background:none; border:none; cursor:pointer; padding:2px; display:flex; }
+  .note-edit .etoile-btn svg { width:26px; height:26px; }
+  .note-edit .note-reset { margin-left:12px; font-size:12px; color:var(--gris); background:none; border:none; cursor:pointer; text-decoration:underline; }
+  .tbl .note-etoiles svg { width:13px; height:13px; }
+  .interv-liste { display:flex; flex-direction:column; gap:8px; margin-bottom:10px; }
+  .interv-row { display:flex; align-items:center; gap:10px; padding:9px 11px; border:1px solid var(--bord); border-radius:9px; background:#fafbfc; }
+  .interv-row .ch { flex:1; min-width:0; }
+  .interv-row .ch .n { font-size:13px; font-weight:600; }
+  .interv-row .ch .d { font-size:11.5px; color:var(--gris); }
+  .interv-row .ch .cm { font-size:11.5px; color:var(--gris); margin-top:2px; }
+  .interv-ajout { border:1px dashed #cbd5e1; border-radius:10px; padding:11px; display:flex; flex-direction:column; gap:8px; }
+  .interv-ajout .rowin { display:flex; gap:8px; }
+  .interv-ajout input { padding:8px 10px; font-size:13.5px; border:1px solid #d1d5db; border-radius:8px; width:100%; }
+  .interv-ajout .note-edit .etoile-btn svg { width:22px; height:22px; }
+  .interv-ajout .btn { white-space:nowrap; padding:8px 12px; }
+  .interv-moy { margin-top:11px; font-size:13px; color:#374151; display:flex; align-items:center; gap:8px; background:var(--bleu-clair); padding:10px 12px; border-radius:9px; }
+  .interv-moy .note-etoiles svg { width:15px; height:15px; }
+  .interv-vide { font-size:12.5px; color:var(--gris-clair); margin-bottom:8px; }
+
   .tableau-wrap { background:var(--card); border:1px solid var(--bord); border-radius:14px; overflow-x:auto; }
   table.tbl { width:100%; border-collapse:collapse; font-size:13.5px; }
   table.tbl th { text-align:left; padding:12px 16px; background:#f7f8fa; color:var(--gris); font-weight:600; font-size:11.5px; letter-spacing:.02em; text-transform:uppercase; cursor:pointer; user-select:none; border-bottom:1px solid var(--bord); white-space:nowrap; }
@@ -142,11 +158,8 @@
   table.tbl tbody tr:hover td { background:#fafbfc; }
   .tbl-nom { display:flex; align-items:center; gap:10px; font-weight:600; }
   .tbl-av { height:30px; width:30px; border-radius:50%; color:#fff; font-weight:700; font-size:11px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .tbl a.info { display:inline; }
-  .tbl .mut { color:var(--gris-clair); }
-  .tbl-actions { display:flex; gap:2px; }
+  .tbl a.info { display:inline; } .tbl .mut { color:var(--gris-clair); } .tbl-actions { display:flex; gap:2px; }
 
-  /* ===== Modales ===== */
   .overlay { position:fixed; inset:0; background:rgba(15,23,32,.5); display:none; align-items:center; justify-content:center; padding:16px; z-index:60; }
   .overlay.ouvert { display:flex; }
   .modale { background:#fff; border-radius:16px; width:100%; max-width:520px; max-height:90vh; display:flex; flex-direction:column; }
@@ -162,30 +175,7 @@
   .ligne-lot .mono { font-family:var(--mono); font-size:12px; color:var(--gris-clair); width:34px; }
   .ajout-lot { display:flex; gap:8px; margin-bottom:14px; } .ajout-lot input.num { width:60px; text-align:center; }
 
-  /* ===== Assistant IA ===== */
-  .ia-bulle { position:fixed; bottom:24px; right:24px; height:56px; width:56px; border-radius:50%; background:linear-gradient(135deg,var(--accent),#1e6fc0); color:#fff; border:none; cursor:pointer; box-shadow:0 8px 24px rgba(43,130,217,.5); display:flex; align-items:center; justify-content:center; z-index:55; transition:transform .15s; }
-  .ia-bulle:hover { transform:scale(1.07); }
-  .ia-panneau { position:fixed; bottom:24px; right:24px; width:384px; max-width:calc(100vw - 32px); height:566px; max-height:calc(100vh - 48px); background:#fff; border-radius:18px; box-shadow:0 16px 48px rgba(0,0,0,.24); display:none; flex-direction:column; z-index:56; overflow:hidden; }
-  .ia-panneau.ouvert { display:flex; }
-  .ia-haut { background:linear-gradient(135deg,var(--hero-1),var(--hero-2)); color:#fff; padding:15px 16px; display:flex; align-items:center; gap:11px; }
-  .ia-haut .av { height:32px; width:32px; border-radius:50%; background:rgba(74,159,224,.25); display:flex; align-items:center; justify-content:center; }
-  .ia-haut .t { font-weight:600; font-size:14px; } .ia-haut .st { font-size:11px; opacity:.7; }
-  .ia-haut button { margin-left:auto; background:none; border:none; color:#fff; cursor:pointer; opacity:.8; display:flex; }
-  .ia-msgs { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; background:var(--main); }
-  .msg { max-width:88%; font-size:13.5px; line-height:1.45; padding:10px 13px; border-radius:14px; }
-  .msg.bot { background:#fff; border:1px solid var(--bord); border-bottom-left-radius:4px; align-self:flex-start; }
-  .msg.moi { background:var(--accent); color:#fff; border-bottom-right-radius:4px; align-self:flex-end; }
-  .exemples { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
-  .ex { font-size:12px; padding:5px 10px; background:var(--bleu-clair); color:var(--accent); border-radius:999px; cursor:pointer; border:none; } .ex:hover { background:#dceaf9; }
-  .res-mini { display:flex; align-items:center; gap:9px; padding:8px 10px; background:#fff; border:1px solid var(--bord); border-radius:10px; margin-top:6px; cursor:pointer; }
-  .res-mini:hover { border-color:var(--accent); }
-  .res-mini .av { height:30px; width:30px; border-radius:50%; color:#fff; font-weight:700; font-size:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .res-mini .nom { font-size:13px; font-weight:600; } .res-mini .meta { font-size:11.5px; color:var(--gris); }
-  .ia-saisie { display:flex; gap:8px; padding:12px; border-top:1px solid var(--bord); background:#fff; }
-  .ia-saisie input { flex:1; padding:10px 12px; font-size:14px; border:1px solid var(--bord); border-radius:11px; } .ia-saisie input:focus { outline:none; border-color:var(--accent); }
-  .ia-saisie button { background:var(--accent); color:#fff; border:none; border-radius:11px; width:42px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-
-  /* ===== Fiche PDF ===== */
+  /* Fiche PDF */
   #overlay-pdf .modale-pdf { background:#fff; border-radius:14px; width:100%; max-width:840px; max-height:92vh; display:flex; flex-direction:column; overflow:hidden; }
   .pdf-bar { display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid var(--bord); background:#f7f8fa; }
   .pdf-bar .titre { font-weight:600; font-size:14px; }
@@ -201,11 +191,9 @@
   .f-titre h1 { font-size:24px; font-weight:700; letter-spacing:-.01em; }
   .f-titre .lot { font-size:14px; color:var(--gris); margin-top:4px; }
   .f-grille { border:1px solid var(--bord); border-radius:10px; overflow:hidden; }
-  .f-ligne { display:flex; border-bottom:1px solid #eef0f3; }
-  .f-ligne:last-child { border-bottom:none; }
+  .f-ligne { display:flex; border-bottom:1px solid #eef0f3; } .f-ligne:last-child { border-bottom:none; }
   .f-ligne .lab { width:175px; flex-shrink:0; background:#f7f8fa; padding:13px 16px; font-size:11.5px; font-weight:600; color:var(--gris); text-transform:uppercase; letter-spacing:.03em; }
-  .f-ligne .val { padding:13px 16px; font-size:14px; }
-  .f-ligne .val.mono { font-family:var(--mono); }
+  .f-ligne .val { padding:13px 16px; font-size:14px; } .f-ligne .val.mono { font-family:var(--mono); }
   .f-notes-bloc { margin-top:20px; }
   .f-notes-bloc .lab { font-size:11.5px; font-weight:600; color:var(--gris); text-transform:uppercase; letter-spacing:.03em; margin-bottom:7px; }
   .f-notes-bloc .txt { font-size:14px; line-height:1.5; border:1px solid var(--bord); border-radius:10px; padding:14px 16px; background:#fafbfc; }
@@ -220,9 +208,30 @@
     .feuille { box-shadow:none; max-width:none; margin:0; padding:0; }
     @page { size:A4; margin:16mm; }
   }
-
   @media (max-width:980px){ .tb-dash{grid-template-columns:1fr;} }
   @media (max-width:860px){ .sidebar{width:68px;} .sb-logo .txt,.sb-item span:not(.badge),.sb-section,.sb-foot{display:none;} .sb-item{justify-content:center;} .main{margin-left:68px;} .hero .kpis{grid-template-columns:repeat(2,1fr);} .rg input{width:150px;} .duo{grid-template-columns:1fr;} }
+
+  /* Assistant IA */
+  .ia-bulle { position:fixed; bottom:24px; right:24px; height:56px; width:56px; border-radius:50%; background:linear-gradient(135deg,var(--accent),#1e6fc0); color:#fff; border:none; cursor:pointer; box-shadow:0 8px 24px rgba(43,130,217,.5); display:flex; align-items:center; justify-content:center; z-index:55; transition:transform .15s; }
+  .ia-bulle:hover { transform:scale(1.07); }
+  .ia-panneau { position:fixed; bottom:24px; right:24px; width:384px; max-width:calc(100vw - 32px); height:566px; max-height:calc(100vh - 48px); background:#fff; border-radius:18px; box-shadow:0 16px 48px rgba(0,0,0,.24); display:none; flex-direction:column; z-index:56; overflow:hidden; }
+  .ia-panneau.ouvert { display:flex; }
+  .ia-haut { background:linear-gradient(135deg,var(--hero-1),var(--hero-2)); color:#fff; padding:15px 16px; display:flex; align-items:center; gap:11px; }
+  .ia-haut .av { height:32px; width:32px; border-radius:50%; background:rgba(74,159,224,.25); display:flex; align-items:center; justify-content:center; }
+  .ia-haut .t { font-weight:600; font-size:14px; } .ia-haut .st { font-size:11px; opacity:.7; }
+  .ia-haut button { margin-left:auto; background:none; border:none; color:#fff; cursor:pointer; opacity:.8; display:flex; }
+  .ia-msgs { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; background:var(--main); }
+  .msg { max-width:88%; font-size:13.5px; line-height:1.45; padding:10px 13px; border-radius:14px; }
+  .msg.bot { background:#fff; border:1px solid var(--bord); border-bottom-left-radius:4px; align-self:flex-start; }
+  .msg.moi { background:var(--accent); color:#fff; border-bottom-right-radius:4px; align-self:flex-end; }
+  .exemples { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .ex { font-size:12px; padding:5px 10px; background:var(--bleu-clair); color:var(--accent); border-radius:999px; cursor:pointer; border:none; } .ex:hover { background:#dceaf9; }
+  .res-mini { display:flex; align-items:center; gap:9px; padding:8px 10px; background:#fff; border:1px solid var(--bord); border-radius:10px; margin-top:6px; cursor:pointer; } .res-mini:hover { border-color:var(--accent); }
+  .res-mini .av { height:30px; width:30px; border-radius:50%; color:#fff; font-weight:700; font-size:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .res-mini .nom { font-size:13px; font-weight:600; } .res-mini .meta { font-size:11.5px; color:var(--gris); }
+  .ia-saisie { display:flex; gap:8px; padding:12px; border-top:1px solid var(--bord); background:#fff; }
+  .ia-saisie input { flex:1; padding:10px 12px; font-size:14px; border:1px solid var(--bord); border-radius:11px; } .ia-saisie input:focus { outline:none; border-color:var(--accent); }
+  .ia-saisie button { background:var(--accent); color:#fff; border:none; border-radius:11px; width:42px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
 </style>
 </head>
 <body>
@@ -279,13 +288,12 @@
         </div>
       </div>
 
-      <!-- Mini tableau de bord de l'onglet -->
       <div class="tb-dash">
         <div class="tb-stats">
           <div class="stat"><div class="v" id="tb-total">0</div><div class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M6 21V7l7-4 7 4v14"/></svg>Référencés</div></div>
           <div class="stat"><div class="v" id="tb-lots">0</div><div class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M3 12h18M3 17h18"/></svg>Lots couverts</div></div>
           <div class="stat"><div class="v" id="tb-email">0</div><div class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>Avec email</div></div>
-          <div class="stat"><div class="v" id="tb-tel">0</div><div class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12 12 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4 12 12 0 0 0 2.8.7 2 2 0 0 1 1.7 2Z"/></svg>Avec tél.</div></div>
+          <div class="stat"><div class="v" id="tb-4">0</div><div class="l" id="tb-4-lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12 12 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4 12 12 0 0 0 2.8.7 2 2 0 0 1 1.7 2Z"/></svg>Avec tél.</div></div>
         </div>
         <div class="panneau">
           <div class="panneau-titre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 16v-5M12 16V8M17 16v-9"/></svg><span id="tb-titre">Répartition des fournisseurs par lot</span></div>
@@ -317,8 +325,19 @@
   <div class="modale-corps">
     <input type="hidden" id="f-id" />
     <label class="champ"><span>Raison sociale *</span><input id="f-raison" /></label>
-    <div class="duo"><label class="champ"><span>Type</span><select id="f-type"><option value="fournisseurs">Fournisseur</option><option value="soustraitants">Sous-traitant</option></select></label>
+    <div class="duo"><label class="champ"><span>Type</span><select id="f-type" onchange="majTypeFiche()"><option value="fournisseurs">Fournisseur</option><option value="soustraitants">Sous-traitant</option></select></label>
       <label class="champ"><span>Lot</span><select id="f-lot"></select></label></div>
+    <div class="champ" id="champ-chantiers"><span>Chantiers réalisés & notes</span>
+      <div class="interv-vide" id="interv-vide">Aucun chantier enregistré pour l'instant.</div>
+      <div class="interv-liste" id="interv-liste"></div>
+      <div class="interv-ajout">
+        <input id="iv-chantier" placeholder="Nom du chantier / affaire" />
+        <div class="rowin"><input id="iv-date" placeholder="Date / période (ex : 06/2026)" /><input id="iv-comment" placeholder="Commentaire (optionnel)" /></div>
+        <div class="rowin" style="align-items:center;justify-content:space-between"><div class="note-edit" id="iv-note-edit"></div><button type="button" class="btn btn-primaire" onclick="ajouterIntervention()">+ Ajouter ce chantier</button></div>
+      </div>
+      <div class="interv-moy" id="interv-moy"></div>
+      <input type="hidden" id="iv-note" value="0" />
+    </div>
     <label class="champ"><span>Contact référent</span><input id="f-contact" /></label>
     <div class="duo"><label class="champ"><span>Téléphone</span><input id="f-tel" /></label><label class="champ"><span>Email</span><input id="f-email" /></label></div>
     <label class="champ"><span>Adresse</span><input id="f-adresse" /></label>
@@ -330,7 +349,7 @@
 
 <!-- Modale lots -->
 <div class="overlay" id="overlay-lots"><div class="modale">
-  <div class="modale-haut"><h2>Gérer les lots</h2><button class="ico-btn" onclick="fermer('overlay-lots')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="modale-haut"><h2 id="lots-modal-titre">Gérer les lots</h2><button class="ico-btn" onclick="fermer('overlay-lots')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
   <div class="modale-corps">
     <div class="ajout-lot"><input class="num" id="lot-num" placeholder="N°" /><input id="lot-lib" placeholder="Libellé du lot" style="flex:1" onkeydown="if(event.key==='Enter')ajouterLot()" /><button class="btn btn-primaire" onclick="ajouterLot()">+</button></div>
     <div class="liste-lots" id="liste-lots"></div>
@@ -362,20 +381,26 @@
 <script>
 /* ===== CONFIG ===== */
 /* ⚠️ BASE DÉDIÉE AU SERVICE ACHATS & COMMERCIAL — INDÉPENDANTE DU CRM.
-   → Crée un NOUVEAU projet Firebase (différent de celui du CRM), puis colle
-     sa config ci-dessous. NE réutilise PAS le projet du CRM : les deux bases
-     doivent rester totalement séparées (données + règles de sécurité). */
+   Crée un NOUVEAU projet Firebase (≠ celui du CRM) puis colle sa config ici. */
 const firebaseConfig = {
-  apiKey: "AIzaSyAVSNnDfqNVfjE4g8Sh1eosqRiZGTws7Fw",
-  authDomain: "base-achat-sst-lab.firebaseapp.com",
-  databaseURL: "https://base-achat-sst-lab-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "base-achat-sst-lab",
-  storageBucket: "base-achat-sst-lab.firebasestorage.app",
-  messagingSenderId: "708989725802",
-  appId: "1:708989725802:web:3bc720a9c6678bcb62ae13"
+  apiKey:"AIzaSyAVSNnDfqNVfjE4g8Sh1eosqRiZGTws7Fw", authDomain:"base-achat-sst-lab.firebaseapp.com",
+  databaseURL:"https://base-achat-sst-lab-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"base-achat-sst-lab", storageBucket:"base-achat-sst-lab.firebasestorage.app",
+  messagingSenderId:"708989725802", appId:"1:708989725802:web:3bc720a9c6678bcb62ae13"
 };
 const IA_CONFIG = { cleApi:"", modele:"claude-sonnet-4-6" };
-const LOTS_DEFAUT = [
+
+/* Listes de lots DIFFÉRENTES selon le type */
+const LOTS_FOURNISSEURS = [
+  {num:'01',libelle:'Gros œuvre / Béton / Ciment'},{num:'02',libelle:'Agglos / Briques / Blocs'},
+  {num:'03',libelle:'Bois / Charpente / Panneaux'},{num:'04',libelle:'Menuiseries / Fermetures'},
+  {num:'05',libelle:'Couverture / Étanchéité'},{num:'06',libelle:'Isolation'},
+  {num:'07',libelle:'Plâtre / Placo / Cloisons'},{num:'08',libelle:'Électricité (matériel)'},
+  {num:'09',libelle:'Plomberie / Sanitaire / CVC'},{num:'10',libelle:'Peinture / Droguerie'},
+  {num:'11',libelle:'Carrelage / Faïence / Sols'},{num:'12',libelle:'Quincaillerie / Visserie'},
+  {num:'13',libelle:'Outillage / EPI'},{num:'14',libelle:'Location matériel / Engins'},
+];
+const LOTS_SOUSTRAITANTS = [
   {num:'01',libelle:'Terrassement / VRD'},{num:'02',libelle:'Gros œuvre / Maçonnerie'},{num:'03',libelle:'Charpente / Structure'},
   {num:'04',libelle:'Couverture / Étanchéité'},{num:'05',libelle:'Menuiseries extérieures'},{num:'06',libelle:'Serrurerie / Métallerie'},
   {num:'07',libelle:'Menuiseries intérieures'},{num:'08',libelle:'Cloisons / Doublages / Plâtrerie'},{num:'09',libelle:'Électricité (CFO / CFA)'},
@@ -384,20 +409,28 @@ const LOTS_DEFAUT = [
 ];
 
 /* ===== ÉTAT ===== */
-let db=null, lots={}, entreprises={fournisseurs:{},soustraitants:{}}, ongletActif='fournisseurs';
+let db=null, lots={fournisseurs:{},soustraitants:{}}, entreprises={fournisseurs:{},soustraitants:{}}, ongletActif='fournisseurs';
 let vueActive='cartes', tri={col:'raisonSociale',dir:1};
 
 const JOURS=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
 const MOIS=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 (function(){ const d=new Date(); document.getElementById('date-jour').textContent=`${JOURS[d.getDay()]} ${d.getDate()} ${MOIS[d.getMonth()]} ${d.getFullYear()}`; })();
 
-try { firebase.initializeApp(firebaseConfig); db=firebase.database(); brancher(); } catch(e){ console.warn('Config Firebase à compléter',e); }
+function seedLocal(liste){ const o={}; liste.forEach((l,i)=>o['seed'+i]=l); return o; }
+try { firebase.initializeApp(firebaseConfig); db=firebase.database(); brancher(); }
+catch(e){ console.warn('Config Firebase à compléter',e); lots={fournisseurs:seedLocal(LOTS_FOURNISSEURS),soustraitants:seedLocal(LOTS_SOUSTRAITANTS)}; remplirFiltreLot(); rendre(); majKpis(); }
+
 function brancher(){
-  db.ref('lots').on('value',s=>{ lots=s.val()||{}; if(!Object.keys(lots).length) semer(); remplirSelectLots(); rendre(); majKpis(); });
+  db.ref('lots').on('value',s=>{
+    lots=s.val()||{}; lots.fournisseurs=lots.fournisseurs||{}; lots.soustraitants=lots.soustraitants||{};
+    if(!Object.keys(lots.fournisseurs).length) semer('fournisseurs',LOTS_FOURNISSEURS);
+    if(!Object.keys(lots.soustraitants).length) semer('soustraitants',LOTS_SOUSTRAITANTS);
+    remplirFiltreLot(); rendre(); majKpis();
+  });
   db.ref('fournisseurs').on('value',s=>{ entreprises.fournisseurs=s.val()||{}; majKpis(); rendre(); });
   db.ref('soustraitants').on('value',s=>{ entreprises.soustraitants=s.val()||{}; majKpis(); rendre(); });
 }
-function semer(){ const m={}; LOTS_DEFAUT.forEach(l=>{ m[db.ref('lots').push().key]=l; }); db.ref('lots').set(m); }
+function semer(type,liste){ const m={}; liste.forEach(l=>{ m[db.ref('lots/'+type).push().key]=l; }); db.ref('lots/'+type).set(m); }
 
 function majKpis(){
   const nf=Object.keys(entreprises.fournisseurs).length, ns=Object.keys(entreprises.soustraitants).length;
@@ -413,40 +446,71 @@ function changerOnglet(t){
   document.querySelectorAll('.sb-item[data-tab]').forEach(o=>o.classList.toggle('actif',o.dataset.tab===t));
   const f=(t==='fournisseurs');
   document.getElementById('titre-section').textContent=f?'Fournisseurs':'Sous-traitants';
-  document.getElementById('soustitre-section').textContent=f?'Répertoire achats classé par lot':'Répertoire des sous-traitants classé par lot';
+  document.getElementById('soustitre-section').textContent=f?'Répertoire achats classé par famille':'Répertoire des sous-traitants classé par lot';
   document.getElementById('txt-ajouter').textContent=f?'Ajouter un fournisseur':'Ajouter un sous-traitant';
   document.getElementById('tb-titre').textContent=f?'Répartition des fournisseurs par lot':'Répartition des sous-traitants par lot';
+  remplirFiltreLot(); document.getElementById('filtre-lot').value='tous';
   rendre();
 }
 function changerVue(v){ vueActive=v; document.querySelectorAll('.vue-toggle button').forEach(b=>b.classList.toggle('actif',b.dataset.vue===v)); rendre(); }
 
-function lotsTries(){ return Object.entries(lots).map(([id,l])=>({id,...l})).sort((a,b)=>String(a.num).localeCompare(String(b.num),'fr',{numeric:true})); }
+function lotsTries(type){ type=type||ongletActif; return Object.entries(lots[type]||{}).map(([id,l])=>({id,...l})).sort((a,b)=>String(a.num).localeCompare(String(b.num),'fr',{numeric:true})); }
+function lotDe(type,id){ return (lots[type]||{})[id]; }
 const COULEURS=['#2b82d9','#16a34a','#7c3aed','#db2777','#ea580c','#0891b2','#ca8a04'];
 function avatar(nom){ const p=String(nom||'?').trim().split(/\s+/); const init=((p[0]||'')[0]||'')+((p[1]||'')[0]||'')||(p[0]||'?')[0];
   const h=[...String(nom||'')].reduce((a,c)=>a+c.charCodeAt(0),0); return {init:init.toUpperCase(),coul:COULEURS[h%COULEURS.length]}; }
 
-/* ===== DASHBOARD DE L'ONGLET ===== */
+/* ===== NOTES / ÉTOILES ===== */
+function etoileSVG(plein){ return plein
+  ? '<svg viewBox="0 0 24 24" fill="#f2a03d"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.8 5.9 20.4l1.5-6.8L2.2 9l6.9-.7z"/></svg>'
+  : '<svg viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.6"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.8 5.9 20.4l1.5-6.8L2.2 9l6.9-.7z"/></svg>'; }
+function etoiles(note){ note=Number(note)||0; let s='<span class="note-etoiles">'; for(let i=1;i<=5;i++) s+=etoileSVG(i<=note); return s+'</span>'; }
+let interventionsForm=[];
+function interventionsArr(e){ return e && e.interventions ? Object.entries(e.interventions).map(([id,i])=>({id,...i})) : []; }
+function noteMoyenne(e){ const a=interventionsArr(e).map(i=>Number(i.note)||0).filter(n=>n>0); if(a.length) return a.reduce((x,y)=>x+y,0)/a.length; return Number(e.note)||0; }
+function nbChantiers(e){ return interventionsArr(e).length; }
+function rendreIvNote(){ const n=Number(document.getElementById('iv-note').value)||0; let h=''; for(let i=1;i<=5;i++) h+=`<button type="button" class="etoile-btn" onclick="setIvNote(${i})">${etoileSVG(i<=n)}</button>`; document.getElementById('iv-note-edit').innerHTML=h; }
+function setIvNote(n){ document.getElementById('iv-note').value=n; rendreIvNote(); }
+function ajouterIntervention(){
+  const ch=document.getElementById('iv-chantier').value.trim(); if(!ch){ alert('Indique le nom du chantier.'); return; }
+  interventionsForm.push({ id:'iv'+Math.random().toString(36).slice(2,9), chantier:ch, date:document.getElementById('iv-date').value.trim(), commentaire:document.getElementById('iv-comment').value.trim(), note:Number(document.getElementById('iv-note').value)||0 });
+  document.getElementById('iv-chantier').value=''; document.getElementById('iv-date').value=''; document.getElementById('iv-comment').value=''; document.getElementById('iv-note').value=0;
+  rendreIvNote(); rendreInterventionsForm();
+}
+function supprimerInterventionForm(id){ interventionsForm=interventionsForm.filter(i=>i.id!==id); rendreInterventionsForm(); }
+function rendreInterventionsForm(){
+  const z=document.getElementById('interv-liste'); document.getElementById('interv-vide').style.display=interventionsForm.length?'none':'block';
+  z.innerHTML=interventionsForm.map(i=>`<div class="interv-row"><div class="ch"><div class="n">${esc(i.chantier)}</div>${i.date?`<div class="d">${esc(i.date)}</div>`:''}${i.commentaire?`<div class="cm">${esc(i.commentaire)}</div>`:''}</div>${etoiles(i.note)}<button type="button" class="ico-btn suppr" onclick="supprimerInterventionForm('${i.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div>`).join('');
+  const ns=interventionsForm.map(i=>Number(i.note)||0).filter(n=>n>0); const moy=ns.length?ns.reduce((a,b)=>a+b,0)/ns.length:0;
+  document.getElementById('interv-moy').innerHTML = ns.length ? `${etoiles(Math.round(moy))} <span><strong>Moyenne : ${moy.toFixed(1)}/5</strong> sur ${ns.length} chantier${ns.length>1?'s':''} noté${ns.length>1?'s':''}</span>` : "Moyenne : non notée pour l'instant";
+}
+
+/* ===== DASHBOARD ===== */
 function majDashboard(){
-  const source=Object.values(entreprises[ongletActif]||{});
+  const source=Object.values(entreprises[ongletActif]||{}), st=(ongletActif==='soustraitants');
   document.getElementById('tb-total').textContent=source.length;
   document.getElementById('tb-lots').textContent=new Set(source.map(e=>e.lotId).filter(Boolean)).size;
   document.getElementById('tb-email').textContent=source.filter(e=>e.email).length;
-  document.getElementById('tb-tel').textContent=source.filter(e=>e.tel).length;
+  // 4e stat : note moyenne pour les sous-traitants, sinon "avec tél."
+  if(st){ const notes=source.map(e=>noteMoyenne(e)).filter(n=>n>0);
+    const moy=notes.length?(notes.reduce((a,b)=>a+b,0)/notes.length):0;
+    document.getElementById('tb-4').textContent=notes.length?moy.toFixed(1)+' ★':'—';
+    document.getElementById('tb-4-lbl').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.8 5.9 20.4l1.5-6.8L2.2 9l6.9-.7z"/></svg>Note moyenne';
+  } else { document.getElementById('tb-4').textContent=source.filter(e=>e.tel).length;
+    document.getElementById('tb-4-lbl').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12 12 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4 12 12 0 0 0 2.8.7 2 2 0 0 1 1.7 2Z"/></svg>Avec tél.'; }
   const parLot={}; source.forEach(e=>{ const k=e.lotId||'sans'; parLot[k]=(parLot[k]||0)+1; });
-  const entries=lotsTries().map(l=>({nom:`${l.num} · ${l.libelle}`, n:parLot[l.id]||0})).filter(x=>x.n>0);
+  const entries=lotsTries(ongletActif).map(l=>({nom:`${l.num} · ${l.libelle}`, n:parLot[l.id]||0})).filter(x=>x.n>0);
   if(parLot['sans']) entries.push({nom:'Sans lot', n:parLot['sans']});
   entries.sort((a,b)=>b.n-a.n);
   const max=Math.max(1,...entries.map(e=>e.n)), zone=document.getElementById('tb-repartition');
-  zone.innerHTML = entries.length
-    ? entries.map(e=>`<div class="barre-ligne"><div class="nom" title="${esc(e.nom)}">${esc(e.nom)}</div><div class="piste"><div class="rempli" style="width:${Math.max(9,e.n/max*100)}%">${e.n}</div></div></div>`).join('')
-    : '<div style="color:var(--gris);font-size:13px">Aucune donnée pour l\'instant.</div>';
+  zone.innerHTML = entries.length ? entries.map(e=>`<div class="barre-ligne"><div class="nom" title="${esc(e.nom)}">${esc(e.nom)}</div><div class="piste"><div class="rempli" style="width:${Math.max(9,e.n/max*100)}%">${e.n}</div></div></div>`).join('') : '<div style="color:var(--gris);font-size:13px">Aucune donnée pour l\'instant.</div>';
 }
 
 /* ===== RENDU ===== */
 function listeFiltree(){
   const q=document.getElementById('recherche').value.trim().toLowerCase(), fl=document.getElementById('filtre-lot').value;
   return Object.entries(entreprises[ongletActif]||{}).map(([id,e])=>({id,...e})).filter(e=>{
-    if(fl!=='tous'&&e.lotId!==fl) return false; if(!q) return true; const lot=lots[e.lotId];
+    if(fl!=='tous'&&e.lotId!==fl) return false; if(!q) return true; const lot=lotDe(ongletActif,e.lotId);
     return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,lot&&lot.libelle].filter(Boolean).join(' ').toLowerCase().includes(q);
   });
 }
@@ -457,8 +521,8 @@ function rendre(){
   const zone=document.getElementById('contenu');
   if(!liste.length){ zone.innerHTML=videHtml(); return; }
   const parLot={}; liste.forEach(e=>{ const k=e.lotId||'sans'; (parLot[k]=parLot[k]||[]).push(e); });
-  let html=''; [...lotsTries().map(l=>l.id),'sans'].forEach(lotId=>{
-    const grp=parLot[lotId]; if(!grp||!grp.length) return; const lot=lots[lotId];
+  let html=''; [...lotsTries(ongletActif).map(l=>l.id),'sans'].forEach(lotId=>{
+    const grp=parLot[lotId]; if(!grp||!grp.length) return; const lot=lotDe(ongletActif,lotId);
     grp.sort((a,b)=>a.raisonSociale.localeCompare(b.raisonSociale,'fr'));
     html+=`<div class="lot-groupe"><div class="lot-titre"><span class="lot-num">${lot?esc(lot.num):'—'}</span><span class="lot-nom">${lot?esc(lot.libelle):'Sans lot'}</span><span class="lot-compte">${grp.length}</span></div><div class="grille">${grp.map(carte).join('')}</div></div>`;
   });
@@ -467,11 +531,13 @@ function rendre(){
 function videHtml(){ return `<div class="vide"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/></svg><p>Aucune entreprise ${ongletActif==='fournisseurs'?'fournisseur':'sous-traitante'} pour l'instant.</p></div>`; }
 
 function carte(e){
-  const cls=ongletActif==='fournisseurs'?'f':'s', label=ongletActif==='fournisseurs'?'Fournisseur':'Sous-traitant', a=avatar(e.raisonSociale);
+  const st=ongletActif==='soustraitants', cls=st?'s':'f', label=st?'Sous-traitant':'Fournisseur', a=avatar(e.raisonSociale);
   return `<div class="carte" id="carte-${e.id}"><div class="carte-haut">
       <div class="avatar" style="background:${a.coul}">${esc(a.init)}</div>
-      <div style="min-width:0"><h3>${esc(e.raisonSociale)}</h3><span class="chip ${cls}">${label}</span></div>
-      <div class="actions"><button class="ico-btn" title="Fiche PDF" onclick="ouvrirFichePDF('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button><button class="ico-btn" onclick='ouvrirFiche(${JSON.stringify({id:e.id})})'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+      <div style="min-width:0"><h3>${esc(e.raisonSociale)}</h3><span class="chip ${cls}">${label}</span>
+        ${st?`<div class="note-ligne">${etoiles(Math.round(noteMoyenne(e)))}<span class="note-txt">${noteMoyenne(e)?noteMoyenne(e).toFixed(1)+'/5':'Non noté'}${nbChantiers(e)?' · '+nbChantiers(e)+' chantier'+(nbChantiers(e)>1?'s':''):''}</span></div>`:''}</div>
+      <div class="actions"><button class="ico-btn" title="Fiche PDF" onclick="ouvrirFichePDF('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
+        <button class="ico-btn" onclick='ouvrirFiche(${JSON.stringify({id:e.id})})'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         <button class="ico-btn suppr" onclick="supprimer('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div></div>
     <div class="infos">
       ${e.contact?`<div class="info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${esc(e.contact)}</div>`:''}
@@ -483,16 +549,16 @@ function carte(e){
     </div></div>`;
 }
 
-/* ===== VUE TABLEAU ===== */
-function valTri(e){ if(tri.col==='lot'){ const l=lots[e.lotId]; return l?String(l.num):'~'; } return String(e[tri.col]||'').toLowerCase(); }
+/* ===== TABLEAU ===== */
+function valTri(e){ if(tri.col==='lot'){ const l=lotDe(ongletActif,e.lotId); return l?String(l.num):'~'; } if(tri.col==='note') return String(noteMoyenne(e)); return String(e[tri.col]||'').toLowerCase(); }
 function trier(col){ if(tri.col===col) tri.dir*=-1; else { tri.col=col; tri.dir=1; } rendre(); }
 function rendreTableau(liste){
-  const zone=document.getElementById('contenu');
+  const zone=document.getElementById('contenu'), st=(ongletActif==='soustraitants');
   if(!liste.length){ zone.innerHTML=videHtml(); return; }
-  liste.sort((a,b)=>{ const va=valTri(a), vb=valTri(b); if(!va&&vb) return 1; if(va&&!vb) return -1; return va.localeCompare(vb,'fr',{numeric:true})*tri.dir; });
+  liste.sort((a,b)=>{ if(tri.col==='note'){ return (noteMoyenne(a)-noteMoyenne(b))*tri.dir; } const va=valTri(a),vb=valTri(b); if(!va&&vb) return 1; if(va&&!vb) return -1; return va.localeCompare(vb,'fr',{numeric:true})*tri.dir; });
   const fleche=col=>tri.col===col?(tri.dir>0?'▲':'▼'):'⇅';
   const th=(col,l)=>`<th class="${tri.col===col?'tri':''}" onclick="trier('${col}')">${l}<span class="fl">${fleche(col)}</span></th>`;
-  const lignes=liste.map(e=>{ const lot=lots[e.lotId], a=avatar(e.raisonSociale);
+  const lignes=liste.map(e=>{ const lot=lotDe(ongletActif,e.lotId), a=avatar(e.raisonSociale);
     return `<tr id="ligne-${e.id}">
       <td><div class="tbl-nom"><div class="tbl-av" style="background:${a.coul}">${esc(a.init)}</div>${esc(e.raisonSociale)}</div></td>
       <td>${lot?`<span class="lot-num">${esc(lot.num)}</span> ${esc(lot.libelle)}`:'<span class="mut">—</span>'}</td>
@@ -500,15 +566,20 @@ function rendreTableau(liste){
       <td>${e.tel?`<a class="info" href="tel:${esc(e.tel)}"><span class="tbl-mono">${esc(e.tel)}</span></a>`:'<span class="mut">—</span>'}</td>
       <td>${e.email?`<a class="info" href="mailto:${esc(e.email)}">${esc(e.email)}</a>`:'<span class="mut">—</span>'}</td>
       <td>${e.siret?`<span class="tbl-mono">${esc(e.siret)}</span>`:'<span class="mut">—</span>'}</td>
-      <td><div class="tbl-actions"><button class="ico-btn" title="Fiche PDF" onclick="ouvrirFichePDF('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button><button class="ico-btn" onclick='ouvrirFiche(${JSON.stringify({id:e.id})})'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+      ${st?`<td>${noteMoyenne(e)?etoiles(Math.round(noteMoyenne(e)))+' <span class="tbl-mono">'+noteMoyenne(e).toFixed(1)+'</span>'+(nbChantiers(e)?' <span class="mut">('+nbChantiers(e)+')</span>':''):'<span class="mut">—</span>'}</td>`:''}
+      <td><div class="tbl-actions"><button class="ico-btn" title="Fiche PDF" onclick="ouvrirFichePDF('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
+        <button class="ico-btn" onclick='ouvrirFiche(${JSON.stringify({id:e.id})})'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         <button class="ico-btn suppr" onclick="supprimer('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div></td></tr>`;
   }).join('');
   zone.innerHTML=`<div class="tableau-wrap"><table class="tbl"><thead><tr>
-    ${th('raisonSociale','Raison sociale')}${th('lot','Lot')}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${th('siret','SIRET')}<th></th>
+    ${th('raisonSociale','Raison sociale')}${th('lot','Lot')}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${th('siret','SIRET')}${st?th('note','Note'):''}<th></th>
   </tr></thead><tbody>${lignes}</tbody></table></div>`;
 }
 
 /* ===== CRUD ===== */
+function majTypeFiche(){ const t=document.getElementById('f-type').value;
+  document.getElementById('champ-chantiers').style.display=(t==='soustraitants')?'':'none';
+  remplirSelectLotsForm(t); rendreIvNote(); rendreInterventionsForm(); }
 function ouvrirFiche(arg){
   const modif=arg&&arg.id;
   let e={type:ongletActif, lotId:document.getElementById('filtre-lot').value!=='tous'?document.getElementById('filtre-lot').value:''};
@@ -518,7 +589,9 @@ function ouvrirFiche(arg){
   document.getElementById('f-raison').value=e.raisonSociale||''; document.getElementById('f-contact').value=e.contact||'';
   document.getElementById('f-tel').value=e.tel||''; document.getElementById('f-email').value=e.email||'';
   document.getElementById('f-adresse').value=e.adresse||''; document.getElementById('f-siret').value=e.siret||''; document.getElementById('f-notes').value=e.notes||'';
-  remplirSelectLots(e.lotId); document.getElementById('overlay-fiche').classList.add('ouvert');
+  interventionsForm = e.interventions ? Object.entries(e.interventions).map(([id,i])=>({id,...i})) : [];
+  majTypeFiche(); document.getElementById('f-lot').value=e.lotId||'';
+  document.getElementById('overlay-fiche').classList.add('ouvert');
 }
 function enregistrerFiche(){
   if(!db){ alert('Firebase non connecté. Complète la config en haut du fichier.'); return; }
@@ -527,6 +600,12 @@ function enregistrerFiche(){
   const fiche={ raisonSociale:raison, lotId:document.getElementById('f-lot').value, contact:document.getElementById('f-contact').value.trim(),
     tel:document.getElementById('f-tel').value.trim(), email:document.getElementById('f-email').value.trim(),
     adresse:document.getElementById('f-adresse').value.trim(), siret:document.getElementById('f-siret').value.trim(), notes:document.getElementById('f-notes').value.trim() };
+  if(typeCible==='soustraitants'){
+    const obj={}; interventionsForm.forEach(i=>{ const k=i.id||('iv'+Math.random().toString(36).slice(2,9)); obj[k]={chantier:i.chantier||'',date:i.date||'',commentaire:i.commentaire||'',note:Number(i.note)||0}; });
+    fiche.interventions=obj;
+    const ns=interventionsForm.map(i=>Number(i.note)||0).filter(n=>n>0);
+    fiche.note=ns.length?+(ns.reduce((a,b)=>a+b,0)/ns.length).toFixed(2):0;
+  } else { fiche.interventions=null; fiche.note=0; }
   if(id){ if(typeCible!==ongletActif){ db.ref(ongletActif+'/'+id).remove(); db.ref(typeCible).push(fiche); } else db.ref(ongletActif+'/'+id).update(fiche); }
   else db.ref(typeCible).push(fiche);
   fermer('overlay-fiche');
@@ -534,30 +613,36 @@ function enregistrerFiche(){
 function supprimer(id){ if(confirm('Supprimer cette entreprise ?')) db.ref(ongletActif+'/'+id).remove(); }
 
 /* ===== LOTS ===== */
-function remplirSelectLots(sel){
+function remplirFiltreLot(){
+  const opt=l=>`<option value="${l.id}">${esc(l.num)} – ${esc(l.libelle)}</option>`, sel=document.getElementById('filtre-lot');
+  const cur=sel.value; sel.innerHTML='<option value="tous">Tous les lots</option>'+lotsTries(ongletActif).map(opt).join('');
+  sel.value=[...sel.options].some(o=>o.value===cur)?cur:'tous';
+}
+function remplirSelectLotsForm(type,sel){
   const opt=l=>`<option value="${l.id}">${esc(l.num)} – ${esc(l.libelle)}</option>`;
-  document.getElementById('f-lot').innerHTML='<option value="">— Aucun —</option>'+lotsTries().map(opt).join('');
+  document.getElementById('f-lot').innerHTML='<option value="">— Aucun —</option>'+lotsTries(type).map(opt).join('');
   if(sel!==undefined) document.getElementById('f-lot').value=sel||'';
-  document.getElementById('filtre-lot').innerHTML='<option value="tous">Tous les lots</option>'+lotsTries().map(opt).join('');
 }
 function ouvrirLots(){
-  document.getElementById('liste-lots').innerHTML=lotsTries().map(l=>`<div class="ligne-lot"><span class="mono">${esc(l.num)}</span><span style="flex:1">${esc(l.libelle)}</span>
+  document.getElementById('lots-modal-titre').textContent='Gérer les lots — '+(ongletActif==='fournisseurs'?'Fournisseurs':'Sous-traitants');
+  document.getElementById('liste-lots').innerHTML=lotsTries(ongletActif).map(l=>`<div class="ligne-lot"><span class="mono">${esc(l.num)}</span><span style="flex:1">${esc(l.libelle)}</span>
     <button class="ico-btn" onclick="renommerLot('${l.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
     <button class="ico-btn suppr" onclick="supprimerLot('${l.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div>`).join('');
   document.getElementById('overlay-lots').classList.add('ouvert');
 }
-function ajouterLot(){ if(!db) return; const num=document.getElementById('lot-num').value.trim()||'—', lib=document.getElementById('lot-lib').value.trim(); if(!lib) return;
-  db.ref('lots').push({num,libelle:lib}); document.getElementById('lot-num').value=''; document.getElementById('lot-lib').value=''; setTimeout(ouvrirLots,200); }
-function renommerLot(id){ const l=lots[id]; const num=prompt('Numéro du lot :',l.num); if(num===null) return; const lib=prompt('Libellé du lot :',l.libelle); if(lib===null) return;
-  db.ref('lots/'+id).update({num:num.trim()||'—',libelle:lib.trim()}); setTimeout(ouvrirLots,200); }
+function ajouterLot(){ if(!db){ alert('Connecte Firebase pour gérer les lots.'); return; } const num=document.getElementById('lot-num').value.trim()||'—', lib=document.getElementById('lot-lib').value.trim(); if(!lib) return;
+  db.ref('lots/'+ongletActif).push({num,libelle:lib}); document.getElementById('lot-num').value=''; document.getElementById('lot-lib').value=''; setTimeout(ouvrirLots,200); }
+function renommerLot(id){ const l=lots[ongletActif][id]; const num=prompt('Numéro du lot :',l.num); if(num===null) return; const lib=prompt('Libellé du lot :',l.libelle); if(lib===null) return;
+  db.ref('lots/'+ongletActif+'/'+id).update({num:num.trim()||'—',libelle:lib.trim()}); setTimeout(ouvrirLots,200); }
 function supprimerLot(id){ if(!confirm('Supprimer ce lot ? Les entreprises rattachées resteront sans lot.')) return;
-  db.ref('lots/'+id).remove(); ['fournisseurs','soustraitants'].forEach(n=>Object.entries(entreprises[n]).forEach(([k,e])=>{ if(e.lotId===id) db.ref(n+'/'+k+'/lotId').set(''); })); setTimeout(ouvrirLots,200); }
+  db.ref('lots/'+ongletActif+'/'+id).remove(); Object.entries(entreprises[ongletActif]).forEach(([k,e])=>{ if(e.lotId===id) db.ref(ongletActif+'/'+k+'/lotId').set(''); }); setTimeout(ouvrirLots,200); }
 
 /* ===== EXPORT ===== */
 function exporterCSV(){
-  const source=entreprises[ongletActif]||{}, echap=v=>`"${String(v||'').replace(/"/g,'""')}"`;
-  const entete=['Lot','Raison sociale','Contact','Téléphone','Email','Adresse','SIRET','Notes'];
-  const lignes=Object.values(source).map(e=>{ const lot=lots[e.lotId]; return [lot?`${lot.num} – ${lot.libelle}`:'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.adresse,e.siret,e.notes].map(echap).join(';'); });
+  const source=entreprises[ongletActif]||{}, st=(ongletActif==='soustraitants'), echap=v=>`"${String(v||'').replace(/"/g,'""')}"`;
+  const entete=['Lot','Raison sociale','Contact','Téléphone','Email','Adresse','SIRET',...(st?['Note moy /5','Nb chantiers']:[]),'Notes'];
+  const lignes=Object.values(source).map(e=>{ const lot=lotDe(ongletActif,e.lotId);
+    return [lot?`${lot.num} – ${lot.libelle}`:'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.adresse,e.siret,...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e)]:[]),e.notes].map(echap).join(';'); });
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+[entete.join(';'),...lignes].join('\n')],{type:'text/csv;charset=utf-8;'})); a.download=`${ongletActif}-lab.csv`; a.click();
 }
 
@@ -566,10 +651,9 @@ function toutesLesEntreprises(){ const r=[]; ['fournisseurs','soustraitants'].fo
 function rechercheGlobale(){
   const q=document.getElementById('recherche-globale').value.trim().toLowerCase(), dd=document.getElementById('dropdown-globale');
   if(!q){ dd.classList.remove('ouvert'); return; }
-  const res=toutesLesEntreprises().filter(e=>{ const lot=lots[e.lotId]; return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,lot&&lot.libelle].filter(Boolean).join(' ').toLowerCase().includes(q); }).slice(0,8);
-  dd.innerHTML=res.length?res.map(e=>{ const lot=lots[e.lotId], t=e.type==='fournisseurs'?'Fournisseur':'Sous-traitant', a=avatar(e.raisonSociale);
-    return `<div class="dd-item" onclick="allerVers('${e.type}','${e.id}')"><div class="av" style="background:${a.coul};height:30px;width:30px;border-radius:50%;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${esc(a.init)}</div><div><div class="dd-nom">${esc(e.raisonSociale)}</div><div class="dd-meta">${t}${lot?' · Lot '+esc(lot.num)+' '+esc(lot.libelle):''}</div></div></div>`; }).join('')
-    :'<div class="dd-vide">Aucun résultat</div>';
+  const res=toutesLesEntreprises().filter(e=>{ const lot=lotDe(e.type,e.lotId); return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,lot&&lot.libelle].filter(Boolean).join(' ').toLowerCase().includes(q); }).slice(0,8);
+  dd.innerHTML=res.length?res.map(e=>{ const lot=lotDe(e.type,e.lotId), t=e.type==='fournisseurs'?'Fournisseur':'Sous-traitant', a=avatar(e.raisonSociale);
+    return `<div class="dd-item" onclick="allerVers('${e.type}','${e.id}')"><div style="background:${a.coul};height:30px;width:30px;border-radius:50%;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${esc(a.init)}</div><div><div class="dd-nom">${esc(e.raisonSociale)}</div><div class="dd-meta">${t}${lot?' · Lot '+esc(lot.num)+' '+esc(lot.libelle):''}</div></div></div>`; }).join('') : '<div class="dd-vide">Aucun résultat</div>';
   dd.classList.add('ouvert');
 }
 function allerVers(type,id){
@@ -580,57 +664,16 @@ function allerVers(type,id){
 }
 document.addEventListener('click',e=>{ if(!e.target.closest('.rg')) document.getElementById('dropdown-globale').classList.remove('ouvert'); });
 
-/* ===== ASSISTANT IA ===== */
-function basculerIA(){
-  const p=document.getElementById('ia-panneau'), b=document.getElementById('ia-bulle');
-  const ouvert=p.classList.toggle('ouvert'); b.style.display=ouvert?'none':'flex';
-  if(ouvert && !document.getElementById('ia-msgs').dataset.init){ msgBot(accueilIA()); document.getElementById('ia-msgs').dataset.init='1'; document.getElementById('ia-input').focus(); }
-  if(IA_CONFIG.cleApi) document.getElementById('ia-mode').textContent='IA Claude connectée';
-}
-function accueilIA(){ return { texte:"Bonjour Samy 👋 Je cherche dans ta base fournisseurs et sous-traitants. Pose ta question :", exemples:["Un plombier sur Orgeval","Sous-traitants peinture avec email","Fournisseurs gros œuvre","Électricien joignable par tél"] }; }
-function msgMoi(t){ const d=document.createElement('div'); d.className='msg moi'; d.textContent=t; ajoutMsg(d); }
-function msgBot(o){
-  const d=document.createElement('div'); d.className='msg bot'; d.innerHTML=esc(o.texte).replace(/\n/g,'<br>');
-  if(o.exemples){ const w=document.createElement('div'); w.className='exemples'; o.exemples.forEach(x=>{ const b=document.createElement('button'); b.className='ex'; b.textContent=x; b.onclick=()=>{ document.getElementById('ia-input').value=x; envoyerIA(); }; w.appendChild(b); }); d.appendChild(w); }
-  if(o.resultats) o.resultats.forEach(e=>{ const lot=lots[e.lotId], t=e.type==='fournisseurs'?'Fournisseur':'Sous-traitant', a=avatar(e.raisonSociale);
-    const r=document.createElement('div'); r.className='res-mini'; r.onclick=()=>allerVers(e.type,e.id);
-    r.innerHTML=`<div class="av" style="background:${a.coul}">${esc(a.init)}</div><div><div class="nom">${esc(e.raisonSociale)}</div><div class="meta">${t}${lot?' · Lot '+esc(lot.num):''}${e.tel?' · '+esc(e.tel):''}</div></div>`; d.appendChild(r); });
-  ajoutMsg(d);
-}
-function ajoutMsg(el){ const z=document.getElementById('ia-msgs'); z.appendChild(el); z.scrollTop=z.scrollHeight; }
-async function envoyerIA(){ const input=document.getElementById('ia-input'), q=input.value.trim(); if(!q) return; msgMoi(q); input.value=''; if(IA_CONFIG.cleApi){ msgBot(await appelClaude(q)); } else msgBot(rechercheLocale(q)); }
-function norm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
-const SYN_LOTS={'plombier':'plomberie','plomberie':'plomberie','cvc':'plomberie','chauffage':'plomberie','sanitaire':'plomberie','electricien':'electricite','electricite':'electricite','electrique':'electricite','courant':'electricite','peintre':'peinture','peinture':'peinture','macon':'maconnerie','maconnerie':'maconnerie','gros oeuvre':'gros','beton':'gros','menuisier':'menuiseries','menuiserie':'menuiseries','carreleur':'carrelage','carrelage':'carrelage','serrurier':'serrurerie','serrurerie':'serrurerie','metallerie':'metallerie','couvreur':'couverture','couverture':'couverture','etancheite':'etancheite','toiture':'couverture','terrassement':'terrassement','vrd':'vrd','charpente':'charpente','ascenseur':'ascenseurs','platrier':'platrerie','platrerie':'platrerie','cloison':'cloisons','paysagiste':'espaces','jardin':'espaces'};
-function rechercheLocale(q){
-  const n=norm(q), tokens=n.split(/[^a-z0-9]+/).filter(t=>t.length>2);
-  let typeVoulu=null; if(/fournisseur/.test(n)) typeVoulu='fournisseurs'; if(/sous.?trait|traitant/.test(n)) typeVoulu='soustraitants';
-  const besoinEmail=/(e-?mail|mail|courriel)/.test(n), besoinTel=/(tel|telephone|numero|joindre|appeler|joignable)/.test(n), besoinSiret=/siret/.test(n);
-  let motsLot=[]; Object.keys(SYN_LOTS).forEach(k=>{ if(n.includes(k)) motsLot.push(SYN_LOTS[k]); });
-  lotsTries().forEach(l=>{ norm(l.libelle).split(/[^a-z]+/).filter(w=>w.length>3).forEach(w=>{ if(n.includes(w)) motsLot.push(w); }); });
-  let base=toutesLesEntreprises(); if(typeVoulu) base=base.filter(e=>e.type===typeVoulu);
-  if(besoinEmail) base=base.filter(e=>e.email); if(besoinTel) base=base.filter(e=>e.tel); if(besoinSiret) base=base.filter(e=>e.siret);
-  const resultats=base.map(e=>{ const lot=lots[e.lotId], txt=norm([e.raisonSociale,e.contact,e.adresse,e.notes,e.email,lot&&lot.libelle].filter(Boolean).join(' '));
-    let score=0; if(motsLot.length&&lot&&motsLot.some(m=>norm(lot.libelle).includes(m))) score+=5; tokens.forEach(t=>{ if(txt.includes(t)) score+=1; }); return {e,score};
-  }).filter(x=>x.score>0||(typeVoulu&&!tokens.length&&!motsLot.length)).sort((a,b)=>b.score-a.score).slice(0,6).map(x=>x.e);
-  if(!resultats.length) return { texte:"Je n'ai rien trouvé. Essaie un métier (plomberie, peinture…), une ville, ou « avec email ».", exemples:["Fournisseurs peinture","Sous-traitants avec téléphone"] };
-  const c=[]; if(typeVoulu) c.push(typeVoulu==='fournisseurs'?'fournisseur(s)':'sous-traitant(s)'); if(besoinEmail) c.push('avec email'); if(besoinTel) c.push('joignable(s)');
-  return { texte:`J'ai trouvé ${resultats.length} résultat${resultats.length>1?'s':''}${c.length?' ('+c.join(', ')+')':''}. Clique pour ouvrir la fiche :`, resultats };
-}
-async function appelClaude(q){
-  const contexte=toutesLesEntreprises().map(e=>{ const lot=lots[e.lotId]; return `${e.type==='fournisseurs'?'FOURNISSEUR':'SOUS-TRAITANT'} | ${e.raisonSociale} | Lot: ${lot?lot.libelle:'—'} | Contact: ${e.contact||'—'} | Tel: ${e.tel||'—'} | Email: ${e.email||'—'} | Adresse: ${e.adresse||'—'}`; }).join('\n');
-  try { const r=await fetch('https://api.anthropic.com/v1/messages',{ method:'POST', headers:{'Content-Type':'application/json','x-api-key':IA_CONFIG.cleApi,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({ model:IA_CONFIG.modele, max_tokens:600, system:"Tu es l'assistant de recherche du CRM achats de l'entreprise BTP LAB. Réponds en français, brièvement, en t'appuyant UNIQUEMENT sur la liste fournie.", messages:[{role:'user',content:`Base :\n${contexte}\n\nQuestion : ${q}`}] }) });
-    const d=await r.json(); const txt=(d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n'); return { texte: txt || "Réponse indisponible." };
-  } catch(err){ console.warn(err); return rechercheLocale(q); }
-}
-
 /* ===== FICHE PDF ===== */
 function ouvrirFichePDF(id){
   const type=ongletActif, e=entreprises[type][id]; if(!e) return;
-  const lot=lots[e.lotId], a=avatar(e.raisonSociale);
-  const typeLabel=type==='fournisseurs'?'FICHE FOURNISSEUR':'FICHE SOUS-TRAITANT';
+  const lot=lotDe(type,e.lotId), a=avatar(e.raisonSociale), st=(type==='soustraitants');
+  const typeLabel=st?'FICHE SOUS-TRAITANT':'FICHE FOURNISSEUR';
   const d=new Date(), dateStr=`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
   const ligne=(lab,val,mono)=> val?`<div class="f-ligne"><div class="lab">${lab}</div><div class="val ${mono?'mono':''}">${esc(val)}</div></div>`:'';
+  const moy=noteMoyenne(e), arr=interventionsArr(e);
+  const ligneNote = st?`<div class="f-ligne"><div class="lab">Note moyenne</div><div class="val">${etoiles(Math.round(moy))} <span style="color:#6b7280;font-size:13px">${moy?moy.toFixed(1)+'/5 sur '+arr.length+' chantier'+(arr.length>1?'s':''):'Non noté'}</span></div></div>`:'';
+  const histoHtml = (st && arr.length)?`<div class="f-notes-bloc"><div class="lab">Historique des chantiers (${arr.length})</div><div class="f-grille">${arr.map(i=>`<div class="f-ligne"><div class="lab" style="width:auto;flex:1;background:#fff;text-transform:none;color:#1f2937;font-weight:600">${esc(i.chantier)}${i.date?' <span style=\"color:#9ca3af;font-weight:400\">· '+esc(i.date)+'</span>':''}${i.commentaire?'<div style=\"font-weight:400;color:#6b7280;font-size:12px;margin-top:3px\">'+esc(i.commentaire)+'</div>':''}</div><div class="val" style="white-space:nowrap">${etoiles(i.note)}</div></div>`).join('')}</div></div>`:'';
   document.getElementById('pdf-contenu').innerHTML=`
     <div class="feuille">
       <div class="f-entete">
@@ -644,17 +687,68 @@ function ouvrirFichePDF(id){
       </div>
       <div class="f-grille">
         ${ligne('Contact référent',e.contact)}
+        ${ligneNote}
         ${ligne('Téléphone',e.tel,true)}
         ${ligne('Email',e.email)}
         ${ligne('Adresse',e.adresse)}
         ${ligne('SIRET',e.siret,true)}
       </div>
+      ${histoHtml}
       ${e.notes?`<div class="f-notes-bloc"><div class="lab">Notes</div><div class="txt">${esc(e.notes)}</div></div>`:''}
       <div class="f-pied"><span>Document interne — Les Artisans Bâtisseurs · Orgeval (78)</span><span>Édité le ${dateStr}</span></div>
     </div>`;
   document.getElementById('overlay-pdf').classList.add('ouvert');
 }
 function imprimerFiche(){ window.print(); }
+
+/* ===== ASSISTANT IA ===== */
+function basculerIA(){
+  const p=document.getElementById('ia-panneau'), b=document.getElementById('ia-bulle');
+  const ouvert=p.classList.toggle('ouvert'); b.style.display=ouvert?'none':'flex';
+  if(ouvert && !document.getElementById('ia-msgs').dataset.init){ msgBot(accueilIA()); document.getElementById('ia-msgs').dataset.init='1'; document.getElementById('ia-input').focus(); }
+  if(IA_CONFIG.cleApi) document.getElementById('ia-mode').textContent='IA Claude connectée';
+}
+function accueilIA(){ return { texte:"Bonjour Samy 👋 Je cherche dans ta base fournisseurs et sous-traitants. Pose ta question :", exemples:["Un plombier sur Orgeval","Sous-traitants peinture avec email","Fournisseurs matériel électrique","Sous-traitant le mieux noté"] }; }
+function msgMoi(t){ const d=document.createElement('div'); d.className='msg moi'; d.textContent=t; ajoutMsg(d); }
+function msgBot(o){
+  const d=document.createElement('div'); d.className='msg bot'; d.innerHTML=esc(o.texte).replace(/\n/g,'<br>');
+  if(o.exemples){ const w=document.createElement('div'); w.className='exemples'; o.exemples.forEach(x=>{ const b=document.createElement('button'); b.className='ex'; b.textContent=x; b.onclick=()=>{ document.getElementById('ia-input').value=x; envoyerIA(); }; w.appendChild(b); }); d.appendChild(w); }
+  if(o.resultats) o.resultats.forEach(e=>{ const lot=lotDe(e.type,e.lotId), t=e.type==='fournisseurs'?'Fournisseur':'Sous-traitant', a=avatar(e.raisonSociale);
+    const r=document.createElement('div'); r.className='res-mini'; r.onclick=()=>allerVers(e.type,e.id);
+    const noteStr=(e.type==='soustraitants'&&noteMoyenne(e))?' · '+noteMoyenne(e).toFixed(1)+'/5 ★':'';
+    r.innerHTML=`<div class="av" style="background:${a.coul}">${esc(a.init)}</div><div><div class="nom">${esc(e.raisonSociale)}</div><div class="meta">${t}${lot?' · Lot '+esc(lot.num):''}${noteStr}${e.tel?' · '+esc(e.tel):''}</div></div>`; d.appendChild(r); });
+  ajoutMsg(d);
+}
+function ajoutMsg(el){ const z=document.getElementById('ia-msgs'); z.appendChild(el); z.scrollTop=z.scrollHeight; }
+async function envoyerIA(){ const input=document.getElementById('ia-input'), q=input.value.trim(); if(!q) return; msgMoi(q); input.value=''; if(IA_CONFIG.cleApi){ msgBot(await appelClaude(q)); } else msgBot(rechercheLocale(q)); }
+function norm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+const SYN_LOTS={'plombier':'plomberie','plomberie':'plomberie','cvc':'cvc','chauffage':'chauffage','sanitaire':'sanitaire','electricien':'electricite','electricite':'electricite','electrique':'electricite','peintre':'peinture','peinture':'peinture','macon':'maconnerie','maconnerie':'maconnerie','gros oeuvre':'gros','beton':'beton','ciment':'ciment','menuisier':'menuiseries','menuiserie':'menuiseries','carreleur':'carrelage','carrelage':'carrelage','serrurier':'serrurerie','serrurerie':'serrurerie','metallerie':'metallerie','couvreur':'couverture','couverture':'couverture','etancheite':'etancheite','toiture':'couverture','terrassement':'terrassement','vrd':'vrd','charpente':'charpente','ascenseur':'ascenseurs','platrier':'platre','platrerie':'platre','placo':'placo','cloison':'cloisons','isolation':'isolation','quincaillerie':'quincaillerie','outillage':'outillage','epi':'epi','location':'location','paysagiste':'espaces','jardin':'espaces'};
+function rechercheLocale(q){
+  const n=norm(q), tokens=n.split(/[^a-z0-9]+/).filter(t=>t.length>2);
+  let typeVoulu=null; if(/fournisseur/.test(n)) typeVoulu='fournisseurs'; if(/sous.?trait|traitant/.test(n)) typeVoulu='soustraitants';
+  const besoinEmail=/(e-?mail|mail|courriel)/.test(n), besoinTel=/(tel|telephone|numero|joindre|appeler|joignable)/.test(n), besoinSiret=/siret/.test(n);
+  const triNote=/(mieux note|meilleur|meilleure note|bien note|top note|plus haute note)/.test(n);
+  let motsLot=[]; Object.keys(SYN_LOTS).forEach(k=>{ if(n.includes(k)) motsLot.push(SYN_LOTS[k]); });
+  [...lotsTries('fournisseurs'),...lotsTries('soustraitants')].forEach(l=>{ norm(l.libelle).split(/[^a-z]+/).filter(w=>w.length>3).forEach(w=>{ if(n.includes(w)) motsLot.push(w); }); });
+  let base=toutesLesEntreprises(); if(typeVoulu) base=base.filter(e=>e.type===typeVoulu);
+  if(besoinEmail) base=base.filter(e=>e.email); if(besoinTel) base=base.filter(e=>e.tel); if(besoinSiret) base=base.filter(e=>e.siret);
+  let scored=base.map(e=>{ const lot=lotDe(e.type,e.lotId), txt=norm([e.raisonSociale,e.contact,e.adresse,e.notes,e.email,lot&&lot.libelle].filter(Boolean).join(' '));
+    let score=0; if(motsLot.length&&lot&&motsLot.some(m=>norm(lot.libelle).includes(m))) score+=5; tokens.forEach(t=>{ if(txt.includes(t)) score+=1; }); return {e,score};
+  }).filter(x=>x.score>0||(typeVoulu&&!tokens.length&&!motsLot.length)||(triNote&&x.e.type==='soustraitants'));
+  if(triNote) scored=scored.filter(x=>x.e.type==='soustraitants').sort((a,b)=>noteMoyenne(b.e)-noteMoyenne(a.e));
+  else scored=scored.sort((a,b)=>b.score-a.score);
+  const resultats=scored.slice(0,6).map(x=>x.e);
+  if(!resultats.length) return { texte:"Je n'ai rien trouvé. Essaie un métier (plomberie, peinture…), une ville, « avec email », ou « le mieux noté ».", exemples:["Fournisseurs peinture","Sous-traitants avec téléphone"] };
+  const c=[]; if(typeVoulu) c.push(typeVoulu==='fournisseurs'?'fournisseur(s)':'sous-traitant(s)'); if(triNote) c.push('classés par note'); if(besoinEmail) c.push('avec email'); if(besoinTel) c.push('joignable(s)');
+  return { texte:`J'ai trouvé ${resultats.length} résultat${resultats.length>1?'s':''}${c.length?' ('+c.join(', ')+')':''}. Clique pour ouvrir la fiche :`, resultats };
+}
+async function appelClaude(q){
+  const contexte=toutesLesEntreprises().map(e=>{ const lot=lotDe(e.type,e.lotId); return `${e.type==='fournisseurs'?'FOURNISSEUR':'SOUS-TRAITANT'} | ${e.raisonSociale} | Lot: ${lot?lot.libelle:'—'}${e.type==='soustraitants'?' | Note moy: '+noteMoyenne(e).toFixed(1)+'/5 sur '+nbChantiers(e)+' chantiers':''} | Contact: ${e.contact||'—'} | Tel: ${e.tel||'—'} | Email: ${e.email||'—'} | Adresse: ${e.adresse||'—'}`; }).join('\n');
+  try { const r=await fetch('https://api.anthropic.com/v1/messages',{ method:'POST', headers:{'Content-Type':'application/json','x-api-key':IA_CONFIG.cleApi,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({ model:IA_CONFIG.modele, max_tokens:600, system:"Tu es l'assistant de recherche de la base achats & commercial de l'entreprise BTP LAB. Réponds en français, brièvement, en t'appuyant UNIQUEMENT sur la liste fournie.", messages:[{role:'user',content:`Base :\n${contexte}\n\nQuestion : ${q}`}] }) });
+    const d=await r.json(); const txt=(d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n'); return { texte: txt || "Réponse indisponible." };
+  } catch(err){ console.warn(err); return rechercheLocale(q); }
+}
 
 /* ===== utils ===== */
 function fermer(id){ document.getElementById(id).classList.remove('ouvert'); }
