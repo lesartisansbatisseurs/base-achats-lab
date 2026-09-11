@@ -1,906 +1,665 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Base Achats &amp; Commercial — LAB</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23787372'/%3E%3Ctext x='32' y='42' font-size='30' text-anchor='middle' fill='%231D9ED9' font-family='Arial' font-weight='bold'%3EA%3C/text%3E%3C/svg%3E">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Base Achats & Commercial — Fournisseurs & Sous-traitants · LAB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --taupe:#787372;
-    --taupe-dark:#5f5b5a;
-    --cyan:#1D9ED9;
-    --cyan-dark:#157bab;
-    --bg:#f4f3f2;
-    --panel:#ffffff;
-    --border:#e3e0df;
-    --text:#2b2928;
-    --text-muted:#736f6e;
-    --danger:#d9483a;
-    --success:#2fa86a;
-    --radius:10px;
-    --shadow:0 2px 10px rgba(0,0,0,.06);
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --sidebar:#1b2430; --sidebar-2:#222d3b; --sidebar-txt:#9aa7b6; --sidebar-actif:#2b82d9;
+    --accent:#2b82d9; --accent-fonce:#2266b3;
+    --main:#f4f5f7; --card:#ffffff; --bord:#e6e8ec;
+    --ink:#1f2937; --gris:#6b7280; --gris-clair:#9ca3af;
+    --hero-1:#202b3a; --hero-2:#18212d; --hero-accent:#4a9fe0;
+    --ambre:#b45309; --ambre-clair:#fef3e2; --bleu-clair:#eaf2fb;
+    --mono:'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
   }
-  [data-theme="dark"]{
-    --bg:#1c1b1a;
-    --panel:#262423;
-    --border:#3a3735;
-    --text:#f1efee;
-    --text-muted:#a8a3a1;
-    --shadow:0 2px 14px rgba(0,0,0,.4);
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    transition:background .2s,color .2s;
-  }
-  a{color:inherit;}
-  header{
-    background:var(--taupe);
-    color:#fff;
-    padding:14px 22px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    flex-wrap:wrap;
-    gap:10px;
-    position:sticky;
-    top:0;
-    z-index:50;
-    box-shadow:var(--shadow);
-  }
-  header .brand{
-    display:flex;
-    align-items:center;
-    gap:12px;
-  }
-  header .brand .logo{
-    width:36px;height:36px;border-radius:8px;
-    background:var(--cyan);
-    display:flex;align-items:center;justify-content:center;
-    font-weight:bold;font-size:18px;
-  }
-  header h1{
-    font-size:17px;
-    margin:0;
-    font-weight:600;
-    line-height:1.2;
-  }
-  header .subtitle{
-    font-size:11.5px;
-    opacity:.85;
-    margin:0;
-  }
-  header .actions{
-    display:flex;
-    gap:8px;
-    align-items:center;
-    flex-wrap:wrap;
-  }
-  .icon-btn{
-    background:rgba(255,255,255,.12);
-    border:1px solid rgba(255,255,255,.25);
-    color:#fff;
-    width:36px;height:36px;
-    border-radius:8px;
-    cursor:pointer;
-    display:flex;align-items:center;justify-content:center;
-    font-size:16px;
-  }
-  .icon-btn:hover{background:rgba(255,255,255,.22);}
-  .btn{
-    border:none;
-    border-radius:8px;
-    padding:9px 16px;
-    font-size:13.5px;
-    font-weight:600;
-    cursor:pointer;
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-  }
-  .btn-primary{background:var(--cyan);color:#fff;}
-  .btn-primary:hover{background:var(--cyan-dark);}
-  .btn-ghost{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);}
-  .btn-ghost:hover{background:rgba(255,255,255,.22);}
-  .btn-secondary{background:var(--panel);color:var(--text);border:1px solid var(--border);}
-  .btn-secondary:hover{border-color:var(--cyan);}
-  .btn-danger{background:var(--danger);color:#fff;}
-  .btn-danger:hover{opacity:.9;}
-  .btn-sm{padding:6px 10px;font-size:12px;border-radius:6px;}
+  body { font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; color:var(--ink); background:var(--main); }
+  .app { display:flex; min-height:100vh; }
 
-  .layout{
-    display:flex;
-    max-width:1400px;
-    margin:0 auto;
-    align-items:flex-start;
-  }
-  aside{
-    width:230px;
-    flex-shrink:0;
-    padding:20px 14px;
-    position:sticky;
-    top:70px;
-    max-height:calc(100vh - 90px);
-    overflow-y:auto;
-  }
-  aside h3{
-    font-size:11px;
-    text-transform:uppercase;
-    letter-spacing:.06em;
-    color:var(--text-muted);
-    margin:18px 8px 8px;
-  }
-  aside h3:first-child{margin-top:0;}
-  .lot-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:8px 10px;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:13.5px;
-    margin-bottom:2px;
-  }
-  .lot-item:hover{background:var(--panel);}
-  .lot-item.active{background:var(--cyan);color:#fff;}
-  .lot-item .count{
-    font-size:11px;
-    background:rgba(120,115,114,.15);
-    border-radius:20px;
-    padding:1px 7px;
-  }
-  .lot-item.active .count{background:rgba(255,255,255,.25);}
+  /* ===== SIDEBAR ===== */
+  .sidebar { width:232px; background:var(--sidebar); color:var(--sidebar-txt); display:flex; flex-direction:column; position:fixed; top:0; bottom:0; left:0; }
+  .sb-logo { display:flex; align-items:center; gap:11px; padding:20px 20px 22px; }
+  .sb-logo .mark { height:38px; width:38px; flex-shrink:0; }
+  .sb-logo .t1 { color:#fff; font-weight:700; font-size:15px; line-height:1.15; letter-spacing:-.01em; }
+  .sb-logo .t2 { font-size:10px; letter-spacing:.14em; color:var(--sidebar-txt); margin-top:2px; }
+  .sb-section { font-size:10px; letter-spacing:.13em; color:#5c6b7d; padding:14px 22px 7px; text-transform:uppercase; }
+  .sb-nav { flex:1; overflow-y:auto; }
+  .sb-item { display:flex; align-items:center; gap:12px; margin:2px 12px; padding:10px 12px; border-radius:9px; cursor:pointer; font-size:14px; font-weight:500; color:var(--sidebar-txt); }
+  .sb-item:hover { background:var(--sidebar-2); color:#dfe6ee; }
+  .sb-item.actif { background:var(--sidebar-actif); color:#fff; box-shadow:0 4px 12px rgba(43,130,217,.35); }
+  .sb-item svg { width:18px; height:18px; flex-shrink:0; }
+  .sb-item .badge { margin-left:auto; font-size:12px; font-weight:600; min-width:22px; height:20px; padding:0 6px; display:flex; align-items:center; justify-content:center; border-radius:999px; background:rgba(255,255,255,.12); color:#c7d2de; }
+  .sb-item.actif .badge { background:rgba(255,255,255,.22); color:#fff; }
+  .sb-foot { padding:16px 22px; font-size:12px; color:#5c6b7d; border-top:1px solid #2a3644; line-height:1.5; }
 
-  main{
-    flex:1;
-    padding:20px 22px 60px;
-    min-width:0;
-  }
-  .toolbar{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    align-items:center;
-    margin-bottom:16px;
-  }
-  .search-box{
-    flex:1;
-    min-width:220px;
-    position:relative;
-  }
-  .search-box input{
-    width:100%;
-    padding:10px 12px 10px 36px;
-    border-radius:8px;
-    border:1px solid var(--border);
-    background:var(--panel);
-    color:var(--text);
-    font-size:14px;
-  }
-  .search-box input:focus{outline:none;border-color:var(--cyan);}
-  .search-box::before{
-    content:"🔍";
-    position:absolute;
-    left:11px;top:50%;
-    transform:translateY(-50%);
-    font-size:13px;
-    opacity:.6;
-  }
-  select.sort-select{
-    padding:10px 12px;
-    border-radius:8px;
-    border:1px solid var(--border);
-    background:var(--panel);
-    color:var(--text);
-    font-size:13.5px;
+  /* ===== MAIN ===== */
+  .main { flex:1; margin-left:232px; display:flex; flex-direction:column; min-width:0; }
+  .topbar { display:flex; align-items:center; gap:16px; padding:22px 30px 18px; }
+  .topbar h1 { font-size:23px; font-weight:700; letter-spacing:-.02em; }
+  .topbar .st { font-size:13px; color:var(--gris); margin-top:2px; }
+  .top-actions { margin-left:auto; display:flex; align-items:center; gap:10px; }
+  .rg { position:relative; }
+  .rg input { width:250px; padding:9px 12px 9px 34px; font-size:13.5px; border:1px solid var(--bord); border-radius:9px; background:#fff; }
+  .rg input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(43,130,217,.14); }
+  .rg .ico { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--gris-clair); }
+  .ico-carre { height:38px; width:38px; border:1px solid var(--bord); background:#fff; border-radius:9px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gris); }
+  .ico-carre:hover { background:#f0f1f3; }
+  .dropdown { position:absolute; top:46px; right:0; width:340px; background:#fff; border:1px solid var(--bord); border-radius:11px; box-shadow:0 12px 34px rgba(0,0,0,.14); max-height:400px; overflow-y:auto; display:none; z-index:40; }
+  .dropdown.ouvert { display:block; }
+  .dd-item { display:flex; align-items:center; gap:10px; padding:10px 14px; cursor:pointer; border-bottom:1px solid #f1f2f4; }
+  .dd-item:hover { background:var(--main); }
+  .dd-nom { font-size:14px; font-weight:500; } .dd-meta { font-size:12px; color:var(--gris); }
+  .dd-vide { padding:18px; text-align:center; color:var(--gris); font-size:13px; }
+  .content { padding:4px 30px 100px; }
+
+  /* ===== Bannière ===== */
+  .hero { position:relative; background:linear-gradient(135deg,var(--hero-1),var(--hero-2)); border-radius:16px; padding:26px 30px; color:#fff; overflow:hidden; margin-bottom:20px; }
+  .hero .coin { position:absolute; width:26px; height:26px; border:2px solid var(--hero-accent); opacity:.8; }
+  .hero .c-tl{top:14px;left:14px;border-right:none;border-bottom:none;} .hero .c-tr{top:14px;right:14px;border-left:none;border-bottom:none;}
+  .hero .c-bl{bottom:14px;left:14px;border-right:none;border-top:none;} .hero .c-br{bottom:14px;right:14px;border-left:none;border-top:none;}
+  .hero .filigrane { position:absolute; top:20px; right:40px; text-align:right; font-family:var(--mono); font-size:10px; letter-spacing:.1em; color:rgba(255,255,255,.28); line-height:1.7; }
+  .hero .surtitre { font-size:11px; letter-spacing:.18em; color:var(--hero-accent); font-weight:600; }
+  .hero .bonjour { font-size:30px; font-weight:700; margin:6px 0 3px; letter-spacing:-.01em; }
+  .hero .date { font-size:13px; color:rgba(255,255,255,.6); }
+  .hero .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:22px; }
+  .kpi { border-left:2px solid rgba(74,159,224,.4); padding-left:14px; }
+  .kpi .lbl { font-size:12px; color:rgba(255,255,255,.55); display:flex; align-items:center; gap:6px; }
+  .kpi .val { font-family:var(--mono); font-size:26px; font-weight:700; margin-top:5px; }
+
+  /* ===== Mini tableau de bord par onglet ===== */
+  .tb-dash { display:grid; grid-template-columns:1fr 1.25fr; gap:16px; margin-bottom:20px; }
+  .tb-stats { display:grid; grid-template-columns:1fr 1fr; gap:13px; }
+  .stat { background:var(--card); border:1px solid var(--bord); border-radius:13px; padding:15px 17px; }
+  .stat .v { font-family:var(--mono); font-size:23px; font-weight:700; }
+  .stat .l { font-size:12.5px; color:var(--gris); margin-top:3px; display:flex; align-items:center; gap:6px; }
+  .stat .l svg { width:14px; height:14px; color:var(--gris-clair); }
+  .panneau { background:var(--card); border:1px solid var(--bord); border-radius:14px; padding:17px 19px; }
+  .panneau-titre { display:flex; align-items:center; gap:8px; font-weight:600; font-size:14.5px; margin-bottom:15px; }
+  .panneau-titre svg { width:16px; height:16px; color:var(--accent); }
+  .repartition { max-height:190px; overflow-y:auto; }
+  .barre-ligne { display:flex; align-items:center; gap:11px; margin-bottom:9px; }
+  .barre-ligne .nom { width:170px; font-size:12.5px; color:#374151; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .barre-ligne .piste { flex:1; background:#eef0f3; border-radius:6px; height:22px; }
+  .barre-ligne .rempli { height:100%; background:var(--accent); border-radius:6px; display:flex; align-items:center; justify-content:flex-end; padding-right:8px; color:#fff; font-size:11.5px; font-weight:700; min-width:24px; font-family:var(--mono); }
+
+  /* ===== Toolbar ===== */
+  .toolbar { display:flex; align-items:center; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
+  select.filtre { padding:9px 13px; font-size:13.5px; border:1px solid var(--bord); border-radius:9px; background:#fff; }
+  .filtre-recherche { position:relative; flex:1; min-width:170px; max-width:260px; }
+  .filtre-recherche input { width:100%; padding:9px 12px 9px 34px; font-size:13.5px; border:1px solid var(--bord); border-radius:9px; background:#fff; }
+  .filtre-recherche svg { position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--gris-clair); }
+  .vue-toggle { display:inline-flex; border:1px solid var(--bord); border-radius:9px; overflow:hidden; background:#fff; }
+  .vue-toggle button { padding:8px 13px; font-size:13px; border:none; background:#fff; cursor:pointer; color:var(--gris); display:flex; align-items:center; gap:6px; }
+  .vue-toggle button+button { border-left:1px solid var(--bord); }
+  .vue-toggle button.actif { background:var(--accent); color:#fff; }
+  .btn { padding:9px 15px; font-size:13.5px; font-weight:500; border-radius:9px; cursor:pointer; border:1px solid var(--bord); background:#fff; color:var(--ink); display:inline-flex; align-items:center; gap:7px; }
+  .btn:hover { background:#f0f1f3; }
+  .btn-primaire { background:var(--accent); color:#fff; border-color:var(--accent); box-shadow:0 4px 12px rgba(43,130,217,.28); }
+  .btn-primaire:hover { background:var(--accent-fonce); }
+
+  /* ===== Cartes ===== */
+  .lot-groupe { margin-bottom:26px; }
+  .lot-titre { display:flex; align-items:center; gap:10px; margin:6px 0 13px; }
+  .lot-num { font-family:var(--mono); font-size:12px; color:#fff; background:var(--sidebar); padding:3px 9px; border-radius:6px; }
+  .lot-nom { font-weight:600; font-size:15px; } .lot-compte { font-size:12px; color:var(--gris); }
+  .grille { display:grid; grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); gap:13px; }
+  .carte { background:var(--card); border:1px solid var(--bord); border-radius:13px; padding:16px; transition:box-shadow .15s,border-color .15s; }
+  .carte:hover { border-color:#cdd3db; box-shadow:0 3px 14px rgba(0,0,0,.06); }
+  .carte.surligne,.tbl tr.surligne td { background:#eaf2fb!important; }
+  .carte.surligne { border-color:var(--accent); box-shadow:0 0 0 3px rgba(43,130,217,.16); }
+  .carte-haut { display:flex; align-items:flex-start; gap:11px; }
+  .avatar { height:40px; width:40px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:14px; }
+  .carte h3 { font-size:15px; font-weight:600; }
+  .chip { display:inline-block; font-size:11px; font-weight:600; padding:2px 9px; border-radius:999px; margin-top:4px; }
+  .chip.f { background:var(--bleu-clair); color:var(--accent); } .chip.s { background:var(--ambre-clair); color:var(--ambre); }
+  .actions { margin-left:auto; display:flex; gap:2px; opacity:0; transition:opacity .15s; }
+  .carte:hover .actions { opacity:1; }
+  .ico-btn { border:none; background:none; cursor:pointer; padding:5px; border-radius:6px; color:var(--gris-clair); display:flex; }
+  .ico-btn:hover { background:#f0f1f3; color:var(--accent); }
+  .ico-btn.suppr:hover { color:#dc2626; background:#fef2f2; }
+  .infos { margin-top:13px; display:flex; flex-direction:column; gap:6px; font-size:13px; }
+  .info { display:flex; align-items:flex-start; gap:8px; color:#374151; text-decoration:none; }
+  .info:hover { color:var(--accent); } .info svg { color:var(--gris-clair); flex-shrink:0; margin-top:1px; }
+  .info .mono,.tbl-mono { font-family:var(--mono); font-size:12px; }
+  .note { font-size:12px; color:var(--gris); border-top:1px solid #f1f2f4; padding-top:8px; margin-top:3px; }
+  .vide { text-align:center; padding:70px 20px; color:var(--gris); } .vide svg { color:#d1d5db; margin-bottom:12px; }
+
+  /* ===== Vue tableau ===== */
+  .tableau-wrap { background:var(--card); border:1px solid var(--bord); border-radius:14px; overflow-x:auto; }
+  table.tbl { width:100%; border-collapse:collapse; font-size:13.5px; }
+  table.tbl th { text-align:left; padding:12px 16px; background:#f7f8fa; color:var(--gris); font-weight:600; font-size:11.5px; letter-spacing:.02em; text-transform:uppercase; cursor:pointer; user-select:none; border-bottom:1px solid var(--bord); white-space:nowrap; }
+  table.tbl th:hover { color:var(--ink); }
+  table.tbl th .fl { font-size:10px; margin-left:4px; opacity:.4; }
+  table.tbl th.tri .fl { opacity:1; color:var(--accent); }
+  table.tbl td { padding:11px 16px; border-bottom:1px solid #f1f2f4; vertical-align:middle; }
+  table.tbl tbody tr:last-child td { border-bottom:none; }
+  table.tbl tbody tr:hover td { background:#fafbfc; }
+  .tbl-nom { display:flex; align-items:center; gap:10px; font-weight:600; }
+  .tbl-av { height:30px; width:30px; border-radius:50%; color:#fff; font-weight:700; font-size:11px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .tbl a.info { display:inline; }
+  .tbl .mut { color:var(--gris-clair); }
+  .tbl-actions { display:flex; gap:2px; }
+
+  /* ===== Modales ===== */
+  .overlay { position:fixed; inset:0; background:rgba(15,23,32,.5); display:none; align-items:center; justify-content:center; padding:16px; z-index:60; }
+  .overlay.ouvert { display:flex; }
+  .modale { background:#fff; border-radius:16px; width:100%; max-width:520px; max-height:90vh; display:flex; flex-direction:column; }
+  .modale-haut { display:flex; justify-content:space-between; align-items:center; padding:18px 22px; border-bottom:1px solid var(--bord); }
+  .modale-haut h2 { font-size:16px; font-weight:600; }
+  .modale-corps { padding:20px 22px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; }
+  .modale-bas { padding:14px 22px; border-top:1px solid var(--bord); display:flex; justify-content:flex-end; gap:8px; }
+  label.champ span { display:block; font-size:12px; font-weight:500; color:var(--gris); margin-bottom:5px; }
+  label.champ input,label.champ select,label.champ textarea { width:100%; padding:9px 11px; font-size:14px; border:1px solid #d1d5db; border-radius:9px; font-family:inherit; }
+  .duo { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .liste-lots { display:flex; flex-direction:column; }
+  .ligne-lot { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid #f1f2f4; }
+  .ligne-lot .mono { font-family:var(--mono); font-size:12px; color:var(--gris-clair); width:34px; }
+  .ajout-lot { display:flex; gap:8px; margin-bottom:14px; } .ajout-lot input.num { width:60px; text-align:center; }
+
+  /* ===== Assistant IA ===== */
+  .ia-bulle { position:fixed; bottom:24px; right:24px; height:56px; width:56px; border-radius:50%; background:linear-gradient(135deg,var(--accent),#1e6fc0); color:#fff; border:none; cursor:pointer; box-shadow:0 8px 24px rgba(43,130,217,.5); display:flex; align-items:center; justify-content:center; z-index:55; transition:transform .15s; }
+  .ia-bulle:hover { transform:scale(1.07); }
+  .ia-panneau { position:fixed; bottom:24px; right:24px; width:384px; max-width:calc(100vw - 32px); height:566px; max-height:calc(100vh - 48px); background:#fff; border-radius:18px; box-shadow:0 16px 48px rgba(0,0,0,.24); display:none; flex-direction:column; z-index:56; overflow:hidden; }
+  .ia-panneau.ouvert { display:flex; }
+  .ia-haut { background:linear-gradient(135deg,var(--hero-1),var(--hero-2)); color:#fff; padding:15px 16px; display:flex; align-items:center; gap:11px; }
+  .ia-haut .av { height:32px; width:32px; border-radius:50%; background:rgba(74,159,224,.25); display:flex; align-items:center; justify-content:center; }
+  .ia-haut .t { font-weight:600; font-size:14px; } .ia-haut .st { font-size:11px; opacity:.7; }
+  .ia-haut button { margin-left:auto; background:none; border:none; color:#fff; cursor:pointer; opacity:.8; display:flex; }
+  .ia-msgs { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; background:var(--main); }
+  .msg { max-width:88%; font-size:13.5px; line-height:1.45; padding:10px 13px; border-radius:14px; }
+  .msg.bot { background:#fff; border:1px solid var(--bord); border-bottom-left-radius:4px; align-self:flex-start; }
+  .msg.moi { background:var(--accent); color:#fff; border-bottom-right-radius:4px; align-self:flex-end; }
+  .exemples { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .ex { font-size:12px; padding:5px 10px; background:var(--bleu-clair); color:var(--accent); border-radius:999px; cursor:pointer; border:none; } .ex:hover { background:#dceaf9; }
+  .res-mini { display:flex; align-items:center; gap:9px; padding:8px 10px; background:#fff; border:1px solid var(--bord); border-radius:10px; margin-top:6px; cursor:pointer; }
+  .res-mini:hover { border-color:var(--accent); }
+  .res-mini .av { height:30px; width:30px; border-radius:50%; color:#fff; font-weight:700; font-size:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .res-mini .nom { font-size:13px; font-weight:600; } .res-mini .meta { font-size:11.5px; color:var(--gris); }
+  .ia-saisie { display:flex; gap:8px; padding:12px; border-top:1px solid var(--bord); background:#fff; }
+  .ia-saisie input { flex:1; padding:10px 12px; font-size:14px; border:1px solid var(--bord); border-radius:11px; } .ia-saisie input:focus { outline:none; border-color:var(--accent); }
+  .ia-saisie button { background:var(--accent); color:#fff; border:none; border-radius:11px; width:42px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+
+  /* ===== Fiche PDF ===== */
+  #overlay-pdf .modale-pdf { background:#fff; border-radius:14px; width:100%; max-width:840px; max-height:92vh; display:flex; flex-direction:column; overflow:hidden; }
+  .pdf-bar { display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid var(--bord); background:#f7f8fa; }
+  .pdf-bar .titre { font-weight:600; font-size:14px; }
+  .pdf-scroll { overflow-y:auto; padding:26px; background:#eceef1; }
+  .feuille { background:#fff; width:100%; max-width:720px; margin:0 auto; padding:42px 46px; box-shadow:0 4px 22px rgba(0,0,0,.12); color:#1f2937; }
+  .f-entete { display:flex; align-items:center; gap:14px; border-bottom:2px solid var(--sidebar); padding-bottom:16px; }
+  .f-entete .mark { height:44px; width:44px; flex-shrink:0; }
+  .f-entete .org { font-weight:700; font-size:16px; color:var(--sidebar); }
+  .f-entete .svc { font-size:11px; letter-spacing:.12em; color:var(--gris); text-transform:uppercase; margin-top:2px; }
+  .f-entete .type { margin-left:auto; font-size:12px; font-weight:700; letter-spacing:.07em; color:#fff; background:var(--accent); padding:7px 13px; border-radius:6px; white-space:nowrap; }
+  .f-titre { display:flex; align-items:center; gap:16px; margin:26px 0 24px; }
+  .f-avatar { height:58px; width:58px; border-radius:13px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:21px; flex-shrink:0; }
+  .f-titre h1 { font-size:24px; font-weight:700; letter-spacing:-.01em; }
+  .f-titre .lot { font-size:14px; color:var(--gris); margin-top:4px; }
+  .f-grille { border:1px solid var(--bord); border-radius:10px; overflow:hidden; }
+  .f-ligne { display:flex; border-bottom:1px solid #eef0f3; }
+  .f-ligne:last-child { border-bottom:none; }
+  .f-ligne .lab { width:175px; flex-shrink:0; background:#f7f8fa; padding:13px 16px; font-size:11.5px; font-weight:600; color:var(--gris); text-transform:uppercase; letter-spacing:.03em; }
+  .f-ligne .val { padding:13px 16px; font-size:14px; }
+  .f-ligne .val.mono { font-family:var(--mono); }
+  .f-notes-bloc { margin-top:20px; }
+  .f-notes-bloc .lab { font-size:11.5px; font-weight:600; color:var(--gris); text-transform:uppercase; letter-spacing:.03em; margin-bottom:7px; }
+  .f-notes-bloc .txt { font-size:14px; line-height:1.5; border:1px solid var(--bord); border-radius:10px; padding:14px 16px; background:#fafbfc; }
+  .f-pied { margin-top:32px; padding-top:14px; border-top:1px solid var(--bord); font-size:11px; color:var(--gris-clair); display:flex; justify-content:space-between; gap:12px; }
+
+  @media print {
+    .app, .ia-bulle, .ia-panneau, #overlay-fiche, #overlay-lots { display:none !important; }
+    #overlay-pdf { position:static !important; inset:auto !important; display:block !important; background:#fff !important; padding:0 !important; }
+    #overlay-pdf .modale-pdf { max-width:none; max-height:none; box-shadow:none; border-radius:0; }
+    #overlay-pdf .pdf-bar { display:none !important; }
+    #overlay-pdf .pdf-scroll { overflow:visible; padding:0; background:#fff; }
+    .feuille { box-shadow:none; max-width:none; margin:0; padding:0; }
+    @page { size:A4; margin:16mm; }
   }
 
-  .stats-row{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-    gap:12px;
-    margin-bottom:18px;
-  }
-  .stat-card{
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:14px 16px;
-    box-shadow:var(--shadow);
-  }
-  .stat-card .num{font-size:22px;font-weight:700;color:var(--cyan);}
-  .stat-card .label{font-size:12px;color:var(--text-muted);margin-top:2px;}
-
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
-    gap:14px;
-  }
-  .card{
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:16px;
-    box-shadow:var(--shadow);
-    cursor:pointer;
-    transition:transform .1s, border-color .15s;
-  }
-  .card:hover{border-color:var(--cyan);transform:translateY(-1px);}
-  .card-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:8px;
-  }
-  .card h4{
-    margin:0 0 4px;
-    font-size:15.5px;
-  }
-  .card .contact-line{
-    font-size:12.5px;
-    color:var(--text-muted);
-    margin:0;
-  }
-  .tags{
-    display:flex;
-    flex-wrap:wrap;
-    gap:5px;
-    margin:10px 0 8px;
-  }
-  .tag{
-    font-size:10.5px;
-    background:rgba(29,158,217,.12);
-    color:var(--cyan-dark);
-    border-radius:20px;
-    padding:3px 9px;
-    font-weight:600;
-    white-space:nowrap;
-  }
-  [data-theme="dark"] .tag{color:#7fd0f5;background:rgba(29,158,217,.18);}
-  .card-details{
-    font-size:12.5px;
-    color:var(--text-muted);
-    display:flex;
-    flex-direction:column;
-    gap:3px;
-    margin-top:6px;
-    border-top:1px solid var(--border);
-    padding-top:8px;
-  }
-  .card-details span b{color:var(--text);font-weight:600;}
-  .empty-state{
-    text-align:center;
-    padding:60px 20px;
-    color:var(--text-muted);
-  }
-  .empty-state .big{font-size:38px;margin-bottom:8px;}
-
-  /* Modal */
-  .modal-overlay{
-    position:fixed;inset:0;
-    background:rgba(20,18,17,.55);
-    display:none;
-    align-items:flex-start;
-    justify-content:center;
-    padding:40px 16px;
-    z-index:100;
-    overflow-y:auto;
-  }
-  .modal-overlay.open{display:flex;}
-  .modal{
-    background:var(--panel);
-    border-radius:12px;
-    width:100%;
-    max-width:560px;
-    padding:22px 24px 24px;
-    box-shadow:0 10px 40px rgba(0,0,0,.3);
-  }
-  .modal h2{margin:0 0 16px;font-size:18px;}
-  .field{margin-bottom:13px;}
-  .field label{
-    display:block;
-    font-size:12.5px;
-    font-weight:600;
-    margin-bottom:5px;
-    color:var(--text-muted);
-  }
-  .field input, .field textarea, .field select{
-    width:100%;
-    padding:9px 11px;
-    border-radius:7px;
-    border:1px solid var(--border);
-    background:var(--bg);
-    color:var(--text);
-    font-size:13.5px;
-    font-family:inherit;
-  }
-  .field input:focus, .field textarea:focus, .field select:focus{outline:none;border-color:var(--cyan);}
-  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .tag-input-box{
-    border:1px solid var(--border);
-    border-radius:7px;
-    padding:6px 8px;
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    background:var(--bg);
-  }
-  .tag-input-box input{
-    border:none;background:transparent;flex:1;min-width:120px;padding:4px;font-size:13px;color:var(--text);
-  }
-  .tag-input-box input:focus{outline:none;}
-  .chip{
-    background:var(--cyan);
-    color:#fff;
-    font-size:11.5px;
-    border-radius:20px;
-    padding:4px 8px 4px 10px;
-    display:flex;align-items:center;gap:5px;
-    font-weight:600;
-  }
-  .chip button{
-    background:none;border:none;color:#fff;cursor:pointer;font-size:13px;line-height:1;padding:0;opacity:.85;
-  }
-  .chip button:hover{opacity:1;}
-  datalist{}
-  .modal-actions{
-    display:flex;
-    justify-content:space-between;
-    margin-top:18px;
-    gap:10px;
-  }
-  .modal-actions .right{display:flex;gap:8px;}
-
-  .toast{
-    position:fixed;
-    bottom:20px;right:20px;
-    background:var(--text);
-    color:var(--bg);
-    padding:11px 18px;
-    border-radius:8px;
-    font-size:13.5px;
-    box-shadow:0 4px 16px rgba(0,0,0,.25);
-    z-index:200;
-    opacity:0;
-    transform:translateY(10px);
-    transition:opacity .2s, transform .2s;
-    pointer-events:none;
-  }
-  .toast.show{opacity:1;transform:translateY(0);}
-  .toast.error{background:var(--danger);color:#fff;}
-
-  .status-dot{
-    width:8px;height:8px;border-radius:50%;
-    background:#f2c94c;
-    display:inline-block;
-    margin-right:6px;
-  }
-  .status-dot.ok{background:var(--success);}
-  .status-dot.error{background:var(--danger);}
-  .sync-label{font-size:11.5px;opacity:.85;display:flex;align-items:center;}
-
-  @media(max-width:820px){
-    .layout{flex-direction:column;}
-    aside{
-      width:100%;
-      position:static;
-      max-height:none;
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-      padding:14px 16px 0;
-    }
-    aside h3{display:none;}
-    .lot-item{margin-bottom:0;}
-  }
+  @media (max-width:980px){ .tb-dash{grid-template-columns:1fr;} }
+  @media (max-width:860px){ .sidebar{width:68px;} .sb-logo .txt,.sb-item span:not(.badge),.sb-section,.sb-foot{display:none;} .sb-item{justify-content:center;} .main{margin-left:68px;} .hero .kpis{grid-template-columns:repeat(2,1fr);} .rg input{width:150px;} .duo{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
-
-<header>
-  <div class="brand">
-    <div class="logo">A</div>
-    <div>
-      <h1>Base Achats &amp; Commercial</h1>
-      <p class="subtitle">Les Artisans Bâtisseurs — Fournisseurs &amp; sous-traitants</p>
+<div class="app">
+  <aside class="sidebar">
+    <!-- LOGO : remplace le <svg class="mark"> par <img class="mark" src="logo.png" alt="LAB"> pour ton vrai logo -->
+    <div class="sb-logo">
+      <svg class="mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 24 20 12l14 12" stroke="#2b82d9" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M6 31 20 19l14 12" stroke="#e6e8ec" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="txt"><div class="t1">Les Artisans<br>Bâtisseurs</div><div class="t2">ACHATS & COMMERCIAL</div></div>
     </div>
-  </div>
-  <div class="actions">
-    <span class="sync-label"><span class="status-dot" id="syncDot"></span><span id="syncText">Connexion…</span></span>
-    <button class="icon-btn" id="themeToggle" title="Changer le thème">🌙</button>
-    <button class="btn btn-ghost" id="exportBtn">⬇ Export CSV</button>
-    <button class="btn btn-primary" id="addBtn">+ Ajouter</button>
-  </div>
-</header>
-
-<div class="layout">
-  <aside>
-    <h3>Lots</h3>
-    <div id="lotList"></div>
+    <div class="sb-nav">
+      <div class="sb-section">Portefeuille</div>
+      <div class="sb-item actif" data-tab="fournisseurs" onclick="changerOnglet('fournisseurs')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M6 21V7l7-4 7 4v14M9 21v-5h4v5"/></svg>
+        <span>Fournisseurs</span><span class="badge" id="badge-fournisseurs">0</span></div>
+      <div class="sb-item" data-tab="soustraitants" onclick="changerOnglet('soustraitants')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Sous-traitants</span><span class="badge" id="badge-soustraitants">0</span></div>
+      <div class="sb-section">Gestion</div>
+      <div class="sb-item" onclick="ouvrirLots()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M3 12h18M3 17h18"/></svg><span>Gérer les lots</span></div>
+      <div class="sb-item" onclick="exporterCSV()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg><span>Exporter CSV</span></div>
+    </div>
+    <div class="sb-foot">Entreprise générale · TCE<br>Orgeval (78)</div>
   </aside>
 
-  <main>
-    <div class="stats-row" id="statsRow"></div>
-
-    <div class="toolbar">
-      <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Rechercher (entreprise, contact, ville, lot…)">
+  <div class="main">
+    <div class="topbar">
+      <div><h1 id="titre-section">Fournisseurs</h1><div class="st" id="soustitre-section">Répertoire achats classé par lot</div></div>
+      <div class="top-actions">
+        <div class="rg">
+          <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="recherche-globale" placeholder="Rechercher partout…" autocomplete="off" oninput="rechercheGlobale()" onfocus="rechercheGlobale()" />
+          <div class="dropdown" id="dropdown-globale"></div>
+        </div>
+        <div class="ico-carre" onclick="rendre();majKpis()" title="Rafraîchir"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-2.6-6.4M21 3v6h-6"/></svg></div>
       </div>
-      <select class="sort-select" id="sortSelect">
-        <option value="nom-asc">Nom (A→Z)</option>
-        <option value="nom-desc">Nom (Z→A)</option>
-        <option value="recent">Plus récents</option>
-        <option value="ville">Ville</option>
-      </select>
     </div>
 
-    <div class="grid" id="grid"></div>
-    <div class="empty-state" id="emptyState" style="display:none">
-      <div class="big">📇</div>
-      <p>Aucun fournisseur / sous-traitant pour ce filtre.</p>
+    <div class="content">
+      <div class="hero">
+        <span class="coin c-tl"></span><span class="coin c-tr"></span><span class="coin c-bl"></span><span class="coin c-br"></span>
+        <div class="filigrane">LES ARTISANS BÂTISSEURS<br>BASE ACHATS · v1.0<br>DOC. INTERNE</div>
+        <div class="surtitre">PILOTAGE ACHATS</div>
+        <div class="bonjour">Bonjour 👋</div>
+        <div class="date" id="date-jour"></div>
+        <div class="kpis">
+          <div class="kpi"><div class="lbl">🏭 Fournisseurs</div><div class="val" id="kpi-f">0</div></div>
+          <div class="kpi"><div class="lbl">👷 Sous-traitants</div><div class="val" id="kpi-s">0</div></div>
+          <div class="kpi"><div class="lbl">📦 Lots couverts</div><div class="val" id="kpi-l">0</div></div>
+          <div class="kpi"><div class="lbl">📇 Total contacts</div><div class="val" id="kpi-t">0</div></div>
+        </div>
+      </div>
+
+      <!-- Mini tableau de bord de l'onglet -->
+      <div class="tb-dash">
+        <div class="tb-stats">
+          <div class="stat"><div class="v" id="tb-total">0</div><div class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M6 21V7l7-4 7 4v14"/></svg>Référencés</div></div>
+          <div class="stat"><div class="v" id="tb-lots">0</div><div class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M3 12h18M3 17h18"/></svg>Lots couverts</div></div>
+          <div class="stat"><div class="v" id="tb-email">0</div><div class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>Avec email</div></div>
+          <div class="stat"><div class="v" id="tb-tel">0</div><div class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12 12 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4 12 12 0 0 0 2.8.7 2 2 0 0 1 1.7 2Z"/></svg>Avec tél.</div></div>
+        </div>
+        <div class="panneau">
+          <div class="panneau-titre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 16v-5M12 16V8M17 16v-9"/></svg><span id="tb-titre">Répartition des fournisseurs par lot</span></div>
+          <div class="repartition" id="tb-repartition"></div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="filtre-recherche">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="recherche" placeholder="Filtrer cette vue…" oninput="rendre()" />
+        </div>
+        <select class="filtre" id="filtre-lot" onchange="rendre()"><option value="tous">Tous les lots</option></select>
+        <div class="vue-toggle">
+          <button data-vue="cartes" class="actif" onclick="changerVue('cartes')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Cartes</button>
+          <button data-vue="tableau" onclick="changerVue('tableau')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>Tableau</button>
+        </div>
+        <button class="btn btn-primaire" style="margin-left:auto" onclick="ouvrirFiche()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5v14"/></svg><span id="txt-ajouter">Ajouter un fournisseur</span></button>
+      </div>
+
+      <main id="contenu"></main>
     </div>
-  </main>
-</div>
-
-<!-- Modal Ajout/Edition -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <h2 id="modalTitle">Ajouter un fournisseur / sous-traitant</h2>
-    <form id="fournisseurForm">
-      <div class="field">
-        <label>Nom de l'entreprise *</label>
-        <input type="text" id="f_nom" required placeholder="Ex : Dupont Plomberie SARL">
-      </div>
-
-      <div class="field">
-        <label>Lot(s) *</label>
-        <div class="tag-input-box" id="tagBox">
-          <input type="text" id="lotInput" list="lotSuggestions" placeholder="Taper un lot puis Entrée">
-        </div>
-        <datalist id="lotSuggestions">
-          <option value="Terrassement / VRD">
-          <option value="Gros Œuvre / Maçonnerie">
-          <option value="Charpente">
-          <option value="Couverture / Étanchéité">
-          <option value="Menuiseries extérieures">
-          <option value="Menuiseries intérieures">
-          <option value="Plâtrerie / Isolation">
-          <option value="Peinture / Revêtements muraux">
-          <option value="Carrelage / Faïence">
-          <option value="Sols souples / Parquet">
-          <option value="Électricité">
-          <option value="Plomberie / Sanitaire">
-          <option value="Chauffage / Ventilation / Climatisation">
-          <option value="Ascenseur">
-          <option value="Serrurerie / Métallerie">
-          <option value="Espaces verts / Paysagisme">
-          <option value="Nettoyage / Fin de chantier">
-        </datalist>
-      </div>
-
-      <div class="field-row">
-        <div class="field">
-          <label>Contact référent</label>
-          <input type="text" id="f_contact" placeholder="Nom du contact">
-        </div>
-        <div class="field">
-          <label>Téléphone</label>
-          <input type="tel" id="f_telephone" placeholder="06 12 34 56 78">
-        </div>
-      </div>
-
-      <div class="field-row">
-        <div class="field">
-          <label>Email</label>
-          <input type="email" id="f_email" placeholder="contact@entreprise.fr">
-        </div>
-        <div class="field">
-          <label>Site web</label>
-          <input type="text" id="f_siteweb" placeholder="www.entreprise.fr">
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Adresse</label>
-        <input type="text" id="f_adresse" placeholder="N° et rue">
-      </div>
-
-      <div class="field-row">
-        <div class="field">
-          <label>Code postal</label>
-          <input type="text" id="f_cp" placeholder="78630">
-        </div>
-        <div class="field">
-          <label>Ville</label>
-          <input type="text" id="f_ville" placeholder="Orgeval">
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Notes / commentaires</label>
-        <textarea id="f_notes" rows="3" placeholder="Qualité, tarifs, délais, historique de collaboration…"></textarea>
-      </div>
-
-      <div class="modal-actions">
-        <button type="button" class="btn btn-danger" id="deleteBtn" style="display:none">Supprimer</button>
-        <div class="right">
-          <button type="button" class="btn btn-secondary" id="cancelBtn">Annuler</button>
-          <button type="submit" class="btn btn-primary">Enregistrer</button>
-        </div>
-      </div>
-    </form>
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- Modale fiche -->
+<div class="overlay" id="overlay-fiche"><div class="modale">
+  <div class="modale-haut"><h2 id="fiche-titre">Nouvelle entreprise</h2><button class="ico-btn" onclick="fermer('overlay-fiche')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="modale-corps">
+    <input type="hidden" id="f-id" />
+    <label class="champ"><span>Raison sociale *</span><input id="f-raison" /></label>
+    <div class="duo"><label class="champ"><span>Type</span><select id="f-type"><option value="fournisseurs">Fournisseur</option><option value="soustraitants">Sous-traitant</option></select></label>
+      <label class="champ"><span>Lot</span><select id="f-lot"></select></label></div>
+    <label class="champ"><span>Contact référent</span><input id="f-contact" /></label>
+    <div class="duo"><label class="champ"><span>Téléphone</span><input id="f-tel" /></label><label class="champ"><span>Email</span><input id="f-email" /></label></div>
+    <label class="champ"><span>Adresse</span><input id="f-adresse" /></label>
+    <label class="champ"><span>SIRET</span><input id="f-siret" /></label>
+    <label class="champ"><span>Notes</span><textarea id="f-notes" rows="2"></textarea></label>
+  </div>
+  <div class="modale-bas"><button class="btn" onclick="fermer('overlay-fiche')">Annuler</button><button class="btn btn-primaire" onclick="enregistrerFiche()">Enregistrer</button></div>
+</div></div>
 
+<!-- Modale lots -->
+<div class="overlay" id="overlay-lots"><div class="modale">
+  <div class="modale-haut"><h2>Gérer les lots</h2><button class="ico-btn" onclick="fermer('overlay-lots')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="modale-corps">
+    <div class="ajout-lot"><input class="num" id="lot-num" placeholder="N°" /><input id="lot-lib" placeholder="Libellé du lot" style="flex:1" onkeydown="if(event.key==='Enter')ajouterLot()" /><button class="btn btn-primaire" onclick="ajouterLot()">+</button></div>
+    <div class="liste-lots" id="liste-lots"></div>
+  </div>
+</div></div>
+
+<!-- Modale aperçu fiche PDF -->
+<div class="overlay" id="overlay-pdf"><div class="modale-pdf">
+  <div class="pdf-bar">
+    <span class="titre">Aperçu de la fiche contact</span>
+    <button class="btn" style="margin-left:auto" onclick="fermer('overlay-pdf')">Fermer</button>
+    <button class="btn btn-primaire" onclick="imprimerFiche()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimer / PDF</button>
+  </div>
+  <div class="pdf-scroll" id="pdf-contenu"></div>
+</div></div>
+
+<!-- Assistant IA -->
+<button class="ia-bulle" id="ia-bulle" onclick="basculerIA()" title="Assistant recherche"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.6L19.5 9l-5.6 1.9L12 16l-1.9-5.1L4.5 9l5.6-1.4L12 2zM19 15l.9 2.6L22.5 18l-2.6.9L19 21l-.9-2.1L15.5 18l2.6-.4L19 15z"/></svg></button>
+<div class="ia-panneau" id="ia-panneau">
+  <div class="ia-haut"><div class="av"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.6L19.5 9l-5.6 1.9L12 16l-1.9-5.1L4.5 9l5.6-1.4L12 2z"/></svg></div>
+    <div><div class="t">Assistant recherche</div><div class="st" id="ia-mode">Recherche intelligente</div></div>
+    <button onclick="basculerIA()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="ia-msgs" id="ia-msgs"></div>
+  <div class="ia-saisie"><input id="ia-input" placeholder="Ex : un plombier sur Orgeval…" onkeydown="if(event.key==='Enter')envoyerIA()" /><button onclick="envoyerIA()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
-/* =========================================================
-   Base Achats & Commercial — LAB
-   Fichier autonome (aucune dépendance externe / aucun build)
-   Backend : Firebase Realtime Database — API REST (fetch)
-   Projet Firebase : base-achat-sst-lab (europe-west1)
-   ========================================================= */
+/* ===== CONFIG ===== */
+/* ⚠️ BASE DÉDIÉE AU SERVICE ACHATS & COMMERCIAL — INDÉPENDANTE DU CRM.
+   → Crée un NOUVEAU projet Firebase (différent de celui du CRM), puis colle
+     sa config ci-dessous. NE réutilise PAS le projet du CRM : les deux bases
+     doivent rester totalement séparées (données + règles de sécurité). */
+const firebaseConfig = {
+  apiKey: "AIzaSyAVSNnDfqNVfjE4g8Sh1eosqRiZGTws7Fw",
+  authDomain: "base-achat-sst-lab.firebaseapp.com",
+  databaseURL: "https://base-achat-sst-lab-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "base-achat-sst-lab",
+  storageBucket: "base-achat-sst-lab.firebasestorage.app",
+  messagingSenderId: "708989725802",
+  appId: "1:708989725802:web:3bc720a9c6678bcb62ae13"
+};
+const IA_CONFIG = { cleApi:"", modele:"claude-sonnet-4-6" };
+const LOTS_DEFAUT = [
+  {num:'01',libelle:'Terrassement / VRD'},{num:'02',libelle:'Gros œuvre / Maçonnerie'},{num:'03',libelle:'Charpente / Structure'},
+  {num:'04',libelle:'Couverture / Étanchéité'},{num:'05',libelle:'Menuiseries extérieures'},{num:'06',libelle:'Serrurerie / Métallerie'},
+  {num:'07',libelle:'Menuiseries intérieures'},{num:'08',libelle:'Cloisons / Doublages / Plâtrerie'},{num:'09',libelle:'Électricité (CFO / CFA)'},
+  {num:'10',libelle:'Plomberie / CVC'},{num:'11',libelle:'Peinture / Revêtements muraux'},{num:'12',libelle:'Revêtements de sols / Carrelage'},
+  {num:'13',libelle:'Ascenseurs'},{num:'14',libelle:'Espaces verts / Aménagements ext.'},
+];
 
-const FIREBASE_DB_URL = "https://base-achat-sst-lab-default-rtdb.europe-west1.firebasedatabase.app";
-const DATA_PATH = "fournisseurs";
+/* ===== ÉTAT ===== */
+let db=null, lots={}, entreprises={fournisseurs:{},soustraitants:{}}, ongletActif='fournisseurs';
+let vueActive='cartes', tri={col:'raisonSociale',dir:1};
 
-let fournisseurs = {};      // { id: {...} }
-let currentLotFilter = "__ALL__";
-let currentSearch = "";
-let currentSort = "nom-asc";
-let editingId = null;
-let currentTags = [];
-let pollTimer = null;
+const JOURS=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+const MOIS=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+(function(){ const d=new Date(); document.getElementById('date-jour').textContent=`${JOURS[d.getDay()]} ${d.getDate()} ${MOIS[d.getMonth()]} ${d.getFullYear()}`; })();
 
-// ---------- Utilitaires ----------
-function $(sel){ return document.querySelector(sel); }
-function esc(str){
-  return (str || "").toString().replace(/[&<>"']/g, c => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[c]));
+try { firebase.initializeApp(firebaseConfig); db=firebase.database(); brancher(); } catch(e){ console.warn('Config Firebase à compléter',e); }
+function brancher(){
+  db.ref('lots').on('value',s=>{ lots=s.val()||{}; if(!Object.keys(lots).length) semer(); remplirSelectLots(); rendre(); majKpis(); });
+  db.ref('fournisseurs').on('value',s=>{ entreprises.fournisseurs=s.val()||{}; majKpis(); rendre(); });
+  db.ref('soustraitants').on('value',s=>{ entreprises.soustraitants=s.val()||{}; majKpis(); rendre(); });
 }
-function showToast(msg, isError){
-  const t = $('#toast');
-  t.textContent = msg;
-  t.classList.toggle('error', !!isError);
-  t.classList.add('show');
-  clearTimeout(showToast._tm);
-  showToast._tm = setTimeout(() => t.classList.remove('show'), 2600);
-}
-function setSyncStatus(state, label){
-  const dot = $('#syncDot');
-  const text = $('#syncText');
-  dot.className = 'status-dot ' + (state === 'ok' ? 'ok' : state === 'error' ? 'error' : '');
-  text.textContent = label;
-}
+function semer(){ const m={}; LOTS_DEFAUT.forEach(l=>{ m[db.ref('lots').push().key]=l; }); db.ref('lots').set(m); }
 
-// ---------- Firebase REST ----------
-async function fbGet(path){
-  const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`);
-  if(!res.ok) throw new Error('Erreur lecture Firebase (' + res.status + ')');
-  return res.json();
-}
-async function fbPost(path, data){
-  const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(data)
-  });
-  if(!res.ok) throw new Error('Erreur écriture Firebase (' + res.status + ')');
-  return res.json(); // { name: "<newId>" }
-}
-async function fbPut(path, data){
-  const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`, {
-    method: 'PUT',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(data)
-  });
-  if(!res.ok) throw new Error('Erreur mise à jour Firebase (' + res.status + ')');
-  return res.json();
-}
-async function fbDelete(path){
-  const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`, { method: 'DELETE' });
-  if(!res.ok) throw new Error('Erreur suppression Firebase (' + res.status + ')');
-  return res.json();
+function majKpis(){
+  const nf=Object.keys(entreprises.fournisseurs).length, ns=Object.keys(entreprises.soustraitants).length;
+  const lu=new Set(toutesLesEntreprises().map(e=>e.lotId).filter(Boolean)).size;
+  document.getElementById('kpi-f').textContent=nf; document.getElementById('kpi-s').textContent=ns;
+  document.getElementById('kpi-l').textContent=lu; document.getElementById('kpi-t').textContent=nf+ns;
+  document.getElementById('badge-fournisseurs').textContent=nf; document.getElementById('badge-soustraitants').textContent=ns;
 }
 
-async function loadData(silent){
-  try{
-    if(!silent) setSyncStatus('', 'Synchronisation…');
-    const data = await fbGet(DATA_PATH);
-    fournisseurs = data || {};
-    setSyncStatus('ok', 'Synchronisé');
-    render();
-  }catch(err){
-    console.error(err);
-    setSyncStatus('error', 'Hors ligne / erreur');
-    if(!silent) showToast("Impossible de joindre Firebase — vérifie ta connexion ou les règles de la base.", true);
-  }
+/* ===== NAV / VUE ===== */
+function changerOnglet(t){
+  ongletActif=t;
+  document.querySelectorAll('.sb-item[data-tab]').forEach(o=>o.classList.toggle('actif',o.dataset.tab===t));
+  const f=(t==='fournisseurs');
+  document.getElementById('titre-section').textContent=f?'Fournisseurs':'Sous-traitants';
+  document.getElementById('soustitre-section').textContent=f?'Répertoire achats classé par lot':'Répertoire des sous-traitants classé par lot';
+  document.getElementById('txt-ajouter').textContent=f?'Ajouter un fournisseur':'Ajouter un sous-traitant';
+  document.getElementById('tb-titre').textContent=f?'Répartition des fournisseurs par lot':'Répartition des sous-traitants par lot';
+  rendre();
+}
+function changerVue(v){ vueActive=v; document.querySelectorAll('.vue-toggle button').forEach(b=>b.classList.toggle('actif',b.dataset.vue===v)); rendre(); }
+
+function lotsTries(){ return Object.entries(lots).map(([id,l])=>({id,...l})).sort((a,b)=>String(a.num).localeCompare(String(b.num),'fr',{numeric:true})); }
+const COULEURS=['#2b82d9','#16a34a','#7c3aed','#db2777','#ea580c','#0891b2','#ca8a04'];
+function avatar(nom){ const p=String(nom||'?').trim().split(/\s+/); const init=((p[0]||'')[0]||'')+((p[1]||'')[0]||'')||(p[0]||'?')[0];
+  const h=[...String(nom||'')].reduce((a,c)=>a+c.charCodeAt(0),0); return {init:init.toUpperCase(),coul:COULEURS[h%COULEURS.length]}; }
+
+/* ===== DASHBOARD DE L'ONGLET ===== */
+function majDashboard(){
+  const source=Object.values(entreprises[ongletActif]||{});
+  document.getElementById('tb-total').textContent=source.length;
+  document.getElementById('tb-lots').textContent=new Set(source.map(e=>e.lotId).filter(Boolean)).size;
+  document.getElementById('tb-email').textContent=source.filter(e=>e.email).length;
+  document.getElementById('tb-tel').textContent=source.filter(e=>e.tel).length;
+  const parLot={}; source.forEach(e=>{ const k=e.lotId||'sans'; parLot[k]=(parLot[k]||0)+1; });
+  const entries=lotsTries().map(l=>({nom:`${l.num} · ${l.libelle}`, n:parLot[l.id]||0})).filter(x=>x.n>0);
+  if(parLot['sans']) entries.push({nom:'Sans lot', n:parLot['sans']});
+  entries.sort((a,b)=>b.n-a.n);
+  const max=Math.max(1,...entries.map(e=>e.n)), zone=document.getElementById('tb-repartition');
+  zone.innerHTML = entries.length
+    ? entries.map(e=>`<div class="barre-ligne"><div class="nom" title="${esc(e.nom)}">${esc(e.nom)}</div><div class="piste"><div class="rempli" style="width:${Math.max(9,e.n/max*100)}%">${e.n}</div></div></div>`).join('')
+    : '<div style="color:var(--gris);font-size:13px">Aucune donnée pour l\'instant.</div>';
 }
 
-// ---------- Rendu ----------
-function getAllLots(){
-  const set = new Set();
-  Object.values(fournisseurs).forEach(f => (f.lots||[]).forEach(l => set.add(l)));
-  return Array.from(set).sort((a,b)=>a.localeCompare(b,'fr'));
-}
-
-function renderLotList(){
-  const lots = getAllLots();
-  const counts = {};
-  lots.forEach(l => counts[l] = 0);
-  Object.values(fournisseurs).forEach(f => (f.lots||[]).forEach(l => { counts[l] = (counts[l]||0)+1; }));
-
-  const total = Object.keys(fournisseurs).length;
-  let html = `<div class="lot-item ${currentLotFilter==='__ALL__'?'active':''}" data-lot="__ALL__">
-      <span>Tous</span><span class="count">${total}</span></div>`;
-  lots.forEach(l => {
-    html += `<div class="lot-item ${currentLotFilter===l?'active':''}" data-lot="${esc(l)}">
-      <span>${esc(l)}</span><span class="count">${counts[l]}</span></div>`;
-  });
-  $('#lotList').innerHTML = html;
-  $('#lotList').querySelectorAll('.lot-item').forEach(el => {
-    el.addEventListener('click', () => {
-      currentLotFilter = el.dataset.lot;
-      render();
-    });
+/* ===== RENDU ===== */
+function listeFiltree(){
+  const q=document.getElementById('recherche').value.trim().toLowerCase(), fl=document.getElementById('filtre-lot').value;
+  return Object.entries(entreprises[ongletActif]||{}).map(([id,e])=>({id,...e})).filter(e=>{
+    if(fl!=='tous'&&e.lotId!==fl) return false; if(!q) return true; const lot=lots[e.lotId];
+    return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,lot&&lot.libelle].filter(Boolean).join(' ').toLowerCase().includes(q);
   });
 }
+function rendre(){
+  majDashboard();
+  const liste=listeFiltree();
+  if(vueActive==='tableau') return rendreTableau(liste);
+  const zone=document.getElementById('contenu');
+  if(!liste.length){ zone.innerHTML=videHtml(); return; }
+  const parLot={}; liste.forEach(e=>{ const k=e.lotId||'sans'; (parLot[k]=parLot[k]||[]).push(e); });
+  let html=''; [...lotsTries().map(l=>l.id),'sans'].forEach(lotId=>{
+    const grp=parLot[lotId]; if(!grp||!grp.length) return; const lot=lots[lotId];
+    grp.sort((a,b)=>a.raisonSociale.localeCompare(b.raisonSociale,'fr'));
+    html+=`<div class="lot-groupe"><div class="lot-titre"><span class="lot-num">${lot?esc(lot.num):'—'}</span><span class="lot-nom">${lot?esc(lot.libelle):'Sans lot'}</span><span class="lot-compte">${grp.length}</span></div><div class="grille">${grp.map(carte).join('')}</div></div>`;
+  });
+  zone.innerHTML=html;
+}
+function videHtml(){ return `<div class="vide"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/></svg><p>Aucune entreprise ${ongletActif==='fournisseurs'?'fournisseur':'sous-traitante'} pour l'instant.</p></div>`; }
 
-function renderStats(){
-  const total = Object.keys(fournisseurs).length;
-  const lotsCount = getAllLots().length;
-  const villes = new Set(Object.values(fournisseurs).map(f => (f.ville||'').trim().toLowerCase()).filter(Boolean));
-  $('#statsRow').innerHTML = `
-    <div class="stat-card"><div class="num">${total}</div><div class="label">Fournisseurs / sous-traitants</div></div>
-    <div class="stat-card"><div class="num">${lotsCount}</div><div class="label">Lots référencés</div></div>
-    <div class="stat-card"><div class="num">${villes.size}</div><div class="label">Villes couvertes</div></div>
-  `;
+function carte(e){
+  const cls=ongletActif==='fournisseurs'?'f':'s', label=ongletActif==='fournisseurs'?'Fournisseur':'Sous-traitant', a=avatar(e.raisonSociale);
+  return `<div class="carte" id="carte-${e.id}"><div class="carte-haut">
+      <div class="avatar" style="background:${a.coul}">${esc(a.init)}</div>
+      <div style="min-width:0"><h3>${esc(e.raisonSociale)}</h3><span class="chip ${cls}">${label}</span></div>
+      <div class="actions"><button class="ico-btn" title="Fiche PDF" onclick="ouvrirFichePDF('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button><button class="ico-btn" onclick='ouvrirFiche(${JSON.stringify({id:e.id})})'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+        <button class="ico-btn suppr" onclick="supprimer('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div></div>
+    <div class="infos">
+      ${e.contact?`<div class="info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${esc(e.contact)}</div>`:''}
+      ${e.tel?`<a class="info" href="tel:${esc(e.tel)}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12 12 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4 12 12 0 0 0 2.8.7 2 2 0 0 1 1.7 2Z"/></svg><span class="mono">${esc(e.tel)}</span></a>`:''}
+      ${e.email?`<a class="info" href="mailto:${esc(e.email)}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>${esc(e.email)}</a>`:''}
+      ${e.adresse?`<div class="info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>${esc(e.adresse)}</div>`:''}
+      ${e.siret?`<div class="info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/></svg><span class="mono">${esc(e.siret)}</span></div>`:''}
+      ${e.notes?`<div class="note">${esc(e.notes)}</div>`:''}
+    </div></div>`;
 }
 
-function getFilteredSorted(){
-  let list = Object.entries(fournisseurs).map(([id, f]) => ({ id, ...f }));
-
-  if(currentLotFilter !== '__ALL__'){
-    list = list.filter(f => (f.lots||[]).includes(currentLotFilter));
-  }
-  if(currentSearch.trim()){
-    const q = currentSearch.trim().toLowerCase();
-    list = list.filter(f =>
-      (f.nom||'').toLowerCase().includes(q) ||
-      (f.contact||'').toLowerCase().includes(q) ||
-      (f.ville||'').toLowerCase().includes(q) ||
-      (f.email||'').toLowerCase().includes(q) ||
-      (f.lots||[]).some(l => l.toLowerCase().includes(q))
-    );
-  }
-  switch(currentSort){
-    case 'nom-asc': list.sort((a,b)=> (a.nom||'').localeCompare(b.nom||'','fr')); break;
-    case 'nom-desc': list.sort((a,b)=> (b.nom||'').localeCompare(a.nom||'','fr')); break;
-    case 'ville': list.sort((a,b)=> (a.ville||'').localeCompare(b.ville||'','fr')); break;
-    case 'recent': list.sort((a,b)=> (b.dateAjout||0) - (a.dateAjout||0)); break;
-  }
-  return list;
+/* ===== VUE TABLEAU ===== */
+function valTri(e){ if(tri.col==='lot'){ const l=lots[e.lotId]; return l?String(l.num):'~'; } return String(e[tri.col]||'').toLowerCase(); }
+function trier(col){ if(tri.col===col) tri.dir*=-1; else { tri.col=col; tri.dir=1; } rendre(); }
+function rendreTableau(liste){
+  const zone=document.getElementById('contenu');
+  if(!liste.length){ zone.innerHTML=videHtml(); return; }
+  liste.sort((a,b)=>{ const va=valTri(a), vb=valTri(b); if(!va&&vb) return 1; if(va&&!vb) return -1; return va.localeCompare(vb,'fr',{numeric:true})*tri.dir; });
+  const fleche=col=>tri.col===col?(tri.dir>0?'▲':'▼'):'⇅';
+  const th=(col,l)=>`<th class="${tri.col===col?'tri':''}" onclick="trier('${col}')">${l}<span class="fl">${fleche(col)}</span></th>`;
+  const lignes=liste.map(e=>{ const lot=lots[e.lotId], a=avatar(e.raisonSociale);
+    return `<tr id="ligne-${e.id}">
+      <td><div class="tbl-nom"><div class="tbl-av" style="background:${a.coul}">${esc(a.init)}</div>${esc(e.raisonSociale)}</div></td>
+      <td>${lot?`<span class="lot-num">${esc(lot.num)}</span> ${esc(lot.libelle)}`:'<span class="mut">—</span>'}</td>
+      <td>${e.contact?esc(e.contact):'<span class="mut">—</span>'}</td>
+      <td>${e.tel?`<a class="info" href="tel:${esc(e.tel)}"><span class="tbl-mono">${esc(e.tel)}</span></a>`:'<span class="mut">—</span>'}</td>
+      <td>${e.email?`<a class="info" href="mailto:${esc(e.email)}">${esc(e.email)}</a>`:'<span class="mut">—</span>'}</td>
+      <td>${e.siret?`<span class="tbl-mono">${esc(e.siret)}</span>`:'<span class="mut">—</span>'}</td>
+      <td><div class="tbl-actions"><button class="ico-btn" title="Fiche PDF" onclick="ouvrirFichePDF('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button><button class="ico-btn" onclick='ouvrirFiche(${JSON.stringify({id:e.id})})'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+        <button class="ico-btn suppr" onclick="supprimer('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div></td></tr>`;
+  }).join('');
+  zone.innerHTML=`<div class="tableau-wrap"><table class="tbl"><thead><tr>
+    ${th('raisonSociale','Raison sociale')}${th('lot','Lot')}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${th('siret','SIRET')}<th></th>
+  </tr></thead><tbody>${lignes}</tbody></table></div>`;
 }
 
-function renderGrid(){
-  const list = getFilteredSorted();
-  $('#emptyState').style.display = list.length ? 'none' : 'block';
-  $('#grid').innerHTML = list.map(f => `
-    <div class="card" data-id="${esc(f.id)}">
-      <div class="card-top">
-        <h4>${esc(f.nom)}</h4>
+/* ===== CRUD ===== */
+function ouvrirFiche(arg){
+  const modif=arg&&arg.id;
+  let e={type:ongletActif, lotId:document.getElementById('filtre-lot').value!=='tous'?document.getElementById('filtre-lot').value:''};
+  if(modif) e={id:arg.id, type:ongletActif, ...entreprises[ongletActif][arg.id]};
+  document.getElementById('fiche-titre').textContent=modif?'Modifier l\u2019entreprise':'Nouvelle entreprise';
+  document.getElementById('f-id').value=modif?arg.id:''; document.getElementById('f-type').value=e.type||ongletActif;
+  document.getElementById('f-raison').value=e.raisonSociale||''; document.getElementById('f-contact').value=e.contact||'';
+  document.getElementById('f-tel').value=e.tel||''; document.getElementById('f-email').value=e.email||'';
+  document.getElementById('f-adresse').value=e.adresse||''; document.getElementById('f-siret').value=e.siret||''; document.getElementById('f-notes').value=e.notes||'';
+  remplirSelectLots(e.lotId); document.getElementById('overlay-fiche').classList.add('ouvert');
+}
+function enregistrerFiche(){
+  if(!db){ alert('Firebase non connecté. Complète la config en haut du fichier.'); return; }
+  const raison=document.getElementById('f-raison').value.trim(); if(!raison){ alert('La raison sociale est obligatoire.'); return; }
+  const id=document.getElementById('f-id').value, typeCible=document.getElementById('f-type').value;
+  const fiche={ raisonSociale:raison, lotId:document.getElementById('f-lot').value, contact:document.getElementById('f-contact').value.trim(),
+    tel:document.getElementById('f-tel').value.trim(), email:document.getElementById('f-email').value.trim(),
+    adresse:document.getElementById('f-adresse').value.trim(), siret:document.getElementById('f-siret').value.trim(), notes:document.getElementById('f-notes').value.trim() };
+  if(id){ if(typeCible!==ongletActif){ db.ref(ongletActif+'/'+id).remove(); db.ref(typeCible).push(fiche); } else db.ref(ongletActif+'/'+id).update(fiche); }
+  else db.ref(typeCible).push(fiche);
+  fermer('overlay-fiche');
+}
+function supprimer(id){ if(confirm('Supprimer cette entreprise ?')) db.ref(ongletActif+'/'+id).remove(); }
+
+/* ===== LOTS ===== */
+function remplirSelectLots(sel){
+  const opt=l=>`<option value="${l.id}">${esc(l.num)} – ${esc(l.libelle)}</option>`;
+  document.getElementById('f-lot').innerHTML='<option value="">— Aucun —</option>'+lotsTries().map(opt).join('');
+  if(sel!==undefined) document.getElementById('f-lot').value=sel||'';
+  document.getElementById('filtre-lot').innerHTML='<option value="tous">Tous les lots</option>'+lotsTries().map(opt).join('');
+}
+function ouvrirLots(){
+  document.getElementById('liste-lots').innerHTML=lotsTries().map(l=>`<div class="ligne-lot"><span class="mono">${esc(l.num)}</span><span style="flex:1">${esc(l.libelle)}</span>
+    <button class="ico-btn" onclick="renommerLot('${l.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+    <button class="ico-btn suppr" onclick="supprimerLot('${l.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div>`).join('');
+  document.getElementById('overlay-lots').classList.add('ouvert');
+}
+function ajouterLot(){ if(!db) return; const num=document.getElementById('lot-num').value.trim()||'—', lib=document.getElementById('lot-lib').value.trim(); if(!lib) return;
+  db.ref('lots').push({num,libelle:lib}); document.getElementById('lot-num').value=''; document.getElementById('lot-lib').value=''; setTimeout(ouvrirLots,200); }
+function renommerLot(id){ const l=lots[id]; const num=prompt('Numéro du lot :',l.num); if(num===null) return; const lib=prompt('Libellé du lot :',l.libelle); if(lib===null) return;
+  db.ref('lots/'+id).update({num:num.trim()||'—',libelle:lib.trim()}); setTimeout(ouvrirLots,200); }
+function supprimerLot(id){ if(!confirm('Supprimer ce lot ? Les entreprises rattachées resteront sans lot.')) return;
+  db.ref('lots/'+id).remove(); ['fournisseurs','soustraitants'].forEach(n=>Object.entries(entreprises[n]).forEach(([k,e])=>{ if(e.lotId===id) db.ref(n+'/'+k+'/lotId').set(''); })); setTimeout(ouvrirLots,200); }
+
+/* ===== EXPORT ===== */
+function exporterCSV(){
+  const source=entreprises[ongletActif]||{}, echap=v=>`"${String(v||'').replace(/"/g,'""')}"`;
+  const entete=['Lot','Raison sociale','Contact','Téléphone','Email','Adresse','SIRET','Notes'];
+  const lignes=Object.values(source).map(e=>{ const lot=lots[e.lotId]; return [lot?`${lot.num} – ${lot.libelle}`:'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.adresse,e.siret,e.notes].map(echap).join(';'); });
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+[entete.join(';'),...lignes].join('\n')],{type:'text/csv;charset=utf-8;'})); a.download=`${ongletActif}-lab.csv`; a.click();
+}
+
+/* ===== RECHERCHE GLOBALE ===== */
+function toutesLesEntreprises(){ const r=[]; ['fournisseurs','soustraitants'].forEach(t=>Object.entries(entreprises[t]).forEach(([id,e])=>r.push({id,type:t,...e}))); return r; }
+function rechercheGlobale(){
+  const q=document.getElementById('recherche-globale').value.trim().toLowerCase(), dd=document.getElementById('dropdown-globale');
+  if(!q){ dd.classList.remove('ouvert'); return; }
+  const res=toutesLesEntreprises().filter(e=>{ const lot=lots[e.lotId]; return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,lot&&lot.libelle].filter(Boolean).join(' ').toLowerCase().includes(q); }).slice(0,8);
+  dd.innerHTML=res.length?res.map(e=>{ const lot=lots[e.lotId], t=e.type==='fournisseurs'?'Fournisseur':'Sous-traitant', a=avatar(e.raisonSociale);
+    return `<div class="dd-item" onclick="allerVers('${e.type}','${e.id}')"><div class="av" style="background:${a.coul};height:30px;width:30px;border-radius:50%;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${esc(a.init)}</div><div><div class="dd-nom">${esc(e.raisonSociale)}</div><div class="dd-meta">${t}${lot?' · Lot '+esc(lot.num)+' '+esc(lot.libelle):''}</div></div></div>`; }).join('')
+    :'<div class="dd-vide">Aucun résultat</div>';
+  dd.classList.add('ouvert');
+}
+function allerVers(type,id){
+  changerOnglet(type); document.getElementById('recherche').value=(entreprises[type][id]||{}).raisonSociale||'';
+  document.getElementById('filtre-lot').value='tous'; rendre();
+  document.getElementById('dropdown-globale').classList.remove('ouvert'); document.getElementById('recherche-globale').value='';
+  setTimeout(()=>{ const c=document.getElementById('carte-'+id)||document.getElementById('ligne-'+id); if(c){ c.scrollIntoView({behavior:'smooth',block:'center'}); c.classList.add('surligne'); setTimeout(()=>c.classList.remove('surligne'),1800); } },250);
+}
+document.addEventListener('click',e=>{ if(!e.target.closest('.rg')) document.getElementById('dropdown-globale').classList.remove('ouvert'); });
+
+/* ===== ASSISTANT IA ===== */
+function basculerIA(){
+  const p=document.getElementById('ia-panneau'), b=document.getElementById('ia-bulle');
+  const ouvert=p.classList.toggle('ouvert'); b.style.display=ouvert?'none':'flex';
+  if(ouvert && !document.getElementById('ia-msgs').dataset.init){ msgBot(accueilIA()); document.getElementById('ia-msgs').dataset.init='1'; document.getElementById('ia-input').focus(); }
+  if(IA_CONFIG.cleApi) document.getElementById('ia-mode').textContent='IA Claude connectée';
+}
+function accueilIA(){ return { texte:"Bonjour Samy 👋 Je cherche dans ta base fournisseurs et sous-traitants. Pose ta question :", exemples:["Un plombier sur Orgeval","Sous-traitants peinture avec email","Fournisseurs gros œuvre","Électricien joignable par tél"] }; }
+function msgMoi(t){ const d=document.createElement('div'); d.className='msg moi'; d.textContent=t; ajoutMsg(d); }
+function msgBot(o){
+  const d=document.createElement('div'); d.className='msg bot'; d.innerHTML=esc(o.texte).replace(/\n/g,'<br>');
+  if(o.exemples){ const w=document.createElement('div'); w.className='exemples'; o.exemples.forEach(x=>{ const b=document.createElement('button'); b.className='ex'; b.textContent=x; b.onclick=()=>{ document.getElementById('ia-input').value=x; envoyerIA(); }; w.appendChild(b); }); d.appendChild(w); }
+  if(o.resultats) o.resultats.forEach(e=>{ const lot=lots[e.lotId], t=e.type==='fournisseurs'?'Fournisseur':'Sous-traitant', a=avatar(e.raisonSociale);
+    const r=document.createElement('div'); r.className='res-mini'; r.onclick=()=>allerVers(e.type,e.id);
+    r.innerHTML=`<div class="av" style="background:${a.coul}">${esc(a.init)}</div><div><div class="nom">${esc(e.raisonSociale)}</div><div class="meta">${t}${lot?' · Lot '+esc(lot.num):''}${e.tel?' · '+esc(e.tel):''}</div></div>`; d.appendChild(r); });
+  ajoutMsg(d);
+}
+function ajoutMsg(el){ const z=document.getElementById('ia-msgs'); z.appendChild(el); z.scrollTop=z.scrollHeight; }
+async function envoyerIA(){ const input=document.getElementById('ia-input'), q=input.value.trim(); if(!q) return; msgMoi(q); input.value=''; if(IA_CONFIG.cleApi){ msgBot(await appelClaude(q)); } else msgBot(rechercheLocale(q)); }
+function norm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+const SYN_LOTS={'plombier':'plomberie','plomberie':'plomberie','cvc':'plomberie','chauffage':'plomberie','sanitaire':'plomberie','electricien':'electricite','electricite':'electricite','electrique':'electricite','courant':'electricite','peintre':'peinture','peinture':'peinture','macon':'maconnerie','maconnerie':'maconnerie','gros oeuvre':'gros','beton':'gros','menuisier':'menuiseries','menuiserie':'menuiseries','carreleur':'carrelage','carrelage':'carrelage','serrurier':'serrurerie','serrurerie':'serrurerie','metallerie':'metallerie','couvreur':'couverture','couverture':'couverture','etancheite':'etancheite','toiture':'couverture','terrassement':'terrassement','vrd':'vrd','charpente':'charpente','ascenseur':'ascenseurs','platrier':'platrerie','platrerie':'platrerie','cloison':'cloisons','paysagiste':'espaces','jardin':'espaces'};
+function rechercheLocale(q){
+  const n=norm(q), tokens=n.split(/[^a-z0-9]+/).filter(t=>t.length>2);
+  let typeVoulu=null; if(/fournisseur/.test(n)) typeVoulu='fournisseurs'; if(/sous.?trait|traitant/.test(n)) typeVoulu='soustraitants';
+  const besoinEmail=/(e-?mail|mail|courriel)/.test(n), besoinTel=/(tel|telephone|numero|joindre|appeler|joignable)/.test(n), besoinSiret=/siret/.test(n);
+  let motsLot=[]; Object.keys(SYN_LOTS).forEach(k=>{ if(n.includes(k)) motsLot.push(SYN_LOTS[k]); });
+  lotsTries().forEach(l=>{ norm(l.libelle).split(/[^a-z]+/).filter(w=>w.length>3).forEach(w=>{ if(n.includes(w)) motsLot.push(w); }); });
+  let base=toutesLesEntreprises(); if(typeVoulu) base=base.filter(e=>e.type===typeVoulu);
+  if(besoinEmail) base=base.filter(e=>e.email); if(besoinTel) base=base.filter(e=>e.tel); if(besoinSiret) base=base.filter(e=>e.siret);
+  const resultats=base.map(e=>{ const lot=lots[e.lotId], txt=norm([e.raisonSociale,e.contact,e.adresse,e.notes,e.email,lot&&lot.libelle].filter(Boolean).join(' '));
+    let score=0; if(motsLot.length&&lot&&motsLot.some(m=>norm(lot.libelle).includes(m))) score+=5; tokens.forEach(t=>{ if(txt.includes(t)) score+=1; }); return {e,score};
+  }).filter(x=>x.score>0||(typeVoulu&&!tokens.length&&!motsLot.length)).sort((a,b)=>b.score-a.score).slice(0,6).map(x=>x.e);
+  if(!resultats.length) return { texte:"Je n'ai rien trouvé. Essaie un métier (plomberie, peinture…), une ville, ou « avec email ».", exemples:["Fournisseurs peinture","Sous-traitants avec téléphone"] };
+  const c=[]; if(typeVoulu) c.push(typeVoulu==='fournisseurs'?'fournisseur(s)':'sous-traitant(s)'); if(besoinEmail) c.push('avec email'); if(besoinTel) c.push('joignable(s)');
+  return { texte:`J'ai trouvé ${resultats.length} résultat${resultats.length>1?'s':''}${c.length?' ('+c.join(', ')+')':''}. Clique pour ouvrir la fiche :`, resultats };
+}
+async function appelClaude(q){
+  const contexte=toutesLesEntreprises().map(e=>{ const lot=lots[e.lotId]; return `${e.type==='fournisseurs'?'FOURNISSEUR':'SOUS-TRAITANT'} | ${e.raisonSociale} | Lot: ${lot?lot.libelle:'—'} | Contact: ${e.contact||'—'} | Tel: ${e.tel||'—'} | Email: ${e.email||'—'} | Adresse: ${e.adresse||'—'}`; }).join('\n');
+  try { const r=await fetch('https://api.anthropic.com/v1/messages',{ method:'POST', headers:{'Content-Type':'application/json','x-api-key':IA_CONFIG.cleApi,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({ model:IA_CONFIG.modele, max_tokens:600, system:"Tu es l'assistant de recherche du CRM achats de l'entreprise BTP LAB. Réponds en français, brièvement, en t'appuyant UNIQUEMENT sur la liste fournie.", messages:[{role:'user',content:`Base :\n${contexte}\n\nQuestion : ${q}`}] }) });
+    const d=await r.json(); const txt=(d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n'); return { texte: txt || "Réponse indisponible." };
+  } catch(err){ console.warn(err); return rechercheLocale(q); }
+}
+
+/* ===== FICHE PDF ===== */
+function ouvrirFichePDF(id){
+  const type=ongletActif, e=entreprises[type][id]; if(!e) return;
+  const lot=lots[e.lotId], a=avatar(e.raisonSociale);
+  const typeLabel=type==='fournisseurs'?'FICHE FOURNISSEUR':'FICHE SOUS-TRAITANT';
+  const d=new Date(), dateStr=`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  const ligne=(lab,val,mono)=> val?`<div class="f-ligne"><div class="lab">${lab}</div><div class="val ${mono?'mono':''}">${esc(val)}</div></div>`:'';
+  document.getElementById('pdf-contenu').innerHTML=`
+    <div class="feuille">
+      <div class="f-entete">
+        <svg class="mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 24 20 12l14 12" stroke="#2b82d9" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 31 20 19l14 12" stroke="#c7ced8" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div><div class="org">Les Artisans Bâtisseurs</div><div class="svc">Service Achats &amp; Commercial</div></div>
+        <div class="type">${typeLabel}</div>
       </div>
-      ${f.contact ? `<p class="contact-line">👤 ${esc(f.contact)}</p>` : ''}
-      <div class="tags">${(f.lots||[]).map(l => `<span class="tag">${esc(l)}</span>`).join('')}</div>
-      <div class="card-details">
-        ${f.telephone ? `<span>📞 <b>${esc(f.telephone)}</b></span>` : ''}
-        ${f.email ? `<span>✉️ ${esc(f.email)}</span>` : ''}
-        ${(f.ville || f.cp) ? `<span>📍 ${esc(f.cp||'')} ${esc(f.ville||'')}</span>` : ''}
+      <div class="f-titre">
+        <div class="f-avatar" style="background:${a.coul}">${esc(a.init)}</div>
+        <div><h1>${esc(e.raisonSociale)}</h1><div class="lot">${lot?'Lot '+esc(lot.num)+' · '+esc(lot.libelle):'Lot non renseigné'}</div></div>
       </div>
-    </div>
-  `).join('');
-  $('#grid').querySelectorAll('.card').forEach(el => {
-    el.addEventListener('click', () => openModal(el.dataset.id));
-  });
+      <div class="f-grille">
+        ${ligne('Contact référent',e.contact)}
+        ${ligne('Téléphone',e.tel,true)}
+        ${ligne('Email',e.email)}
+        ${ligne('Adresse',e.adresse)}
+        ${ligne('SIRET',e.siret,true)}
+      </div>
+      ${e.notes?`<div class="f-notes-bloc"><div class="lab">Notes</div><div class="txt">${esc(e.notes)}</div></div>`:''}
+      <div class="f-pied"><span>Document interne — Les Artisans Bâtisseurs · Orgeval (78)</span><span>Édité le ${dateStr}</span></div>
+    </div>`;
+  document.getElementById('overlay-pdf').classList.add('ouvert');
 }
+function imprimerFiche(){ window.print(); }
 
-function render(){
-  renderLotList();
-  renderStats();
-  renderGrid();
-}
-
-// ---------- Modal / Formulaire ----------
-function renderTags(){
-  const box = $('#tagBox');
-  box.querySelectorAll('.chip').forEach(c => c.remove());
-  const input = $('#lotInput');
-  currentTags.forEach((tag, i) => {
-    const chip = document.createElement('span');
-    chip.className = 'chip';
-    chip.innerHTML = `${esc(tag)} <button type="button" data-i="${i}">✕</button>`;
-    box.insertBefore(chip, input);
-  });
-  box.querySelectorAll('.chip button').forEach(btn => {
-    btn.addEventListener('click', () => {
-      currentTags.splice(Number(btn.dataset.i), 1);
-      renderTags();
-    });
-  });
-}
-
-function addTagFromInput(){
-  const input = $('#lotInput');
-  const val = input.value.trim();
-  if(val && !currentTags.includes(val)){
-    currentTags.push(val);
-    renderTags();
-  }
-  input.value = '';
-}
-
-function openModal(id){
-  editingId = id || null;
-  const f = id ? fournisseurs[id] : null;
-  $('#modalTitle').textContent = f ? 'Modifier le fournisseur / sous-traitant' : 'Ajouter un fournisseur / sous-traitant';
-  $('#f_nom').value = f?.nom || '';
-  $('#f_contact').value = f?.contact || '';
-  $('#f_telephone').value = f?.telephone || '';
-  $('#f_email').value = f?.email || '';
-  $('#f_siteweb').value = f?.siteweb || '';
-  $('#f_adresse').value = f?.adresse || '';
-  $('#f_cp').value = f?.cp || '';
-  $('#f_ville').value = f?.ville || '';
-  $('#f_notes').value = f?.notes || '';
-  currentTags = f?.lots ? [...f.lots] : [];
-  renderTags();
-  $('#deleteBtn').style.display = f ? 'inline-flex' : 'none';
-  $('#modalOverlay').classList.add('open');
-  $('#f_nom').focus();
-}
-
-function closeModal(){
-  $('#modalOverlay').classList.remove('open');
-  editingId = null;
-  currentTags = [];
-}
-
-async function handleSubmit(e){
-  e.preventDefault();
-  addTagFromInput();
-  const nom = $('#f_nom').value.trim();
-  if(!nom){ showToast('Le nom de l\'entreprise est obligatoire.', true); return; }
-  if(currentTags.length === 0){ showToast('Ajoute au moins un lot.', true); return; }
-
-  const payload = {
-    nom,
-    lots: currentTags,
-    contact: $('#f_contact').value.trim(),
-    telephone: $('#f_telephone').value.trim(),
-    email: $('#f_email').value.trim(),
-    siteweb: $('#f_siteweb').value.trim(),
-    adresse: $('#f_adresse').value.trim(),
-    cp: $('#f_cp').value.trim(),
-    ville: $('#f_ville').value.trim(),
-    notes: $('#f_notes').value.trim(),
-    dateAjout: editingId ? (fournisseurs[editingId]?.dateAjout || Date.now()) : Date.now(),
-    dateMaj: Date.now()
-  };
-
-  const submitBtn = e.target.querySelector('button[type="submit"]');
-  submitBtn.disabled = true;
-  try{
-    if(editingId){
-      await fbPut(`${DATA_PATH}/${editingId}`, payload);
-      fournisseurs[editingId] = payload;
-      showToast('Fiche mise à jour ✓');
-    } else {
-      const res = await fbPost(DATA_PATH, payload);
-      fournisseurs[res.name] = payload;
-      showToast('Fournisseur ajouté ✓');
-    }
-    closeModal();
-    render();
-  }catch(err){
-    console.error(err);
-    showToast("Échec de l'enregistrement — vérifie ta connexion.", true);
-  }finally{
-    submitBtn.disabled = false;
-  }
-}
-
-async function handleDelete(){
-  if(!editingId) return;
-  const f = fournisseurs[editingId];
-  if(!confirm(`Supprimer "${f?.nom || 'ce fournisseur'}" ? Cette action est irréversible.`)) return;
-  try{
-    await fbDelete(`${DATA_PATH}/${editingId}`);
-    delete fournisseurs[editingId];
-    showToast('Fournisseur supprimé');
-    closeModal();
-    render();
-  }catch(err){
-    console.error(err);
-    showToast('Échec de la suppression.', true);
-  }
-}
-
-// ---------- Export CSV ----------
-function exportCSV(){
-  const rows = [
-    ['Nom','Lots','Contact','Téléphone','Email','Site web','Adresse','Code postal','Ville','Notes']
-  ];
-  Object.values(fournisseurs).forEach(f => {
-    rows.push([
-      f.nom||'', (f.lots||[]).join(' | '), f.contact||'', f.telephone||'',
-      f.email||'', f.siteweb||'', f.adresse||'', f.cp||'', f.ville||'', (f.notes||'').replace(/\n/g,' ')
-    ]);
-  });
-  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(';')).join('\r\n');
-  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `base-achats-lab-${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-// ---------- Thème ----------
-function initTheme(){
-  let theme = 'light';
-  try{ theme = localStorage.getItem('lab-achats-theme') || 'light'; }catch(e){}
-  document.documentElement.setAttribute('data-theme', theme);
-  $('#themeToggle').textContent = theme === 'dark' ? '☀️' : '🌙';
-}
-function toggleTheme(){
-  const cur = document.documentElement.getAttribute('data-theme');
-  const next = cur === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  $('#themeToggle').textContent = next === 'dark' ? '☀️' : '🌙';
-  try{ localStorage.setItem('lab-achats-theme', next); }catch(e){}
-}
-
-// ---------- Init ----------
-function init(){
-  initTheme();
-
-  $('#addBtn').addEventListener('click', () => openModal(null));
-  $('#cancelBtn').addEventListener('click', closeModal);
-  $('#modalOverlay').addEventListener('click', (e) => { if(e.target.id === 'modalOverlay') closeModal(); });
-  $('#fournisseurForm').addEventListener('submit', handleSubmit);
-  $('#deleteBtn').addEventListener('click', handleDelete);
-  $('#themeToggle').addEventListener('click', toggleTheme);
-  $('#exportBtn').addEventListener('click', exportCSV);
-
-  $('#lotInput').addEventListener('keydown', (e) => {
-    if(e.key === 'Enter' || e.key === ','){
-      e.preventDefault();
-      addTagFromInput();
-    }
-  });
-  $('#lotInput').addEventListener('blur', () => addTagFromInput());
-
-  $('#searchInput').addEventListener('input', (e) => { currentSearch = e.target.value; renderGrid(); });
-  $('#sortSelect').addEventListener('change', (e) => { currentSort = e.target.value; renderGrid(); });
-
-  document.addEventListener('keydown', (e) => {
-    if(e.key === 'Escape') closeModal();
-  });
-
-  loadData();
-  // Rafraîchissement périodique pour rester synchronisé entre utilisateurs (pas de socket temps réel via REST)
-  pollTimer = setInterval(() => loadData(true), 20000);
-  window.addEventListener('focus', () => loadData(true));
-}
-
-document.addEventListener('DOMContentLoaded', init);
+/* ===== utils ===== */
+function fermer(id){ document.getElementById(id).classList.remove('ouvert'); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('ouvert'); }));
+rendre(); majKpis();
 </script>
 </body>
 </html>
