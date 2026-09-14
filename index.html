@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Base Achats & Commercial — Fournisseurs & Sous-traitants · LAB</title>
-<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -147,6 +146,19 @@
   .lot-chip:hover { background:#fce7c8; }
   .dash-sous { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--gris); margin:2px 0 8px; font-weight:600; }
   .pdf-scroll .feuille + .feuille { margin-top:22px; }
+  .login-overlay { position:fixed; inset:0; background:linear-gradient(135deg,var(--hero-1),var(--hero-2)); display:flex; align-items:center; justify-content:center; z-index:100; padding:16px; }
+  .login-card { background:#fff; border-radius:16px; padding:34px 32px; width:100%; max-width:380px; box-shadow:0 20px 60px rgba(0,0,0,.35); }
+  .login-logo { display:flex; align-items:center; gap:11px; margin-bottom:22px; }
+  .login-logo svg { height:40px; width:40px; flex-shrink:0; }
+  .login-logo .org { font-weight:700; font-size:15px; line-height:1.1; }
+  .login-logo .sub { font-size:10px; letter-spacing:.12em; color:var(--gris); text-transform:uppercase; margin-top:2px; }
+  .login-card h2 { font-size:20px; font-weight:700; }
+  .login-desc { font-size:13px; color:var(--gris); margin:4px 0 18px; }
+  .login-card input { width:100%; padding:11px 13px; font-size:14px; border:1px solid #d1d5db; border-radius:9px; margin-bottom:11px; }
+  .login-card input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(43,130,217,.14); }
+  .login-err { color:#dc2626; font-size:13px; min-height:18px; margin-bottom:6px; }
+  .sb-logout { margin-top:9px; background:none; border:none; color:#8fa0b3; cursor:pointer; font-size:12px; display:inline-flex; align-items:center; gap:6px; padding:0; }
+  .sb-logout:hover { color:#cdd8e3; }
   .interv-liste { display:flex; flex-direction:column; gap:8px; margin-bottom:10px; }
   .interv-row { display:flex; align-items:center; gap:10px; padding:9px 11px; border:1px solid var(--bord); border-radius:9px; background:#fafbfc; }
   .interv-row .ch { flex:1; min-width:0; }
@@ -251,6 +263,20 @@
 </style>
 </head>
 <body>
+<div id="login-overlay" class="login-overlay">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 24 20 12l14 12" stroke="#2b82d9" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 31 20 19l14 12" stroke="#c7ced8" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div><div class="org">Les Artisans Bâtisseurs</div><div class="sub">Base Achats & Commercial</div></div>
+    </div>
+    <h2>Connexion</h2>
+    <p class="login-desc">Accès réservé à l'équipe LAB.</p>
+    <input id="login-mail" type="email" placeholder="Email" autocomplete="username" />
+    <input id="login-pwd" type="password" placeholder="Mot de passe" autocomplete="current-password" onkeydown="if(event.key==='Enter')seConnecter()" />
+    <div class="login-err" id="login-err"></div>
+    <button class="btn btn-primaire" style="width:100%;justify-content:center" onclick="seConnecter()">Se connecter</button>
+  </div>
+</div>
 <div class="app">
   <aside class="sidebar">
     <!-- LOGO : remplace le <svg class="mark"> par <img class="mark" src="logo.png" alt="LAB"> pour ton vrai logo -->
@@ -277,7 +303,7 @@
       <div class="sb-item" onclick="ouvrirLots()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M3 12h18M3 17h18"/></svg><span>Gérer les lots</span></div>
       <div class="sb-item" onclick="exporterCSV()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg><span>Exporter CSV</span></div>
     </div>
-    <div class="sb-foot">Entreprise générale · TCE<br>Orgeval (78)</div>
+    <div class="sb-foot"><div id="user-mail" style="color:#c7d2de;margin-bottom:4px;word-break:break-all;font-size:11px"></div>Entreprise générale · TCE — Orgeval (78)<br><button class="sb-logout" onclick="seDeconnecter()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Se déconnecter</button></div>
   </aside>
 
   <div class="main">
@@ -401,10 +427,10 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script>
 /* ===== CONFIG ===== */
-/* ⚠️ BASE DÉDIÉE AU SERVICE ACHATS & COMMERCIAL — INDÉPENDANTE DU CRM.
-   Crée un NOUVEAU projet Firebase (≠ celui du CRM) puis colle sa config ici. */
+/* Base Achats & Commercial de LAB — projet Firebase dédié base-achat-sst-lab (indépendant du CRM). */
 const firebaseConfig = {
   apiKey:"AIzaSyAVSNnDfqNVfjE4g8Sh1eosqRiZGTws7Fw", authDomain:"base-achat-sst-lab.firebaseapp.com",
   databaseURL:"https://base-achat-sst-lab-default-rtdb.europe-west1.firebasedatabase.app",
@@ -440,8 +466,31 @@ const MOIS=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','
 (function(){ const d=new Date(); document.getElementById('date-jour').textContent=`${JOURS[d.getDay()]} ${d.getDate()} ${MOIS[d.getMonth()]} ${d.getFullYear()}`; })();
 
 function seedLocal(liste){ const o={}; liste.forEach((l,i)=>o['seed'+i]=l); return o; }
-try { firebase.initializeApp(firebaseConfig); db=firebase.database(); brancher(); }
-catch(e){ console.warn('Config Firebase à compléter',e); lots={fournisseurs:seedLocal(LOTS_FOURNISSEURS),soustraitants:seedLocal(LOTS_SOUSTRAITANTS)}; remplirFiltreLot(); rendre(); majKpis(); }
+let auth=null, brancheFait=false;
+try {
+  firebase.initializeApp(firebaseConfig); db=firebase.database(); auth=firebase.auth();
+  auth.onAuthStateChanged(u=>{
+    if(u){
+      document.getElementById('login-overlay').style.display='none';
+      document.getElementById('user-mail').textContent=u.email||'';
+      if(!brancheFait){ brancher(); brancheFait=true; }
+    } else {
+      document.getElementById('login-overlay').style.display='flex';
+    }
+  });
+} catch(e){ console.warn('Firebase non initialisé',e); document.getElementById('login-overlay').style.display='none';
+  lots={fournisseurs:seedLocal(LOTS_FOURNISSEURS),soustraitants:seedLocal(LOTS_SOUSTRAITANTS)}; remplirFiltreLot(); rendre(); majKpis(); }
+
+function seConnecter(){
+  const mail=document.getElementById('login-mail').value.trim(), pwd=document.getElementById('login-pwd').value, err=document.getElementById('login-err'); err.textContent='';
+  if(!mail||!pwd){ err.textContent='Renseigne ton email et ton mot de passe.'; return; }
+  if(!auth){ err.textContent='Service d\u2019authentification indisponible.'; return; }
+  auth.signInWithEmailAndPassword(mail,pwd).catch(e=>{
+    const m={'auth/invalid-email':'Email invalide.','auth/user-not-found':'Compte introuvable.','auth/wrong-password':'Mot de passe incorrect.','auth/invalid-credential':'Identifiants incorrects.','auth/too-many-requests':'Trop de tentatives — réessaie plus tard.'};
+    err.textContent=m[e.code]||('Erreur : '+e.message);
+  });
+}
+function seDeconnecter(){ if(auth) auth.signOut(); }
 
 function brancher(){
   db.ref('lots').on('value',s=>{
