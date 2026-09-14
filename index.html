@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Base Achats & Commercial — Fournisseurs & Sous-traitants · LAB</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -133,6 +133,20 @@
   .note-edit .etoile-btn svg { width:26px; height:26px; }
   .note-edit .note-reset { margin-left:12px; font-size:12px; color:var(--gris); background:none; border:none; cursor:pointer; text-decoration:underline; }
   .tbl .note-etoiles svg { width:13px; height:13px; }
+  .btn.actif { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .dash-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .dash-grid .panneau.large { grid-column:1 / -1; }
+  .d-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #f1f2f4; cursor:pointer; }
+  .d-row:last-child { border-bottom:none; }
+  .d-row:hover .nom { color:var(--accent); }
+  .d-av { height:32px; width:32px; border-radius:50%; color:#fff; font-weight:700; font-size:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .d-row .nom { font-size:13.5px; font-weight:600; } .d-row .meta { font-size:11.5px; color:var(--gris); }
+  .d-row .droite { margin-left:auto; text-align:right; white-space:nowrap; display:flex; align-items:center; gap:5px; }
+  .d-vide { color:var(--gris-clair); font-size:13px; padding:6px 0; }
+  .lot-chip { display:inline-flex; align-items:center; gap:5px; font-size:12.5px; background:#fff4e6; color:var(--ambre); border:1px solid #f7d9ad; padding:5px 10px; border-radius:8px; margin:0 6px 6px 0; cursor:pointer; }
+  .lot-chip:hover { background:#fce7c8; }
+  .dash-sous { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--gris); margin:2px 0 8px; font-weight:600; }
+  .pdf-scroll .feuille + .feuille { margin-top:22px; }
   .interv-liste { display:flex; flex-direction:column; gap:8px; margin-bottom:10px; }
   .interv-row { display:flex; align-items:center; gap:10px; padding:9px 11px; border:1px solid var(--bord); border-radius:9px; background:#fafbfc; }
   .interv-row .ch { flex:1; min-width:0; }
@@ -207,6 +221,7 @@
     #overlay-pdf .pdf-bar { display:none !important; }
     #overlay-pdf .pdf-scroll { overflow:visible; padding:0; background:#fff; }
     .feuille { box-shadow:none; max-width:none; margin:0; padding:0; }
+    .feuille + .feuille { page-break-before:always; }
     @page { size:A4; margin:16mm; }
   }
   @media (max-width:980px){ .tb-dash{grid-template-columns:1fr;} }
@@ -247,8 +262,12 @@
       <div class="txt"><div class="t1">Les Artisans<br>Bâtisseurs</div><div class="t2">ACHATS & COMMERCIAL</div></div>
     </div>
     <div class="sb-nav">
+      <div class="sb-section">Pilotage</div>
+      <div class="sb-item actif" data-tab="dashboard" onclick="changerOnglet('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        <span>Tableau de bord</span></div>
       <div class="sb-section">Portefeuille</div>
-      <div class="sb-item actif" data-tab="fournisseurs" onclick="changerOnglet('fournisseurs')">
+      <div class="sb-item" data-tab="fournisseurs" onclick="changerOnglet('fournisseurs')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M6 21V7l7-4 7 4v14M9 21v-5h4v5"/></svg>
         <span>Fournisseurs</span><span class="badge" id="badge-fournisseurs">0</span></div>
       <div class="sb-item" data-tab="soustraitants" onclick="changerOnglet('soustraitants')">
@@ -289,7 +308,7 @@
         </div>
       </div>
 
-      <div class="tb-dash">
+      <div class="tb-dash" id="tb-dash">
         <div class="tb-stats">
           <div class="stat"><div class="v" id="tb-total">0</div><div class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M6 21V7l7-4 7 4v14"/></svg>Référencés</div></div>
           <div class="stat"><div class="v" id="tb-lots">0</div><div class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M3 12h18M3 17h18"/></svg>Lots couverts</div></div>
@@ -312,6 +331,8 @@
           <button data-vue="cartes" class="actif" onclick="changerVue('cartes')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Cartes</button>
           <button data-vue="tableau" onclick="changerVue('tableau')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>Tableau</button>
         </div>
+        <button class="btn" id="btn-favoris" onclick="toggleFiltreFavori()" title="Afficher seulement les favoris"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.8 5.9 20.4l1.5-6.8L2.2 9l6.9-.7z"/></svg>Favoris</button>
+        <button class="btn" onclick="imprimerAnnuaire()" title="Imprimer tout l'annuaire de cette vue"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Annuaire</button>
         <button class="btn btn-primaire" style="margin-left:auto" onclick="ouvrirFiche()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5v14"/></svg><span id="txt-ajouter">Ajouter un fournisseur</span></button>
       </div>
 
@@ -342,6 +363,7 @@
     <label class="champ"><span>Contact référent</span><input id="f-contact" /></label>
     <div class="duo"><label class="champ"><span>Téléphone</span><input id="f-tel" /></label><label class="champ"><span>Email</span><input id="f-email" /></label></div>
     <label class="champ"><span>Adresse</span><input id="f-adresse" /></label>
+    <label class="champ"><span>Site web</span><input id="f-siteweb" placeholder="ex : entreprise.fr" /></label>
     <label class="champ"><span>SIRET</span><input id="f-siret" /></label>
     <label class="champ"><span>Notes</span><textarea id="f-notes" rows="2"></textarea></label>
   </div>
@@ -360,7 +382,7 @@
 <!-- Modale aperçu fiche PDF -->
 <div class="overlay" id="overlay-pdf"><div class="modale-pdf">
   <div class="pdf-bar">
-    <span class="titre">Aperçu de la fiche contact</span>
+    <span class="titre" id="pdf-titre">Aperçu de la fiche contact</span>
     <button class="btn" style="margin-left:auto" onclick="fermer('overlay-pdf')">Fermer</button>
     <button class="btn btn-primaire" onclick="imprimerFiche()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimer / PDF</button>
   </div>
@@ -410,7 +432,7 @@ const LOTS_SOUSTRAITANTS = [
 ];
 
 /* ===== ÉTAT ===== */
-let db=null, lots={fournisseurs:{},soustraitants:{}}, entreprises={fournisseurs:{},soustraitants:{}}, ongletActif='fournisseurs';
+let db=null, lots={fournisseurs:{},soustraitants:{}}, entreprises={fournisseurs:{},soustraitants:{}}, ongletActif='dashboard';
 let vueActive='cartes', tri={col:'raisonSociale',dir:1};
 
 const JOURS=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
@@ -445,7 +467,11 @@ function majKpis(){
 function changerOnglet(t){
   ongletActif=t;
   document.querySelectorAll('.sb-item[data-tab]').forEach(o=>o.classList.toggle('actif',o.dataset.tab===t));
-  const f=(t==='fournisseurs');
+  const dash=(t==='dashboard'), f=(t==='fournisseurs');
+  document.getElementById('tb-dash').style.display=dash?'none':'';
+  document.querySelector('.toolbar').style.display=dash?'none':'';
+  if(dash){ document.getElementById('titre-section').textContent='Tableau de bord';
+    document.getElementById('soustitre-section').textContent="Vue d'ensemble Achats & Commercial"; rendre(); return; }
   document.getElementById('titre-section').textContent=f?'Fournisseurs':'Sous-traitants';
   document.getElementById('soustitre-section').textContent=f?'Répertoire achats classé par famille':'Répertoire des sous-traitants classé par lot';
   document.getElementById('txt-ajouter').textContent=f?'Ajouter un fournisseur':'Ajouter un sous-traitant';
@@ -508,14 +534,18 @@ function majDashboard(){
 }
 
 /* ===== RENDU ===== */
+let filtreFavori=false;
 function listeFiltree(){
   const q=document.getElementById('recherche').value.trim().toLowerCase(), fl=document.getElementById('filtre-lot').value;
   return Object.entries(entreprises[ongletActif]||{}).map(([id,e])=>({id,...e})).filter(e=>{
+    if(filtreFavori && !e.favori) return false;
     if(fl!=='tous'&&e.lotId!==fl) return false; if(!q) return true; const lot=lotDe(ongletActif,e.lotId);
-    return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,lot&&lot.libelle].filter(Boolean).join(' ').toLowerCase().includes(q);
+    return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,lot&&lot.libelle].filter(Boolean).join(' ').toLowerCase().includes(q);
   });
 }
+function toggleFiltreFavori(){ filtreFavori=!filtreFavori; document.getElementById('btn-favoris').classList.toggle('actif',filtreFavori); rendre(); }
 function rendre(){
+  if(ongletActif==='dashboard'){ rendreDashboard(); return; }
   majDashboard();
   const liste=listeFiltree();
   if(vueActive==='tableau') return rendreTableau(liste);
@@ -524,12 +554,41 @@ function rendre(){
   const parLot={}; liste.forEach(e=>{ const k=e.lotId||'sans'; (parLot[k]=parLot[k]||[]).push(e); });
   let html=''; [...lotsTries(ongletActif).map(l=>l.id),'sans'].forEach(lotId=>{
     const grp=parLot[lotId]; if(!grp||!grp.length) return; const lot=lotDe(ongletActif,lotId);
-    grp.sort((a,b)=>a.raisonSociale.localeCompare(b.raisonSociale,'fr'));
+    grp.sort((a,b)=>(b.favori?1:0)-(a.favori?1:0)||a.raisonSociale.localeCompare(b.raisonSociale,'fr'));
     html+=`<div class="lot-groupe"><div class="lot-titre"><span class="lot-num">${lot?esc(lot.num):'—'}</span><span class="lot-nom">${lot?esc(lot.libelle):'Sans lot'}</span><span class="lot-compte">${grp.length}</span></div><div class="grille">${grp.map(carte).join('')}</div></div>`;
   });
   zone.innerHTML=html;
 }
 function videHtml(){ return `<div class="vide"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/></svg><p>Aucune entreprise ${ongletActif==='fournisseurs'?'fournisseur':'sous-traitante'} pour l'instant.</p></div>`; }
+
+function rendreDashboard(){
+  const zone=document.getElementById('contenu'), all=toutesLesEntreprises();
+  const nf=Object.keys(entreprises.fournisseurs).length, ns=Object.keys(entreprises.soustraitants).length, total=nf+ns, maxRep=Math.max(1,nf,ns);
+  const tops=Object.entries(entreprises.soustraitants).map(([id,e])=>({id,type:'soustraitants',...e})).filter(e=>noteMoyenne(e)>0).sort((a,b)=>noteMoyenne(b)-noteMoyenne(a)).slice(0,5);
+  const usedF=new Set(Object.values(entreprises.fournisseurs).map(e=>e.lotId).filter(Boolean));
+  const usedS=new Set(Object.values(entreprises.soustraitants).map(e=>e.lotId).filter(Boolean));
+  const manqueF=lotsTries('fournisseurs').filter(l=>!usedF.has(l.id)), manqueS=lotsTries('soustraitants').filter(l=>!usedS.has(l.id));
+  const derniers=all.slice().sort((a,b)=>String(b.id).localeCompare(String(a.id))).slice(0,6);
+  const favs=all.filter(e=>e.favori);
+  const rowEnt=e=>{ const a=avatar(e.raisonSociale), lot=lotDe(e.type,e.lotId), t=e.type==='fournisseurs'?'Fournisseur':'Sous-traitant';
+    return `<div class="d-row" onclick="allerVers('${e.type}','${e.id}')"><div class="d-av" style="background:${a.coul}">${esc(a.init)}</div><div style="min-width:0"><div class="nom">${esc(e.raisonSociale)}</div><div class="meta">${t}${lot?' · '+esc(lot.libelle):''}</div></div>${(e.type==='soustraitants'&&noteMoyenne(e))?`<div class="droite">${etoiles(Math.round(noteMoyenne(e)))}<span class="meta">${noteMoyenne(e).toFixed(1)}</span></div>`:''}</div>`; };
+  zone.innerHTML=`<div class="dash-grid">
+    <div class="panneau"><div class="panneau-titre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>Répartition du portefeuille</div>
+      <div class="barre-ligne"><div class="nom">Fournisseurs</div><div class="piste"><div class="rempli" style="width:${Math.max(9,nf/maxRep*100)}%">${nf}</div></div></div>
+      <div class="barre-ligne"><div class="nom">Sous-traitants</div><div class="piste"><div class="rempli" style="width:${Math.max(9,ns/maxRep*100)}%;background:var(--ambre)">${ns}</div></div></div>
+      <div style="margin-top:12px;font-size:13px;color:var(--gris)">Total : <strong style="color:var(--ink)">${total}</strong> contacts</div></div>
+    <div class="panneau"><div class="panneau-titre"><svg viewBox="0 0 24 24" fill="#f2a03d" stroke="none"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.8 5.9 20.4l1.5-6.8L2.2 9l6.9-.7z"/></svg>Top sous-traitants</div>
+      ${tops.length?tops.map(rowEnt).join(''):'<div class="d-vide">Aucun sous-traitant noté pour l\'instant.</div>'}</div>
+    <div class="panneau"><div class="panneau-titre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>Lots à compléter</div>
+      <div class="dash-sous">Fournisseurs</div>${manqueF.length?manqueF.map(l=>`<span class="lot-chip" onclick="ajouterPourLot('fournisseurs','${l.id}')">＋ ${esc(l.libelle)}</span>`).join(''):'<div class="d-vide">Tous les lots ont au moins un contact.</div>'}
+      <div class="dash-sous" style="margin-top:12px">Sous-traitants</div>${manqueS.length?manqueS.map(l=>`<span class="lot-chip" onclick="ajouterPourLot('soustraitants','${l.id}')">＋ ${esc(l.libelle)}</span>`).join(''):'<div class="d-vide">Tous les lots ont au moins un contact.</div>'}</div>
+    <div class="panneau"><div class="panneau-titre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>Derniers ajouts</div>
+      ${derniers.length?derniers.map(rowEnt).join(''):'<div class="d-vide">Aucun contact enregistré.</div>'}</div>
+    <div class="panneau large"><div class="panneau-titre"><svg viewBox="0 0 24 24" fill="#f2a03d" stroke="none"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.8 5.9 20.4l1.5-6.8L2.2 9l6.9-.7z"/></svg>Favoris ${favs.length?'('+favs.length+')':''}</div>
+      ${favs.length?favs.map(rowEnt).join(''):'<div class="d-vide">Aucun favori. Épingle tes partenaires clés avec l\'étoile sur leur fiche.</div>'}</div>
+  </div>`;
+}
+function ajouterPourLot(type,lotId){ changerOnglet(type); ouvrirFiche(); document.getElementById('f-lot').value=lotId; }
 
 function carte(e){
   const st=ongletActif==='soustraitants', cls=st?'s':'f', label=st?'Sous-traitant':'Fournisseur', a=avatar(e.raisonSociale);
@@ -537,15 +596,18 @@ function carte(e){
       <div class="avatar" style="background:${a.coul}">${esc(a.init)}</div>
       <div style="min-width:0"><h3>${esc(e.raisonSociale)}</h3><span class="chip ${cls}">${label}</span>
         ${st?`<div class="note-ligne">${etoiles(Math.round(noteMoyenne(e)))}<span class="note-txt">${noteMoyenne(e)?noteMoyenne(e).toFixed(1)+'/5':'Non noté'}${nbChantiers(e)?' · '+nbChantiers(e)+' chantier'+(nbChantiers(e)>1?'s':''):''}</span></div>`:''}</div>
+      <div style="margin-left:auto;display:flex;align-items:flex-start;gap:2px">
+      <button class="ico-btn fav" title="Favori" onclick="toggleFavori('${e.id}')">${etoileSVG(!!e.favori)}</button>
       <div class="actions"><button class="ico-btn" title="Fiche PDF" onclick="ouvrirFichePDF('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
         <button class="ico-btn" onclick='ouvrirFiche(${JSON.stringify({id:e.id})})'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
-        <button class="ico-btn suppr" onclick="supprimer('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div></div>
+        <button class="ico-btn suppr" onclick="supprimer('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div></div></div>
     <div class="infos">
       ${e.contact?`<div class="info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${esc(e.contact)}</div>`:''}
       ${e.tel?`<a class="info" href="tel:${esc(e.tel)}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12 12 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4 12 12 0 0 0 2.8.7 2 2 0 0 1 1.7 2Z"/></svg><span class="mono">${esc(e.tel)}</span></a>`:''}
       ${e.email?`<a class="info" href="mailto:${esc(e.email)}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>${esc(e.email)}</a>`:''}
       ${e.adresse?`<div class="info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>${esc(e.adresse)}</div>`:''}
       ${e.siret?`<div class="info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/></svg><span class="mono">${esc(e.siret)}</span></div>`:''}
+      ${e.siteweb?`<a class="info" href="${lienWeb(e.siteweb)}" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20Z"/></svg>${esc(e.siteweb)}</a>`:''}
       ${e.notes?`<div class="note">${esc(e.notes)}</div>`:''}
     </div></div>`;
 }
@@ -568,7 +630,7 @@ function rendreTableau(liste){
       <td>${e.email?`<a class="info" href="mailto:${esc(e.email)}">${esc(e.email)}</a>`:'<span class="mut">—</span>'}</td>
       <td>${e.siret?`<span class="tbl-mono">${esc(e.siret)}</span>`:'<span class="mut">—</span>'}</td>
       ${st?`<td>${noteMoyenne(e)?etoiles(Math.round(noteMoyenne(e)))+' <span class="tbl-mono">'+noteMoyenne(e).toFixed(1)+'</span>'+(nbChantiers(e)?' <span class="mut">('+nbChantiers(e)+')</span>':''):'<span class="mut">—</span>'}</td>`:''}
-      <td><div class="tbl-actions"><button class="ico-btn" title="Fiche PDF" onclick="ouvrirFichePDF('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
+      <td><div class="tbl-actions"><button class="ico-btn fav" title="Favori" onclick="toggleFavori('${e.id}')">${etoileSVG(!!e.favori)}</button><button class="ico-btn" title="Fiche PDF" onclick="ouvrirFichePDF('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
         <button class="ico-btn" onclick='ouvrirFiche(${JSON.stringify({id:e.id})})'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         <button class="ico-btn suppr" onclick="supprimer('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div></td></tr>`;
   }).join('');
@@ -589,7 +651,7 @@ function ouvrirFiche(arg){
   document.getElementById('f-id').value=modif?arg.id:''; document.getElementById('f-type').value=e.type||ongletActif;
   document.getElementById('f-raison').value=e.raisonSociale||''; document.getElementById('f-contact').value=e.contact||'';
   document.getElementById('f-tel').value=e.tel||''; document.getElementById('f-email').value=e.email||'';
-  document.getElementById('f-adresse').value=e.adresse||''; document.getElementById('f-siret').value=e.siret||''; document.getElementById('f-notes').value=e.notes||'';
+  document.getElementById('f-adresse').value=e.adresse||''; document.getElementById('f-siret').value=e.siret||''; document.getElementById('f-siteweb').value=e.siteweb||''; document.getElementById('f-notes').value=e.notes||'';
   interventionsForm = e.interventions ? Object.entries(e.interventions).map(([id,i])=>({id,...i})) : [];
   majTypeFiche(); document.getElementById('f-lot').value=e.lotId||'';
   document.getElementById('overlay-fiche').classList.add('ouvert');
@@ -600,7 +662,7 @@ function enregistrerFiche(){
   const id=document.getElementById('f-id').value, typeCible=document.getElementById('f-type').value;
   const fiche={ raisonSociale:raison, lotId:document.getElementById('f-lot').value, contact:document.getElementById('f-contact').value.trim(),
     tel:document.getElementById('f-tel').value.trim(), email:document.getElementById('f-email').value.trim(),
-    adresse:document.getElementById('f-adresse').value.trim(), siret:document.getElementById('f-siret').value.trim(), notes:document.getElementById('f-notes').value.trim() };
+    adresse:document.getElementById('f-adresse').value.trim(), siret:document.getElementById('f-siret').value.trim(), siteweb:document.getElementById('f-siteweb').value.trim(), notes:document.getElementById('f-notes').value.trim() };
   if(typeCible==='soustraitants'){
     const obj={}; interventionsForm.forEach(i=>{ const k=i.id||('iv'+Math.random().toString(36).slice(2,9)); obj[k]={chantier:i.chantier||'',date:i.date||'',commentaire:i.commentaire||'',note:Number(i.note)||0}; });
     fiche.interventions=obj;
@@ -625,6 +687,7 @@ function remplirSelectLotsForm(type,sel){
   if(sel!==undefined) document.getElementById('f-lot').value=sel||'';
 }
 function ouvrirLots(){
+  if(ongletActif==='dashboard'){ alert('Ouvre l\u2019onglet Fournisseurs ou Sous-traitants pour gérer ses lots.'); return; }
   document.getElementById('lots-modal-titre').textContent='Gérer les lots — '+(ongletActif==='fournisseurs'?'Fournisseurs':'Sous-traitants');
   document.getElementById('liste-lots').innerHTML=lotsTries(ongletActif).map(l=>`<div class="ligne-lot"><span class="mono">${esc(l.num)}</span><span style="flex:1">${esc(l.libelle)}</span>
     <button class="ico-btn" onclick="renommerLot('${l.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
@@ -640,10 +703,11 @@ function supprimerLot(id){ if(!confirm('Supprimer ce lot ? Les entreprises ratta
 
 /* ===== EXPORT ===== */
 function exporterCSV(){
+  if(ongletActif==='dashboard'){ alert('Ouvre l\u2019onglet Fournisseurs ou Sous-traitants pour exporter.'); return; }
   const source=entreprises[ongletActif]||{}, st=(ongletActif==='soustraitants'), echap=v=>`"${String(v||'').replace(/"/g,'""')}"`;
-  const entete=['Lot','Raison sociale','Contact','Téléphone','Email','Adresse','SIRET',...(st?['Note moy /5','Nb chantiers']:[]),'Notes'];
+  const entete=['Lot','Raison sociale','Contact','Téléphone','Email','Site web','Adresse','SIRET',...(st?['Note moy /5','Nb chantiers']:[]),'Favori','Notes'];
   const lignes=Object.values(source).map(e=>{ const lot=lotDe(ongletActif,e.lotId);
-    return [lot?`${lot.num} – ${lot.libelle}`:'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.adresse,e.siret,...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e)]:[]),e.notes].map(echap).join(';'); });
+    return [lot?`${lot.num} – ${lot.libelle}`:'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e)]:[]),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+[entete.join(';'),...lignes].join('\n')],{type:'text/csv;charset=utf-8;'})); a.download=`${ongletActif}-lab.csv`; a.click();
 }
 
@@ -652,7 +716,7 @@ function toutesLesEntreprises(){ const r=[]; ['fournisseurs','soustraitants'].fo
 function rechercheGlobale(){
   const q=document.getElementById('recherche-globale').value.trim().toLowerCase(), dd=document.getElementById('dropdown-globale');
   if(!q){ dd.classList.remove('ouvert'); return; }
-  const res=toutesLesEntreprises().filter(e=>{ const lot=lotDe(e.type,e.lotId); return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,lot&&lot.libelle].filter(Boolean).join(' ').toLowerCase().includes(q); }).slice(0,8);
+  const res=toutesLesEntreprises().filter(e=>{ const lot=lotDe(e.type,e.lotId); return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,lot&&lot.libelle].filter(Boolean).join(' ').toLowerCase().includes(q); }).slice(0,8);
   dd.innerHTML=res.length?res.map(e=>{ const lot=lotDe(e.type,e.lotId), t=e.type==='fournisseurs'?'Fournisseur':'Sous-traitant', a=avatar(e.raisonSociale);
     return `<div class="dd-item" onclick="allerVers('${e.type}','${e.id}')"><div style="background:${a.coul};height:30px;width:30px;border-radius:50%;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${esc(a.init)}</div><div><div class="dd-nom">${esc(e.raisonSociale)}</div><div class="dd-meta">${t}${lot?' · Lot '+esc(lot.num)+' '+esc(lot.libelle):''}</div></div></div>`; }).join('') : '<div class="dd-vide">Aucun résultat</div>';
   dd.classList.add('ouvert');
@@ -665,9 +729,11 @@ function allerVers(type,id){
 }
 document.addEventListener('click',e=>{ if(!e.target.closest('.rg')) document.getElementById('dropdown-globale').classList.remove('ouvert'); });
 
-/* ===== FICHE PDF ===== */
-function ouvrirFichePDF(id){
-  const type=ongletActif, e=entreprises[type][id]; if(!e) return;
+/* ===== FICHE PDF / ANNUAIRE ===== */
+function lienWeb(u){ u=String(u||'').trim(); if(!u) return '#'; return /^https?:\/\//i.test(u)?u:'https://'+u; }
+function toggleFavori(id){ const e=entreprises[ongletActif]&&entreprises[ongletActif][id]; if(!e) return; const val=!e.favori;
+  if(db){ db.ref(ongletActif+'/'+id+'/favori').set(val); } else { e.favori=val; rendre(); } }
+function feuilleHTML(e,type){
   const lot=lotDe(type,e.lotId), a=avatar(e.raisonSociale), st=(type==='soustraitants');
   const typeLabel=st?'FICHE SOUS-TRAITANT':'FICHE FOURNISSEUR';
   const d=new Date(), dateStr=`${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
@@ -675,8 +741,7 @@ function ouvrirFichePDF(id){
   const moy=noteMoyenne(e), arr=interventionsArr(e);
   const ligneNote = st?`<div class="f-ligne"><div class="lab">Note moyenne</div><div class="val">${etoiles(Math.round(moy))} <span style="color:#6b7280;font-size:13px">${moy?moy.toFixed(1)+'/5 sur '+arr.length+' chantier'+(arr.length>1?'s':''):'Non noté'}</span></div></div>`:'';
   const histoHtml = (st && arr.length)?`<div class="f-notes-bloc"><div class="lab">Historique des chantiers (${arr.length})</div><div class="f-grille">${arr.map(i=>`<div class="f-ligne"><div class="lab" style="width:auto;flex:1;background:#fff;text-transform:none;color:#1f2937;font-weight:600">${esc(i.chantier)}${i.date?' <span style=\"color:#9ca3af;font-weight:400\">· '+esc(i.date)+'</span>':''}${i.commentaire?'<div style=\"font-weight:400;color:#6b7280;font-size:12px;margin-top:3px\">'+esc(i.commentaire)+'</div>':''}</div><div class="val" style="white-space:nowrap">${etoiles(i.note)}</div></div>`).join('')}</div></div>`:'';
-  document.getElementById('pdf-contenu').innerHTML=`
-    <div class="feuille">
+  return `<div class="feuille">
       <div class="f-entete">
         <svg class="mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 24 20 12l14 12" stroke="#2b82d9" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 31 20 19l14 12" stroke="#c7ced8" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <div><div class="org">Les Artisans Bâtisseurs</div><div class="svc">Service Achats &amp; Commercial</div></div>
@@ -684,13 +749,14 @@ function ouvrirFichePDF(id){
       </div>
       <div class="f-titre">
         <div class="f-avatar" style="background:${a.coul}">${esc(a.init)}</div>
-        <div><h1>${esc(e.raisonSociale)}</h1><div class="lot">${lot?'Lot '+esc(lot.num)+' · '+esc(lot.libelle):'Lot non renseigné'}</div></div>
+        <div><h1>${esc(e.raisonSociale)}${e.favori?' <span style=\"color:#f2a03d;font-size:18px\">★</span>':''}</h1><div class="lot">${lot?'Lot '+esc(lot.num)+' · '+esc(lot.libelle):'Lot non renseigné'}</div></div>
       </div>
       <div class="f-grille">
         ${ligne('Contact référent',e.contact)}
         ${ligneNote}
         ${ligne('Téléphone',e.tel,true)}
         ${ligne('Email',e.email)}
+        ${ligne('Site web',e.siteweb)}
         ${ligne('Adresse',e.adresse)}
         ${ligne('SIRET',e.siret,true)}
       </div>
@@ -698,6 +764,17 @@ function ouvrirFichePDF(id){
       ${e.notes?`<div class="f-notes-bloc"><div class="lab">Notes</div><div class="txt">${esc(e.notes)}</div></div>`:''}
       <div class="f-pied"><span>Document interne — Les Artisans Bâtisseurs · Orgeval (78)</span><span>Édité le ${dateStr}</span></div>
     </div>`;
+}
+function ouvrirFichePDF(id){
+  const type=ongletActif, e=entreprises[type]&&entreprises[type][id]; if(!e) return;
+  document.getElementById('pdf-titre').textContent='Aperçu de la fiche contact';
+  document.getElementById('pdf-contenu').innerHTML=feuilleHTML(e,type);
+  document.getElementById('overlay-pdf').classList.add('ouvert');
+}
+function imprimerAnnuaire(){
+  const type=ongletActif, liste=listeFiltree(); if(!liste.length){ alert('Aucune fiche à imprimer dans cette vue.'); return; }
+  document.getElementById('pdf-titre').textContent=`Annuaire ${type==='fournisseurs'?'fournisseurs':'sous-traitants'} — ${liste.length} fiche${liste.length>1?'s':''}`;
+  document.getElementById('pdf-contenu').innerHTML=liste.map(e=>feuilleHTML(e,type)).join('');
   document.getElementById('overlay-pdf').classList.add('ouvert');
 }
 function imprimerFiche(){ window.print(); }
@@ -755,7 +832,7 @@ async function appelClaude(q){
 function fermer(id){ document.getElementById(id).classList.remove('ouvert'); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('ouvert'); }));
-rendre(); majKpis();
+changerOnglet('dashboard'); majKpis();
 </script>
 </body>
 </html>
