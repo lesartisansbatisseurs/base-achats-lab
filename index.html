@@ -309,6 +309,7 @@
     <input id="login-pwd" type="password" placeholder="Mot de passe" autocomplete="current-password" onkeydown="if(event.key==='Enter')seConnecter()" />
     <div class="login-err" id="login-err"></div>
     <button class="btn btn-primaire" style="width:100%;justify-content:center" onclick="seConnecter()">Se connecter</button>
+    <div style="text-align:center;margin-top:12px"><a href="#" onclick="motDePasseOublie();return false" style="font-size:12.5px;color:var(--accent);text-decoration:none">Mot de passe oublié ?</a></div>
   </div>
 </div>
 <div class="app">
@@ -529,16 +530,25 @@ try {
       document.getElementById('user-mail').textContent=u.email||'';
       if(!brancheFait){ brancher(); brancheFait=true; }
     } else {
+      debrancher();
       document.getElementById('login-overlay').style.display='flex';
     }
   });
 } catch(e){ console.warn('Firebase non initialisé',e); document.getElementById('login-overlay').style.display='none';
   lots={fournisseurs:seedLocal(LOTS_FOURNISSEURS),soustraitants:seedLocal(LOTS_SOUSTRAITANTS)}; remplirFiltreLot(); rendre(); majKpis(); }
 
+function motDePasseOublie(){
+  const mail=document.getElementById('login-mail').value.trim(), err=document.getElementById('login-err');
+  if(!mail){ err.textContent='Saisis d\u2019abord ton email ci-dessus, puis clique sur « Mot de passe oublié ».'; return; }
+  if(!auth){ err.textContent='Service d\u2019authentification indisponible.'; return; }
+  auth.sendPasswordResetEmail(mail).then(()=>{ err.style.color='#15803d'; err.textContent='Si ce compte existe, un email de réinitialisation vient d\u2019être envoyé.'; setTimeout(()=>err.style.color='',6000); })
+    .catch(e=>{ err.textContent=e.code==='auth/invalid-email'?'Email invalide.':'Envoi impossible pour le moment, réessaie plus tard.'; });
+}
 function seConnecter(){
   const mail=document.getElementById('login-mail').value.trim(), pwd=document.getElementById('login-pwd').value, err=document.getElementById('login-err'); err.textContent='';
   if(!mail||!pwd){ err.textContent='Renseigne ton email et ton mot de passe.'; return; }
   if(!auth){ err.textContent='Service d\u2019authentification indisponible.'; return; }
+  accesRefuse=false;
   auth.signInWithEmailAndPassword(mail,pwd).catch(e=>{
     const m={'auth/invalid-email':'Email invalide.','auth/user-not-found':'Compte introuvable.','auth/wrong-password':'Mot de passe incorrect.','auth/invalid-credential':'Identifiants incorrects.','auth/too-many-requests':'Trop de tentatives — réessaie plus tard.'};
     err.textContent=m[e.code]||('Erreur : '+e.message);
@@ -546,17 +556,22 @@ function seConnecter(){
 }
 function seDeconnecter(){ if(auth) auth.signOut(); }
 
+let accesRefuse=false;
+function refusAcces(err){ console.warn('Accès refusé',err); if(accesRefuse) return; accesRefuse=true; debrancher(); if(auth) auth.signOut();
+  setTimeout(()=>{ document.getElementById('login-err').textContent='Ce compte n\u2019est pas autorisé à accéder à la base. Contacte l\u2019administrateur.'; },50); }
+function debrancher(){ if(!db) return; ['lots','fournisseurs','soustraitants'].forEach(k=>db.ref(k).off()); brancheFait=false;
+  entreprises={fournisseurs:{},soustraitants:{}}; lots={fournisseurs:{},soustraitants:{}}; try{ rendre(); majKpis(); }catch(e){} }
 function brancher(){
   db.ref('lots').on('value',s=>{
     lots=s.val()||{}; lots.fournisseurs=lots.fournisseurs||{}; lots.soustraitants=lots.soustraitants||{};
     if(!Object.keys(lots.fournisseurs).length) semer('fournisseurs',LOTS_FOURNISSEURS);
     if(!Object.keys(lots.soustraitants).length) semer('soustraitants',LOTS_SOUSTRAITANTS);
     remplirFiltreLot(); rendre(); majKpis();
-  });
-  db.ref('fournisseurs').on('value',s=>{ entreprises.fournisseurs=s.val()||{}; majKpis(); rendre(); });
-  db.ref('soustraitants').on('value',s=>{ entreprises.soustraitants=s.val()||{}; majKpis(); rendre(); });
+  },refusAcces);
+  db.ref('fournisseurs').on('value',s=>{ entreprises.fournisseurs=s.val()||{}; majKpis(); rendre(); },refusAcces);
+  db.ref('soustraitants').on('value',s=>{ entreprises.soustraitants=s.val()||{}; majKpis(); rendre(); },refusAcces);
 }
-function semer(type,liste){ const m={}; liste.forEach(l=>{ m[db.ref('lots/'+type).push().key]=l; }); db.ref('lots/'+type).set(m); }
+function semer(type,liste){ const m={}; liste.forEach(l=>{ m[db.ref('lots/'+type).push().key]=l; }); db.ref('lots/'+type).update(m); }
 
 function majKpis(){
   const nf=Object.keys(entreprises.fournisseurs).length, ns=Object.keys(entreprises.soustraitants).length;
