@@ -134,7 +134,7 @@
   .ao-case input:checked { background:var(--accent); border-color:var(--accent); }
   .ao-case input:checked::after { content:''; width:5px; height:9px; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg) translate(-1px,-1px); }
   .ao-case.oui { color:var(--accent); font-weight:600; }
-  .chip.fp { background:#e7f6ee; color:#15803d; } .chip.ps { background:#f1eefc; color:#6d4fc9; }
+  .chip.fp { background:#e7f6ee; color:#15803d; } .chip.fs { background:var(--bleu-clair); color:var(--accent); } .chip.ps { background:#f1eefc; color:#6d4fc9; }
   .tbl .chip { margin-top:0; white-space:nowrap; }
   .carte-ao { margin-top:12px; padding-top:11px; border-top:1px dashed var(--bord); }
   .note-edit { display:flex; align-items:center; gap:2px; }
@@ -194,6 +194,7 @@
   table.tbl tbody tr:last-child td { border-bottom:none; }
   table.tbl tbody tr:hover td { background:#fafbfc; }
   .cliquable { cursor:pointer; }
+  .tbl-adr { display:block; max-width:230px; font-size:13px; line-height:1.35; }
   .lots-cell { display:flex; flex-direction:column; gap:5px; }
   .lots-choix { display:flex; flex-wrap:wrap; gap:7px; max-height:190px; overflow-y:auto; padding:10px; border:1px solid var(--bord); border-radius:10px; background:#fff; }
   .lots-choix label { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; padding:5px 10px; border:1px solid var(--bord); border-radius:8px; cursor:pointer; user-select:none; background:#fafbfc; transition:all .12s; }
@@ -424,7 +425,7 @@
       <div class="duo"><label class="champ"><span>Téléphone</span><input id="f-c2-tel" /></label><label class="champ"><span>Email</span><input id="f-c2-email" /></label></div>
       <datalist id="roles-contact"><option value="Gérant / Patron"><option value="Directeur général"><option value="Commercial(e)"><option value="Secrétaire"><option value="Assistant(e) administratif(ve)"><option value="Conducteur de travaux"><option value="Chef de chantier"><option value="Comptable"></datalist>
     </div>
-    <label class="champ"><span>Adresse</span><input id="f-adresse" /></label>
+    <label class="champ"><span id="lbl-adresse">Adresse</span><input id="f-adresse" /></label>
     <label class="champ"><span>Site web</span><input id="f-siteweb" placeholder="ex : entreprise.fr" /></label>
     <label class="champ"><span>SIRET</span><input id="f-siret" /></label>
     <label class="champ"><span>Notes</span><textarea id="f-notes" rows="2"></textarea></label>
@@ -553,7 +554,7 @@ function changerOnglet(t){
   ongletActif=t;
   document.querySelectorAll('.sb-item[data-tab]').forEach(o=>o.classList.toggle('actif',o.dataset.tab===t));
   const dash=(t==='dashboard'), f=(t==='fournisseurs');
-  document.getElementById('tb-dash').style.display=(dash||t==='soustraitants')?'none':'';
+  document.getElementById('tb-dash').style.display='none';
   document.querySelector('.toolbar').style.display=dash?'none':'';
   if(dash){ document.getElementById('titre-section').textContent='Tableau de bord';
     document.getElementById('soustitre-section').textContent="Vue d'ensemble Achats & Commercial"; rendre(); return; }
@@ -562,8 +563,8 @@ function changerOnglet(t){
   document.getElementById('txt-ajouter').textContent=f?'Ajouter un fournisseur':'Ajouter un sous-traitant';
   document.getElementById('tb-titre').textContent=f?'Répartition des fournisseurs par lot':'Répartition des sous-traitants par lot';
   remplirFiltreLot(); document.getElementById('filtre-lot').value='tous';
-  // Vue par défaut à l'ouverture de l'onglet : Tableau pour les sous-traitants, Cartes pour les fournisseurs
-  changerVue(f?'cartes':'tableau');
+  // Vue par défaut à l'ouverture de l'onglet : Tableau (fournisseurs et sous-traitants)
+  changerVue('tableau');
 }
 function changerVue(v){ vueActive=v; document.querySelectorAll('.vue-toggle button').forEach(b=>b.classList.toggle('actif',b.dataset.vue===v)); rendre(); }
 
@@ -686,9 +687,9 @@ function ajouterPourLot(type,lotId){ changerOnglet(type); ouvrirFiche(); documen
 
 function carte(e){
   const st=ongletActif==='soustraitants', cls=st?'s':'f', label=st?'Sous-traitant':'Fournisseur', a=avatar(e.raisonSociale);
-  return `<div class="carte${st?' cliquable':''}" id="carte-${e.id}" ${st?`onclick="clicFiche(event,'${e.id}')" title="Ouvrir la fiche"`:''}><div class="carte-haut">
+  return `<div class="carte cliquable" id="carte-${e.id}" onclick="clicFiche(event,'${e.id}')" title="Ouvrir la fiche"><div class="carte-haut">
       <div class="avatar" style="background:${a.coul}">${esc(a.init)}</div>
-      <div style="min-width:0"><h3>${esc(e.raisonSociale)}</h3><span class="chip ${cls}">${label}</span>${st&&libIntervention(e)?' '+chipIntervention(e):''}
+      <div style="min-width:0"><h3>${esc(e.raisonSociale)}</h3><span class="chip ${cls}">${label}</span>${libIntervention(e)?' '+chipIntervention(e):''}
         ${st?`<div class="note-ligne">${etoiles(Math.round(noteMoyenne(e)))}<span class="note-txt">${noteMoyenne(e)?noteMoyenne(e).toFixed(1)+'/5':'Non noté'}${nbChantiers(e)?' · '+nbChantiers(e)+' chantier'+(nbChantiers(e)>1?'s':''):''}</span></div>`:''}</div>
       <div style="margin-left:auto;display:flex;align-items:flex-start;gap:2px">
       <button class="ico-btn fav" title="Favori" onclick="toggleFavori('${e.id}')">${etoileSVG(!!e.favori)}</button>
@@ -700,7 +701,6 @@ function carte(e){
       ${e.tel?`<a class="info" href="tel:${esc(e.tel)}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12 12 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4 12 12 0 0 0 2.8.7 2 2 0 0 1 1.7 2Z"/></svg><span class="mono">${esc(e.tel)}</span></a>`:''}
       ${e.email?`<a class="info" href="mailto:${esc(e.email)}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>${esc(e.email)}</a>`:''}
       ${e.adresse?`<div class="info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>${esc(e.adresse)}</div>`:''}
-      ${(e.siret&&!st)?`<div class="info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/></svg><span class="mono">${esc(e.siret)}</span></div>`:''}
       ${e.siteweb?`<a class="info" href="${lienWeb(e.siteweb)}" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20Z"/></svg>${esc(e.siteweb)}</a>`:''}
       ${e.notes?`<div class="note">${esc(e.notes)}</div>`:''}
     </div>
@@ -717,33 +717,33 @@ function rendreTableau(liste){
   const fleche=col=>tri.col===col?(tri.dir>0?'▲':'▼'):'⇅';
   const th=(col,l)=>`<th class="${tri.col===col?'tri':''}" onclick="trier('${col}')">${l}<span class="fl">${fleche(col)}</span></th>`;
   const lignes=liste.map(e=>{ const lot=lotDe(ongletActif,e.lotId), a=avatar(e.raisonSociale);
-    return `<tr id="ligne-${e.id}" ${st?`class="cliquable" onclick="clicFiche(event,'${e.id}')" title="Ouvrir la fiche"`:''}>
+    return `<tr id="ligne-${e.id}" class="cliquable" onclick="clicFiche(event,'${e.id}')" title="Ouvrir la fiche">
       <td><div class="tbl-nom"><div class="tbl-av" style="background:${a.coul}">${esc(a.init)}</div>${esc(e.raisonSociale)}</div></td>
       <td>${celluleLots(ongletActif,e)}</td>
-      ${st?`<td>${chipIntervention(e)||'<span class="mut">—</span>'}</td>`:''}
+      <td>${chipIntervention(e)||'<span class="mut">—</span>'}</td>
       <td>${e.contact?esc(e.contact):'<span class="mut">—</span>'}</td>
       <td>${e.tel?`<a class="info" href="tel:${esc(e.tel)}"><span class="tbl-mono">${esc(e.tel)}</span></a>`:'<span class="mut">—</span>'}</td>
       <td>${e.email?`<a class="info" href="mailto:${esc(e.email)}">${esc(e.email)}</a>`:'<span class="mut">—</span>'}</td>
-      ${st?`<td>${caseAO(e,false)}</td>`:`<td>${e.siret?`<span class="tbl-mono">${esc(e.siret)}</span>`:'<span class="mut">—</span>'}</td>`}
+      ${st?`<td>${caseAO(e,false)}</td>`:`<td>${e.adresse?`<span class="tbl-adr">${esc(e.adresse)}</span>`:'<span class="mut">—</span>'}</td>`}
       ${st?`<td>${noteMoyenne(e)?etoiles(Math.round(noteMoyenne(e)))+' <span class="tbl-mono">'+noteMoyenne(e).toFixed(1)+'</span>'+(nbChantiers(e)?' <span class="mut">('+nbChantiers(e)+')</span>':''):'<span class="mut">—</span>'}</td>`:''}
       <td><div class="tbl-actions"><button class="ico-btn fav" title="Favori" onclick="toggleFavori('${e.id}')">${etoileSVG(!!e.favori)}</button><button class="ico-btn" title="Fiche PDF" onclick="ouvrirFichePDF('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
         <button class="ico-btn" onclick='ouvrirFiche(${JSON.stringify({id:e.id})})'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         <button class="ico-btn suppr" onclick="supprimer('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div></td></tr>`;
   }).join('');
   zone.innerHTML=`<div class="tableau-wrap"><table class="tbl"><thead><tr>
-    ${th('raisonSociale','Raison sociale')}${th('lot',st?'Lots':'Lot')}${st?th('typeIntervention','Intervention'):''}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${st?th('consultAO','Consulter AO'):th('siret','SIRET')}${st?th('note','Note'):''}<th></th>
+    ${th('raisonSociale','Raison sociale')}${th('lot','Lots')}${th('typeIntervention','Intervention')}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${st?th('consultAO','Consulter AO'):th('adresse','Agence référente')}${st?th('note','Note'):''}<th></th>
   </tr></thead><tbody>${lignes}</tbody></table></div>`;
 }
 
 /* ===== CRUD ===== */
 function majTypeFiche(){ const t=document.getElementById('f-type').value;
   document.getElementById('champ-chantiers').style.display=(t==='soustraitants')?'':'none';
-  document.getElementById('champ-intervention').style.display=(t==='soustraitants')?'':'none';
-  document.getElementById('champ-lot-simple').style.display=(t==='soustraitants')?'none':'';
-  document.getElementById('champ-lots-multi').style.display=(t==='soustraitants')?'':'none';
-  document.getElementById('champ-contact2').style.display=(t==='soustraitants')?'':'none';
-  document.getElementById('champ-role1').style.display=(t==='soustraitants')?'':'none';
-  document.getElementById('duo-contact1').style.gridTemplateColumns=(t==='soustraitants')?'':'1fr';
+  document.getElementById('champ-lot-simple').style.display='none';
+  // Options du type d'intervention selon le type d'entreprise
+  const selI=document.getElementById('f-intervention'), valI=selI.value;
+  selI.innerHTML='<option value="">— Non renseigné —</option>'+(t==='soustraitants'?'<option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option>':'<option value="fs">Fourniture seule</option><option value="fp">Fourniture et pose</option>');
+  selI.value=[...selI.options].some(o=>o.value===valI)?valI:'';
+  document.getElementById('lbl-adresse').textContent=(t==='soustraitants')?'Adresse':'Adresse de l\u2019agence référente';
   remplirSelectLotsForm(t); rendreIvNote(); rendreInterventionsForm(); }
 function ouvrirFiche(arg){
   const modif=arg&&arg.id;
@@ -760,7 +760,7 @@ function ouvrirFiche(arg){
   const c2=e.contact2||{}; document.getElementById('f-c2-nom').value=c2.nom||''; document.getElementById('f-c2-role').value=c2.role||'';
   document.getElementById('f-c2-tel').value=c2.tel||''; document.getElementById('f-c2-email').value=c2.email||'';
   document.getElementById('f-lots').innerHTML='';
-  majTypeFiche(); document.getElementById('f-lot').value=e.lotId||''; cocherLotsForm(lotsIds(e));
+  majTypeFiche(); document.getElementById('f-intervention').value=e.typeIntervention||''; document.getElementById('f-lot').value=e.lotId||''; cocherLotsForm(lotsIds(e));
   document.getElementById('overlay-fiche').classList.add('ouvert');
 }
 function enregistrerFiche(){
@@ -770,19 +770,19 @@ function enregistrerFiche(){
   const fiche={ raisonSociale:raison, lotId:document.getElementById('f-lot').value, contact:document.getElementById('f-contact').value.trim(),
     tel:document.getElementById('f-tel').value.trim(), email:document.getElementById('f-email').value.trim(),
     adresse:document.getElementById('f-adresse').value.trim(), siret:document.getElementById('f-siret').value.trim(), siteweb:document.getElementById('f-siteweb').value.trim(), notes:document.getElementById('f-notes').value.trim() };
+  const ids=lotsTries(typeCible).map(l=>l.id).filter(id=>lotsCochesForm().includes(id));
+  fiche.lotIds=ids.length?ids:null; fiche.lotId=ids[0]||'';
+  fiche.typeIntervention=document.getElementById('f-intervention').value||null;
+  fiche.contactRole=document.getElementById('f-contact-role').value.trim()||null;
+  const c2={ nom:document.getElementById('f-c2-nom').value.trim(), role:document.getElementById('f-c2-role').value.trim(),
+    tel:document.getElementById('f-c2-tel').value.trim(), email:document.getElementById('f-c2-email').value.trim() };
+  fiche.contact2=(c2.nom||c2.role||c2.tel||c2.email)?c2:null;
   if(typeCible==='soustraitants'){
     const obj={}; interventionsForm.forEach(i=>{ const k=i.id||('iv'+Math.random().toString(36).slice(2,9)); obj[k]={chantier:i.chantier||'',date:i.date||'',commentaire:i.commentaire||'',note:Number(i.note)||0}; });
     fiche.interventions=obj;
-    const ids=lotsTries('soustraitants').map(l=>l.id).filter(id=>lotsCochesForm().includes(id));
-    fiche.lotIds=ids.length?ids:null; fiche.lotId=ids[0]||'';
-    fiche.typeIntervention=document.getElementById('f-intervention').value||null;
-    fiche.contactRole=document.getElementById('f-contact-role').value.trim()||null;
-    const c2={ nom:document.getElementById('f-c2-nom').value.trim(), role:document.getElementById('f-c2-role').value.trim(),
-      tel:document.getElementById('f-c2-tel').value.trim(), email:document.getElementById('f-c2-email').value.trim() };
-    fiche.contact2=(c2.nom||c2.role||c2.tel||c2.email)?c2:null;
     const ns=interventionsForm.map(i=>Number(i.note)||0).filter(n=>n>0);
     fiche.note=ns.length?+(ns.reduce((a,b)=>a+b,0)/ns.length).toFixed(2):0;
-  } else { fiche.interventions=null; fiche.note=0; fiche.typeIntervention=null; fiche.contact2=null; fiche.contactRole=null; fiche.lotIds=null; }
+  } else { fiche.interventions=null; fiche.note=0; }
   if(id){ if(typeCible!==ongletActif){ db.ref(ongletActif+'/'+id).remove(); db.ref(typeCible).push(fiche); } else db.ref(ongletActif+'/'+id).update(fiche); }
   else db.ref(typeCible).push(fiche);
   fermer('overlay-fiche');
@@ -823,9 +823,9 @@ function supprimerLot(id){ if(!confirm('Supprimer ce lot ? Les entreprises ratta
 function exporterCSV(){
   if(ongletActif==='dashboard'){ alert('Ouvre l\u2019onglet Fournisseurs ou Sous-traitants pour exporter.'); return; }
   const source=entreprises[ongletActif]||{}, st=(ongletActif==='soustraitants'), echap=v=>`"${String(v||'').replace(/"/g,'""')}"`;
-  const entete=[st?'Lots':'Lot','Raison sociale','Contact','Téléphone','Email','Site web','Adresse','SIRET',...(st?['Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention','Note moy /5','Nb chantiers','Consulter AO']:[]),'Favori','Notes'];
+  const entete=[st?'Lots':'Lot','Raison sociale','Contact','Téléphone','Email','Site web',st?'Adresse':'Adresse agence référente','SIRET','Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention',...(st?['Note moy /5','Nb chantiers','Consulter AO']:[]),'Favori','Notes'];
   const lignes=Object.values(source).map(e=>{ const lot=lotDe(ongletActif,e.lotId);
-    return [texteLots(ongletActif,e,' / ')||'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,...(st?[e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),e.consultAO?'Oui':'Non']:[]),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
+    return [texteLots(ongletActif,e,' / ')||'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),e.consultAO?'Oui':'Non']:[]),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+[entete.join(';'),...lignes].join('\n')],{type:'text/csv;charset=utf-8;'})); a.download=`${ongletActif}-lab.csv`; a.click();
 }
 
@@ -851,7 +851,7 @@ document.addEventListener('click',e=>{ if(!e.target.closest('.rg')) document.get
 function lienWeb(u){ u=String(u||'').trim(); if(!u) return '#'; return /^https?:\/\//i.test(u)?u:'https://'+u; }
 // Clic sur une carte / ligne = ouvre la fiche, sauf si on clique sur un bouton, un lien ou la case AO
 function clicFiche(ev,id){ if(ev.target.closest('button,a,label,input,select')) return; ouvrirFiche({id}); }
-const TYPES_INTERV={fp:'Fourniture et pose',ps:'Pose seule'};
+const TYPES_INTERV={fp:'Fourniture et pose',ps:'Pose seule',fs:'Fourniture seule'};
 function libIntervention(e){ return TYPES_INTERV[e.typeIntervention]||''; }
 function chipIntervention(e){ const l=libIntervention(e); return l?`<span class="chip ${e.typeIntervention}">${l}</span>`:''; }
 function caseAO(e,avecLibelle){ const c=!!e.consultAO;
@@ -879,18 +879,18 @@ function feuilleHTML(e,type){
         <div><h1>${esc(e.raisonSociale)}${e.favori?' <span style=\"color:#f2a03d;font-size:18px\">★</span>':''}</h1><div class="lot">${lotsObjs(type,e).length?(lotsObjs(type,e).length>1?'Lots ':'Lot ')+lotsObjs(type,e).map(l=>esc(l.num)+' · '+esc(l.libelle)).join('<br>'):'Lot non renseigné'}</div></div>
       </div>
       <div class="f-grille">
-        ${st?ligne('Type d\u2019intervention',libIntervention(e)||'Non renseigné'):''}
+        ${ligne('Type d\u2019intervention',libIntervention(e)||'Non renseigné')}
         ${ligne('Contact référent',e.contact)}
-        ${st?ligne('Rôle',e.contactRole):''}
+        ${ligne('Rôle',e.contactRole)}
         ${ligneNote}
         ${ligne('Téléphone',e.tel,true)}
         ${ligne('Email',e.email)}
         ${ligne('Site web',e.siteweb)}
-        ${ligne('Adresse',e.adresse)}
+        ${ligne(st?'Adresse':'Agence référente',e.adresse)}
         ${ligne('SIRET',e.siret,true)}
         ${st?ligne('Consultation AO',e.consultAO?'Oui':'Non'):''}
       </div>
-      ${(st&&e.contact2&&(e.contact2.nom||e.contact2.role||e.contact2.tel||e.contact2.email))?`<div class="f-notes-bloc"><div class="lab">Second contact</div><div class="f-grille">
+      ${(e.contact2&&(e.contact2.nom||e.contact2.role||e.contact2.tel||e.contact2.email))?`<div class="f-notes-bloc"><div class="lab">Second contact</div><div class="f-grille">
         ${ligne('Nom',e.contact2.nom)}${ligne('Rôle',e.contact2.role)}${ligne('Téléphone',e.contact2.tel,true)}${ligne('Email',e.contact2.email)}</div></div>`:''}
       ${histoHtml}
       ${e.notes?`<div class="f-notes-bloc"><div class="lab">Notes</div><div class="txt">${esc(e.notes)}</div></div>`:''}
