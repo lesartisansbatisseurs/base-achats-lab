@@ -211,6 +211,8 @@
   label.champ span { display:block; font-size:12px; font-weight:500; color:var(--gris); margin-bottom:5px; }
   label.champ input,label.champ select,label.champ textarea { width:100%; padding:9px 11px; font-size:14px; border:1px solid #d1d5db; border-radius:9px; font-family:inherit; }
   .duo { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .bloc-contact2 { border:1px dashed var(--bord); border-radius:11px; padding:13px 14px 2px; margin-bottom:14px; background:#fafbfc; }
+  .bloc-contact2 .titre-bloc { font-size:12px; font-weight:600; color:var(--gris); text-transform:uppercase; letter-spacing:.03em; margin-bottom:10px; }
   .liste-lots { display:flex; flex-direction:column; }
   .ligne-lot { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid #f1f2f4; }
   .ligne-lot .mono { font-family:var(--mono); font-size:12px; color:var(--gris-clair); width:34px; }
@@ -403,6 +405,13 @@
     </div>
     <label class="champ"><span>Contact référent</span><input id="f-contact" /></label>
     <div class="duo"><label class="champ"><span>Téléphone</span><input id="f-tel" /></label><label class="champ"><span>Email</span><input id="f-email" /></label></div>
+    <div class="bloc-contact2" id="champ-contact2">
+      <div class="titre-bloc">Second contact</div>
+      <div class="duo"><label class="champ"><span>Nom</span><input id="f-c2-nom" /></label>
+        <label class="champ"><span>Rôle</span><input id="f-c2-role" list="roles-contact" placeholder="Choisir ou saisir…" /></label></div>
+      <div class="duo"><label class="champ"><span>Téléphone</span><input id="f-c2-tel" /></label><label class="champ"><span>Email</span><input id="f-c2-email" /></label></div>
+      <datalist id="roles-contact"><option value="Gérant / Patron"><option value="Directeur général"><option value="Commercial(e)"><option value="Secrétaire"><option value="Assistant(e) administratif(ve)"><option value="Conducteur de travaux"><option value="Chef de chantier"><option value="Comptable"></datalist>
+    </div>
     <label class="champ"><span>Adresse</span><input id="f-adresse" /></label>
     <label class="champ"><span>Site web</span><input id="f-siteweb" placeholder="ex : entreprise.fr" /></label>
     <label class="champ"><span>SIRET</span><input id="f-siret" /></label>
@@ -605,7 +614,7 @@ function listeFiltree(){
   return Object.entries(entreprises[ongletActif]||{}).map(([id,e])=>({id,...e})).filter(e=>{
     if(filtreFavori && !e.favori) return false;
     if(fl!=='tous'&&e.lotId!==fl) return false; if(!q) return true; const lot=lotDe(ongletActif,e.lotId);
-    return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,lot&&lot.libelle,libIntervention(e)].filter(Boolean).join(' ').toLowerCase().includes(q);
+    return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,lot&&lot.libelle,libIntervention(e),e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q);
   });
 }
 function toggleFiltreFavori(){ filtreFavori=!filtreFavori; document.getElementById('btn-favoris').classList.toggle('actif',filtreFavori); rendre(); }
@@ -710,6 +719,7 @@ function rendreTableau(liste){
 function majTypeFiche(){ const t=document.getElementById('f-type').value;
   document.getElementById('champ-chantiers').style.display=(t==='soustraitants')?'':'none';
   document.getElementById('champ-intervention').style.display=(t==='soustraitants')?'':'none';
+  document.getElementById('champ-contact2').style.display=(t==='soustraitants')?'':'none';
   remplirSelectLotsForm(t); rendreIvNote(); rendreInterventionsForm(); }
 function ouvrirFiche(arg){
   const modif=arg&&arg.id;
@@ -722,6 +732,8 @@ function ouvrirFiche(arg){
   document.getElementById('f-adresse').value=e.adresse||''; document.getElementById('f-siret').value=e.siret||''; document.getElementById('f-siteweb').value=e.siteweb||''; document.getElementById('f-notes').value=e.notes||'';
   interventionsForm = e.interventions ? Object.entries(e.interventions).map(([id,i])=>({id,...i})) : [];
   document.getElementById('f-intervention').value=e.typeIntervention||'';
+  const c2=e.contact2||{}; document.getElementById('f-c2-nom').value=c2.nom||''; document.getElementById('f-c2-role').value=c2.role||'';
+  document.getElementById('f-c2-tel').value=c2.tel||''; document.getElementById('f-c2-email').value=c2.email||'';
   majTypeFiche(); document.getElementById('f-lot').value=e.lotId||'';
   document.getElementById('overlay-fiche').classList.add('ouvert');
 }
@@ -736,9 +748,12 @@ function enregistrerFiche(){
     const obj={}; interventionsForm.forEach(i=>{ const k=i.id||('iv'+Math.random().toString(36).slice(2,9)); obj[k]={chantier:i.chantier||'',date:i.date||'',commentaire:i.commentaire||'',note:Number(i.note)||0}; });
     fiche.interventions=obj;
     fiche.typeIntervention=document.getElementById('f-intervention').value||null;
+    const c2={ nom:document.getElementById('f-c2-nom').value.trim(), role:document.getElementById('f-c2-role').value.trim(),
+      tel:document.getElementById('f-c2-tel').value.trim(), email:document.getElementById('f-c2-email').value.trim() };
+    fiche.contact2=(c2.nom||c2.role||c2.tel||c2.email)?c2:null;
     const ns=interventionsForm.map(i=>Number(i.note)||0).filter(n=>n>0);
     fiche.note=ns.length?+(ns.reduce((a,b)=>a+b,0)/ns.length).toFixed(2):0;
-  } else { fiche.interventions=null; fiche.note=0; fiche.typeIntervention=null; }
+  } else { fiche.interventions=null; fiche.note=0; fiche.typeIntervention=null; fiche.contact2=null; }
   if(id){ if(typeCible!==ongletActif){ db.ref(ongletActif+'/'+id).remove(); db.ref(typeCible).push(fiche); } else db.ref(ongletActif+'/'+id).update(fiche); }
   else db.ref(typeCible).push(fiche);
   fermer('overlay-fiche');
@@ -775,9 +790,9 @@ function supprimerLot(id){ if(!confirm('Supprimer ce lot ? Les entreprises ratta
 function exporterCSV(){
   if(ongletActif==='dashboard'){ alert('Ouvre l\u2019onglet Fournisseurs ou Sous-traitants pour exporter.'); return; }
   const source=entreprises[ongletActif]||{}, st=(ongletActif==='soustraitants'), echap=v=>`"${String(v||'').replace(/"/g,'""')}"`;
-  const entete=['Lot','Raison sociale','Contact','Téléphone','Email','Site web','Adresse','SIRET',...(st?['Type d\'intervention','Note moy /5','Nb chantiers','Consulter AO']:[]),'Favori','Notes'];
+  const entete=['Lot','Raison sociale','Contact','Téléphone','Email','Site web','Adresse','SIRET',...(st?['Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention','Note moy /5','Nb chantiers','Consulter AO']:[]),'Favori','Notes'];
   const lignes=Object.values(source).map(e=>{ const lot=lotDe(ongletActif,e.lotId);
-    return [lot?`${lot.num} – ${lot.libelle}`:'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,...(st?[libIntervention(e),noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),e.consultAO?'Oui':'Non']:[]),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
+    return [lot?`${lot.num} – ${lot.libelle}`:'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,...(st?[...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),e.consultAO?'Oui':'Non']:[]),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+[entete.join(';'),...lignes].join('\n')],{type:'text/csv;charset=utf-8;'})); a.download=`${ongletActif}-lab.csv`; a.click();
 }
 
@@ -786,7 +801,7 @@ function toutesLesEntreprises(){ const r=[]; ['fournisseurs','soustraitants'].fo
 function rechercheGlobale(){
   const q=document.getElementById('recherche-globale').value.trim().toLowerCase(), dd=document.getElementById('dropdown-globale');
   if(!q){ dd.classList.remove('ouvert'); return; }
-  const res=toutesLesEntreprises().filter(e=>{ const lot=lotDe(e.type,e.lotId); return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,lot&&lot.libelle,libIntervention(e)].filter(Boolean).join(' ').toLowerCase().includes(q); }).slice(0,8);
+  const res=toutesLesEntreprises().filter(e=>{ const lot=lotDe(e.type,e.lotId); return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,lot&&lot.libelle,libIntervention(e),e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q); }).slice(0,8);
   dd.innerHTML=res.length?res.map(e=>{ const lot=lotDe(e.type,e.lotId), t=e.type==='fournisseurs'?'Fournisseur':'Sous-traitant', a=avatar(e.raisonSociale);
     return `<div class="dd-item" onclick="allerVers('${e.type}','${e.id}')"><div style="background:${a.coul};height:30px;width:30px;border-radius:50%;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${esc(a.init)}</div><div><div class="dd-nom">${esc(e.raisonSociale)}</div><div class="dd-meta">${t}${lot?' · Lot '+esc(lot.num)+' '+esc(lot.libelle):''}</div></div></div>`; }).join('') : '<div class="dd-vide">Aucun résultat</div>';
   dd.classList.add('ouvert');
@@ -841,6 +856,8 @@ function feuilleHTML(e,type){
         ${ligne('SIRET',e.siret,true)}
         ${st?ligne('Consultation AO',e.consultAO?'Oui':'Non'):''}
       </div>
+      ${(st&&e.contact2&&(e.contact2.nom||e.contact2.role||e.contact2.tel||e.contact2.email))?`<div class="f-notes-bloc"><div class="lab">Second contact</div><div class="f-grille">
+        ${ligne('Nom',e.contact2.nom)}${ligne('Rôle',e.contact2.role)}${ligne('Téléphone',e.contact2.tel,true)}${ligne('Email',e.contact2.email)}</div></div>`:''}
       ${histoHtml}
       ${e.notes?`<div class="f-notes-bloc"><div class="lab">Notes</div><div class="txt">${esc(e.notes)}</div></div>`:''}
       <div class="f-pied"><span>Document interne — Les Artisans Bâtisseurs · Orgeval (78)</span><span>Édité le ${dateStr}</span></div>
