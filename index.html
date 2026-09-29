@@ -194,6 +194,13 @@
   table.tbl tbody tr:last-child td { border-bottom:none; }
   table.tbl tbody tr:hover td { background:#fafbfc; }
   .cliquable { cursor:pointer; }
+  .lots-cell { display:flex; flex-direction:column; gap:5px; }
+  .lots-choix { display:flex; flex-wrap:wrap; gap:7px; max-height:190px; overflow-y:auto; padding:10px; border:1px solid var(--bord); border-radius:10px; background:#fff; }
+  .lots-choix label { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; padding:5px 10px; border:1px solid var(--bord); border-radius:8px; cursor:pointer; user-select:none; background:#fafbfc; transition:all .12s; }
+  .lots-choix label:hover { border-color:var(--accent); }
+  .lots-choix input { display:none; }
+  .lots-choix label.coche { background:var(--bleu-clair); border-color:var(--accent); color:var(--accent); font-weight:600; }
+  .lots-choix .n { font-family:var(--mono); font-size:11px; }
   table.tbl tbody tr.cliquable:hover td { background:var(--bleu-clair); }
   table.tbl tbody tr.cliquable:hover .tbl-nom { color:var(--accent); }
   .carte.cliquable:hover { border-color:var(--accent); }
@@ -390,7 +397,8 @@
     <input type="hidden" id="f-id" />
     <label class="champ"><span>Raison sociale *</span><input id="f-raison" /></label>
     <div class="duo"><label class="champ"><span>Type</span><select id="f-type" onchange="majTypeFiche()"><option value="fournisseurs">Fournisseur</option><option value="soustraitants">Sous-traitant</option></select></label>
-      <label class="champ"><span>Lot</span><select id="f-lot"></select></label></div>
+      <label class="champ" id="champ-lot-simple"><span>Lot</span><select id="f-lot"></select></label></div>
+    <div class="champ" id="champ-lots-multi"><span style="display:block;font-size:12px;font-weight:500;color:var(--gris);margin-bottom:5px">Lots (plusieurs choix possibles)</span><div class="lots-choix" id="f-lots"></div></div>
     <label class="champ" id="champ-intervention"><span>Type d'intervention</span><select id="f-intervention"><option value="">— Non renseigné —</option><option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option></select></label>
     <div class="champ" id="champ-chantiers"><span>Chantiers réalisés & notes</span>
       <div class="interv-vide" id="interv-vide">Aucun chantier enregistré pour l'instant.</div>
@@ -534,7 +542,7 @@ function semer(type,liste){ const m={}; liste.forEach(l=>{ m[db.ref('lots/'+type
 
 function majKpis(){
   const nf=Object.keys(entreprises.fournisseurs).length, ns=Object.keys(entreprises.soustraitants).length;
-  const lu=new Set(toutesLesEntreprises().map(e=>e.lotId).filter(Boolean)).size;
+  const lu=new Set(toutesLesEntreprises().flatMap(lotsIds)).size;
   document.getElementById('kpi-f').textContent=nf; document.getElementById('kpi-s').textContent=ns;
   document.getElementById('kpi-l').textContent=lu; document.getElementById('kpi-t').textContent=nf+ns;
   document.getElementById('badge-fournisseurs').textContent=nf; document.getElementById('badge-soustraitants').textContent=ns;
@@ -561,6 +569,14 @@ function changerVue(v){ vueActive=v; document.querySelectorAll('.vue-toggle butt
 
 function lotsTries(type){ type=type||ongletActif; return Object.entries(lots[type]||{}).map(([id,l])=>({id,...l})).sort((a,b)=>String(a.num).localeCompare(String(b.num),'fr',{numeric:true})); }
 function lotDe(type,id){ return (lots[type]||{})[id]; }
+// Multi-lots : un sous-traitant peut avoir plusieurs lots (lotIds). lotId = lot principal (1er), conservé pour compatibilité.
+function lotsIds(e){ if(e.lotIds){ const a=(Array.isArray(e.lotIds)?e.lotIds:Object.values(e.lotIds)).filter(Boolean); if(a.length) return a; } return e.lotId?[e.lotId]:[]; }
+function lotsObjs(type,e){ return lotsIds(e).map(id=>lotDe(type,id)).filter(Boolean).sort((a,b)=>String(a.num).localeCompare(String(b.num),'fr',{numeric:true})); }
+function libLots(type,e){ return lotsObjs(type,e).map(l=>l.libelle).join(' '); }
+function texteLots(type,e,sep){ return lotsObjs(type,e).map(l=>`${l.num} – ${l.libelle}`).join(sep||', '); }
+function resumeLots(type,e){ const l=lotsObjs(type,e); if(!l.length) return ''; return l[0].libelle+(l.length>1?` +${l.length-1}`:''); }
+function celluleLots(type,e){ const l=lotsObjs(type,e); if(!l.length) return '<span class="mut">—</span>';
+  return `<div class="lots-cell">${l.map(x=>`<div><span class="lot-num">${esc(x.num)}</span> ${esc(x.libelle)}</div>`).join('')}</div>`; }
 const COULEURS=['#2b82d9','#16a34a','#7c3aed','#db2777','#ea580c','#0891b2','#ca8a04'];
 function avatar(nom){ const p=String(nom||'?').trim().split(/\s+/); const init=((p[0]||'')[0]||'')+((p[1]||'')[0]||'')||(p[0]||'?')[0];
   const h=[...String(nom||'')].reduce((a,c)=>a+c.charCodeAt(0),0); return {init:init.toUpperCase(),coul:COULEURS[h%COULEURS.length]}; }
@@ -594,7 +610,7 @@ function rendreInterventionsForm(){
 function majDashboard(){
   const source=Object.values(entreprises[ongletActif]||{}), st=(ongletActif==='soustraitants');
   document.getElementById('tb-total').textContent=source.length;
-  document.getElementById('tb-lots').textContent=new Set(source.map(e=>e.lotId).filter(Boolean)).size;
+  document.getElementById('tb-lots').textContent=new Set(source.flatMap(lotsIds)).size;
   document.getElementById('tb-email').textContent=source.filter(e=>e.email).length;
   // 4e stat : note moyenne pour les sous-traitants, sinon "avec tél."
   if(st){ const notes=source.map(e=>noteMoyenne(e)).filter(n=>n>0);
@@ -603,7 +619,7 @@ function majDashboard(){
     document.getElementById('tb-4-lbl').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.8 5.9 20.4l1.5-6.8L2.2 9l6.9-.7z"/></svg>Note moyenne';
   } else { document.getElementById('tb-4').textContent=source.filter(e=>e.tel).length;
     document.getElementById('tb-4-lbl').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12 12 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4 12 12 0 0 0 2.8.7 2 2 0 0 1 1.7 2Z"/></svg>Avec tél.'; }
-  const parLot={}; source.forEach(e=>{ const k=e.lotId||'sans'; parLot[k]=(parLot[k]||0)+1; });
+  const parLot={}; source.forEach(e=>{ const ids=lotsIds(e); (ids.length?ids:['sans']).forEach(k=>{ parLot[k]=(parLot[k]||0)+1; }); });
   const entries=lotsTries(ongletActif).map(l=>({nom:`${l.num} · ${l.libelle}`, n:parLot[l.id]||0})).filter(x=>x.n>0);
   if(parLot['sans']) entries.push({nom:'Sans lot', n:parLot['sans']});
   entries.sort((a,b)=>b.n-a.n);
@@ -617,8 +633,8 @@ function listeFiltree(){
   const q=document.getElementById('recherche').value.trim().toLowerCase(), fl=document.getElementById('filtre-lot').value;
   return Object.entries(entreprises[ongletActif]||{}).map(([id,e])=>({id,...e})).filter(e=>{
     if(filtreFavori && !e.favori) return false;
-    if(fl!=='tous'&&e.lotId!==fl) return false; if(!q) return true; const lot=lotDe(ongletActif,e.lotId);
-    return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,lot&&lot.libelle,libIntervention(e),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q);
+    if(fl!=='tous'&&!lotsIds(e).includes(fl)) return false; if(!q) return true; const lot=lotDe(ongletActif,e.lotId);
+    return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q);
   });
 }
 function toggleFiltreFavori(){ filtreFavori=!filtreFavori; document.getElementById('btn-favoris').classList.toggle('actif',filtreFavori); rendre(); }
@@ -629,7 +645,7 @@ function rendre(){
   if(vueActive==='tableau') return rendreTableau(liste);
   const zone=document.getElementById('contenu');
   if(!liste.length){ zone.innerHTML=videHtml(); return; }
-  const parLot={}; liste.forEach(e=>{ const k=e.lotId||'sans'; (parLot[k]=parLot[k]||[]).push(e); });
+  const parLot={}; liste.forEach(e=>{ const ids=lotsIds(e); (ids.length?ids:['sans']).forEach(k=>{ (parLot[k]=parLot[k]||[]).push(e); }); });
   let html=''; [...lotsTries(ongletActif).map(l=>l.id),'sans'].forEach(lotId=>{
     const grp=parLot[lotId]; if(!grp||!grp.length) return; const lot=lotDe(ongletActif,lotId);
     grp.sort((a,b)=>(b.favori?1:0)-(a.favori?1:0)||a.raisonSociale.localeCompare(b.raisonSociale,'fr'));
@@ -643,13 +659,13 @@ function rendreDashboard(){
   const zone=document.getElementById('contenu'), all=toutesLesEntreprises();
   const nf=Object.keys(entreprises.fournisseurs).length, ns=Object.keys(entreprises.soustraitants).length, total=nf+ns, maxRep=Math.max(1,nf,ns);
   const tops=Object.entries(entreprises.soustraitants).map(([id,e])=>({id,type:'soustraitants',...e})).filter(e=>noteMoyenne(e)>0).sort((a,b)=>noteMoyenne(b)-noteMoyenne(a)).slice(0,5);
-  const usedF=new Set(Object.values(entreprises.fournisseurs).map(e=>e.lotId).filter(Boolean));
-  const usedS=new Set(Object.values(entreprises.soustraitants).map(e=>e.lotId).filter(Boolean));
+  const usedF=new Set(Object.values(entreprises.fournisseurs).flatMap(lotsIds));
+  const usedS=new Set(Object.values(entreprises.soustraitants).flatMap(lotsIds));
   const manqueF=lotsTries('fournisseurs').filter(l=>!usedF.has(l.id)), manqueS=lotsTries('soustraitants').filter(l=>!usedS.has(l.id));
   const derniers=all.slice().sort((a,b)=>String(b.id).localeCompare(String(a.id))).slice(0,6);
   const favs=all.filter(e=>e.favori);
   const rowEnt=e=>{ const a=avatar(e.raisonSociale), lot=lotDe(e.type,e.lotId), t=e.type==='fournisseurs'?'Fournisseur':'Sous-traitant';
-    return `<div class="d-row" onclick="allerVers('${e.type}','${e.id}')"><div class="d-av" style="background:${a.coul}">${esc(a.init)}</div><div style="min-width:0"><div class="nom">${esc(e.raisonSociale)}</div><div class="meta">${t}${lot?' · '+esc(lot.libelle):''}</div></div>${(e.type==='soustraitants'&&noteMoyenne(e))?`<div class="droite">${etoiles(Math.round(noteMoyenne(e)))}<span class="meta">${noteMoyenne(e).toFixed(1)}</span></div>`:''}</div>`; };
+    return `<div class="d-row" onclick="allerVers('${e.type}','${e.id}')"><div class="d-av" style="background:${a.coul}">${esc(a.init)}</div><div style="min-width:0"><div class="nom">${esc(e.raisonSociale)}</div><div class="meta">${t}${resumeLots(e.type,e)?' · '+esc(resumeLots(e.type,e)):''}</div></div>${(e.type==='soustraitants'&&noteMoyenne(e))?`<div class="droite">${etoiles(Math.round(noteMoyenne(e)))}<span class="meta">${noteMoyenne(e).toFixed(1)}</span></div>`:''}</div>`; };
   zone.innerHTML=`<div class="dash-grid">
     <div class="panneau"><div class="panneau-titre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>Répartition du portefeuille</div>
       <div class="barre-ligne"><div class="nom">Fournisseurs</div><div class="piste"><div class="rempli" style="width:${Math.max(9,nf/maxRep*100)}%">${nf}</div></div></div>
@@ -666,7 +682,7 @@ function rendreDashboard(){
       ${favs.length?favs.map(rowEnt).join(''):'<div class="d-vide">Aucun favori. Épingle tes partenaires clés avec l\'étoile sur leur fiche.</div>'}</div>
   </div>`;
 }
-function ajouterPourLot(type,lotId){ changerOnglet(type); ouvrirFiche(); document.getElementById('f-lot').value=lotId; }
+function ajouterPourLot(type,lotId){ changerOnglet(type); ouvrirFiche(); document.getElementById('f-lot').value=lotId; cocherLotsForm([lotId]); }
 
 function carte(e){
   const st=ongletActif==='soustraitants', cls=st?'s':'f', label=st?'Sous-traitant':'Fournisseur', a=avatar(e.raisonSociale);
@@ -692,7 +708,7 @@ function carte(e){
 }
 
 /* ===== TABLEAU ===== */
-function valTri(e){ if(tri.col==='lot'){ const l=lotDe(ongletActif,e.lotId); return l?String(l.num):'~'; } if(tri.col==='note') return String(noteMoyenne(e)); if(tri.col==='consultAO') return e.consultAO?'1':'0'; return String(e[tri.col]||'').toLowerCase(); }
+function valTri(e){ if(tri.col==='lot'){ const l=lotsObjs(ongletActif,e)[0]; return l?String(l.num):'~'; } if(tri.col==='note') return String(noteMoyenne(e)); if(tri.col==='consultAO') return e.consultAO?'1':'0'; return String(e[tri.col]||'').toLowerCase(); }
 function trier(col){ if(tri.col===col) tri.dir*=-1; else { tri.col=col; tri.dir=1; } rendre(); }
 function rendreTableau(liste){
   const zone=document.getElementById('contenu'), st=(ongletActif==='soustraitants');
@@ -703,7 +719,7 @@ function rendreTableau(liste){
   const lignes=liste.map(e=>{ const lot=lotDe(ongletActif,e.lotId), a=avatar(e.raisonSociale);
     return `<tr id="ligne-${e.id}" ${st?`class="cliquable" onclick="clicFiche(event,'${e.id}')" title="Ouvrir la fiche"`:''}>
       <td><div class="tbl-nom"><div class="tbl-av" style="background:${a.coul}">${esc(a.init)}</div>${esc(e.raisonSociale)}</div></td>
-      <td>${lot?`<span class="lot-num">${esc(lot.num)}</span> ${esc(lot.libelle)}`:'<span class="mut">—</span>'}</td>
+      <td>${celluleLots(ongletActif,e)}</td>
       ${st?`<td>${chipIntervention(e)||'<span class="mut">—</span>'}</td>`:''}
       <td>${e.contact?esc(e.contact):'<span class="mut">—</span>'}</td>
       <td>${e.tel?`<a class="info" href="tel:${esc(e.tel)}"><span class="tbl-mono">${esc(e.tel)}</span></a>`:'<span class="mut">—</span>'}</td>
@@ -715,7 +731,7 @@ function rendreTableau(liste){
         <button class="ico-btn suppr" onclick="supprimer('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div></td></tr>`;
   }).join('');
   zone.innerHTML=`<div class="tableau-wrap"><table class="tbl"><thead><tr>
-    ${th('raisonSociale','Raison sociale')}${th('lot','Lot')}${st?th('typeIntervention','Intervention'):''}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${st?th('consultAO','Consulter AO'):th('siret','SIRET')}${st?th('note','Note'):''}<th></th>
+    ${th('raisonSociale','Raison sociale')}${th('lot',st?'Lots':'Lot')}${st?th('typeIntervention','Intervention'):''}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${st?th('consultAO','Consulter AO'):th('siret','SIRET')}${st?th('note','Note'):''}<th></th>
   </tr></thead><tbody>${lignes}</tbody></table></div>`;
 }
 
@@ -723,6 +739,8 @@ function rendreTableau(liste){
 function majTypeFiche(){ const t=document.getElementById('f-type').value;
   document.getElementById('champ-chantiers').style.display=(t==='soustraitants')?'':'none';
   document.getElementById('champ-intervention').style.display=(t==='soustraitants')?'':'none';
+  document.getElementById('champ-lot-simple').style.display=(t==='soustraitants')?'none':'';
+  document.getElementById('champ-lots-multi').style.display=(t==='soustraitants')?'':'none';
   document.getElementById('champ-contact2').style.display=(t==='soustraitants')?'':'none';
   document.getElementById('champ-role1').style.display=(t==='soustraitants')?'':'none';
   document.getElementById('duo-contact1').style.gridTemplateColumns=(t==='soustraitants')?'':'1fr';
@@ -741,7 +759,8 @@ function ouvrirFiche(arg){
   document.getElementById('f-contact-role').value=e.contactRole||'';
   const c2=e.contact2||{}; document.getElementById('f-c2-nom').value=c2.nom||''; document.getElementById('f-c2-role').value=c2.role||'';
   document.getElementById('f-c2-tel').value=c2.tel||''; document.getElementById('f-c2-email').value=c2.email||'';
-  majTypeFiche(); document.getElementById('f-lot').value=e.lotId||'';
+  document.getElementById('f-lots').innerHTML='';
+  majTypeFiche(); document.getElementById('f-lot').value=e.lotId||''; cocherLotsForm(lotsIds(e));
   document.getElementById('overlay-fiche').classList.add('ouvert');
 }
 function enregistrerFiche(){
@@ -754,6 +773,8 @@ function enregistrerFiche(){
   if(typeCible==='soustraitants'){
     const obj={}; interventionsForm.forEach(i=>{ const k=i.id||('iv'+Math.random().toString(36).slice(2,9)); obj[k]={chantier:i.chantier||'',date:i.date||'',commentaire:i.commentaire||'',note:Number(i.note)||0}; });
     fiche.interventions=obj;
+    const ids=lotsTries('soustraitants').map(l=>l.id).filter(id=>lotsCochesForm().includes(id));
+    fiche.lotIds=ids.length?ids:null; fiche.lotId=ids[0]||'';
     fiche.typeIntervention=document.getElementById('f-intervention').value||null;
     fiche.contactRole=document.getElementById('f-contact-role').value.trim()||null;
     const c2={ nom:document.getElementById('f-c2-nom').value.trim(), role:document.getElementById('f-c2-role').value.trim(),
@@ -761,7 +782,7 @@ function enregistrerFiche(){
     fiche.contact2=(c2.nom||c2.role||c2.tel||c2.email)?c2:null;
     const ns=interventionsForm.map(i=>Number(i.note)||0).filter(n=>n>0);
     fiche.note=ns.length?+(ns.reduce((a,b)=>a+b,0)/ns.length).toFixed(2):0;
-  } else { fiche.interventions=null; fiche.note=0; fiche.typeIntervention=null; fiche.contact2=null; fiche.contactRole=null; }
+  } else { fiche.interventions=null; fiche.note=0; fiche.typeIntervention=null; fiche.contact2=null; fiche.contactRole=null; fiche.lotIds=null; }
   if(id){ if(typeCible!==ongletActif){ db.ref(ongletActif+'/'+id).remove(); db.ref(typeCible).push(fiche); } else db.ref(ongletActif+'/'+id).update(fiche); }
   else db.ref(typeCible).push(fiche);
   fermer('overlay-fiche');
@@ -778,7 +799,11 @@ function remplirSelectLotsForm(type,sel){
   const opt=l=>`<option value="${l.id}">${esc(l.num)} – ${esc(l.libelle)}</option>`;
   document.getElementById('f-lot').innerHTML='<option value="">— Aucun —</option>'+lotsTries(type).map(opt).join('');
   if(sel!==undefined) document.getElementById('f-lot').value=sel||'';
+  const coches=lotsCochesForm();
+  document.getElementById('f-lots').innerHTML=lotsTries(type).map(l=>`<label class="${coches.includes(l.id)?'coche':''}"><input type="checkbox" value="${l.id}" ${coches.includes(l.id)?'checked':''} onchange="this.parentNode.classList.toggle('coche',this.checked)"><span class="n">${esc(l.num)}</span>${esc(l.libelle)}</label>`).join('')||'<span class="mut" style="font-size:12.5px">Aucun lot — crée-les via « Gérer les lots »</span>';
 }
+function lotsCochesForm(){ return [...document.querySelectorAll('#f-lots input:checked')].map(i=>i.value); }
+function cocherLotsForm(ids){ document.querySelectorAll('#f-lots input').forEach(i=>{ i.checked=ids.includes(i.value); i.parentNode.classList.toggle('coche',i.checked); }); }
 function ouvrirLots(){
   if(ongletActif==='dashboard'){ alert('Ouvre l\u2019onglet Fournisseurs ou Sous-traitants pour gérer ses lots.'); return; }
   document.getElementById('lots-modal-titre').textContent='Gérer les lots — '+(ongletActif==='fournisseurs'?'Fournisseurs':'Sous-traitants');
@@ -792,15 +817,15 @@ function ajouterLot(){ if(!db){ alert('Connecte Firebase pour gérer les lots.')
 function renommerLot(id){ const l=lots[ongletActif][id]; const num=prompt('Numéro du lot :',l.num); if(num===null) return; const lib=prompt('Libellé du lot :',l.libelle); if(lib===null) return;
   db.ref('lots/'+ongletActif+'/'+id).update({num:num.trim()||'—',libelle:lib.trim()}); setTimeout(ouvrirLots,200); }
 function supprimerLot(id){ if(!confirm('Supprimer ce lot ? Les entreprises rattachées resteront sans lot.')) return;
-  db.ref('lots/'+ongletActif+'/'+id).remove(); Object.entries(entreprises[ongletActif]).forEach(([k,e])=>{ if(e.lotId===id) db.ref(ongletActif+'/'+k+'/lotId').set(''); }); setTimeout(ouvrirLots,200); }
+  db.ref('lots/'+ongletActif+'/'+id).remove(); Object.entries(entreprises[ongletActif]).forEach(([k,e])=>{ const ids=lotsIds(e); if(ids.includes(id)){ const reste=ids.filter(x=>x!==id); db.ref(ongletActif+'/'+k).update({lotId:reste[0]||'', lotIds:reste.length?reste:null}); } }); setTimeout(ouvrirLots,200); }
 
 /* ===== EXPORT ===== */
 function exporterCSV(){
   if(ongletActif==='dashboard'){ alert('Ouvre l\u2019onglet Fournisseurs ou Sous-traitants pour exporter.'); return; }
   const source=entreprises[ongletActif]||{}, st=(ongletActif==='soustraitants'), echap=v=>`"${String(v||'').replace(/"/g,'""')}"`;
-  const entete=['Lot','Raison sociale','Contact','Téléphone','Email','Site web','Adresse','SIRET',...(st?['Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention','Note moy /5','Nb chantiers','Consulter AO']:[]),'Favori','Notes'];
+  const entete=[st?'Lots':'Lot','Raison sociale','Contact','Téléphone','Email','Site web','Adresse','SIRET',...(st?['Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention','Note moy /5','Nb chantiers','Consulter AO']:[]),'Favori','Notes'];
   const lignes=Object.values(source).map(e=>{ const lot=lotDe(ongletActif,e.lotId);
-    return [lot?`${lot.num} – ${lot.libelle}`:'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,...(st?[e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),e.consultAO?'Oui':'Non']:[]),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
+    return [texteLots(ongletActif,e,' / ')||'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,...(st?[e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),e.consultAO?'Oui':'Non']:[]),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+[entete.join(';'),...lignes].join('\n')],{type:'text/csv;charset=utf-8;'})); a.download=`${ongletActif}-lab.csv`; a.click();
 }
 
@@ -809,9 +834,9 @@ function toutesLesEntreprises(){ const r=[]; ['fournisseurs','soustraitants'].fo
 function rechercheGlobale(){
   const q=document.getElementById('recherche-globale').value.trim().toLowerCase(), dd=document.getElementById('dropdown-globale');
   if(!q){ dd.classList.remove('ouvert'); return; }
-  const res=toutesLesEntreprises().filter(e=>{ const lot=lotDe(e.type,e.lotId); return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,lot&&lot.libelle,libIntervention(e),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q); }).slice(0,8);
+  const res=toutesLesEntreprises().filter(e=>{ const lot=lotDe(e.type,e.lotId); return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q); }).slice(0,8);
   dd.innerHTML=res.length?res.map(e=>{ const lot=lotDe(e.type,e.lotId), t=e.type==='fournisseurs'?'Fournisseur':'Sous-traitant', a=avatar(e.raisonSociale);
-    return `<div class="dd-item" onclick="allerVers('${e.type}','${e.id}')"><div style="background:${a.coul};height:30px;width:30px;border-radius:50%;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${esc(a.init)}</div><div><div class="dd-nom">${esc(e.raisonSociale)}</div><div class="dd-meta">${t}${lot?' · Lot '+esc(lot.num)+' '+esc(lot.libelle):''}</div></div></div>`; }).join('') : '<div class="dd-vide">Aucun résultat</div>';
+    return `<div class="dd-item" onclick="allerVers('${e.type}','${e.id}')"><div style="background:${a.coul};height:30px;width:30px;border-radius:50%;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${esc(a.init)}</div><div><div class="dd-nom">${esc(e.raisonSociale)}</div><div class="dd-meta">${t}${texteLots(e.type,e)?' · Lot '+esc(texteLots(e.type,e)):''}</div></div></div>`; }).join('') : '<div class="dd-vide">Aucun résultat</div>';
   dd.classList.add('ouvert');
 }
 function allerVers(type,id){
@@ -851,7 +876,7 @@ function feuilleHTML(e,type){
       </div>
       <div class="f-titre">
         <div class="f-avatar" style="background:${a.coul}">${esc(a.init)}</div>
-        <div><h1>${esc(e.raisonSociale)}${e.favori?' <span style=\"color:#f2a03d;font-size:18px\">★</span>':''}</h1><div class="lot">${lot?'Lot '+esc(lot.num)+' · '+esc(lot.libelle):'Lot non renseigné'}</div></div>
+        <div><h1>${esc(e.raisonSociale)}${e.favori?' <span style=\"color:#f2a03d;font-size:18px\">★</span>':''}</h1><div class="lot">${lotsObjs(type,e).length?(lotsObjs(type,e).length>1?'Lots ':'Lot ')+lotsObjs(type,e).map(l=>esc(l.num)+' · '+esc(l.libelle)).join('<br>'):'Lot non renseigné'}</div></div>
       </div>
       <div class="f-grille">
         ${st?ligne('Type d\u2019intervention',libIntervention(e)||'Non renseigné'):''}
@@ -901,7 +926,7 @@ function msgBot(o){
   if(o.resultats) o.resultats.forEach(e=>{ const lot=lotDe(e.type,e.lotId), t=e.type==='fournisseurs'?'Fournisseur':'Sous-traitant', a=avatar(e.raisonSociale);
     const r=document.createElement('div'); r.className='res-mini'; r.onclick=()=>allerVers(e.type,e.id);
     const noteStr=(e.type==='soustraitants'&&noteMoyenne(e))?' · '+noteMoyenne(e).toFixed(1)+'/5 ★':'';
-    r.innerHTML=`<div class="av" style="background:${a.coul}">${esc(a.init)}</div><div><div class="nom">${esc(e.raisonSociale)}</div><div class="meta">${t}${lot?' · Lot '+esc(lot.num):''}${noteStr}${e.tel?' · '+esc(e.tel):''}</div></div>`; d.appendChild(r); });
+    r.innerHTML=`<div class="av" style="background:${a.coul}">${esc(a.init)}</div><div><div class="nom">${esc(e.raisonSociale)}</div><div class="meta">${t}${lotsObjs(e.type,e).length?' · Lot '+lotsObjs(e.type,e).map(l=>esc(l.num)).join(', '):''}${noteStr}${e.tel?' · '+esc(e.tel):''}</div></div>`; d.appendChild(r); });
   ajoutMsg(d);
 }
 function ajoutMsg(el){ const z=document.getElementById('ia-msgs'); z.appendChild(el); z.scrollTop=z.scrollHeight; }
@@ -917,8 +942,8 @@ function rechercheLocale(q){
   [...lotsTries('fournisseurs'),...lotsTries('soustraitants')].forEach(l=>{ norm(l.libelle).split(/[^a-z]+/).filter(w=>w.length>3).forEach(w=>{ if(n.includes(w)) motsLot.push(w); }); });
   let base=toutesLesEntreprises(); if(typeVoulu) base=base.filter(e=>e.type===typeVoulu);
   if(besoinEmail) base=base.filter(e=>e.email); if(besoinTel) base=base.filter(e=>e.tel); if(besoinSiret) base=base.filter(e=>e.siret);
-  let scored=base.map(e=>{ const lot=lotDe(e.type,e.lotId), txt=norm([e.raisonSociale,e.contact,e.adresse,e.notes,e.email,lot&&lot.libelle].filter(Boolean).join(' '));
-    let score=0; if(motsLot.length&&lot&&motsLot.some(m=>norm(lot.libelle).includes(m))) score+=5; tokens.forEach(t=>{ if(txt.includes(t)) score+=1; }); return {e,score};
+  let scored=base.map(e=>{ const lot=lotDe(e.type,e.lotId), txt=norm([e.raisonSociale,e.contact,e.adresse,e.notes,e.email,libLots(e.type,e)].filter(Boolean).join(' '));
+    let score=0; if(motsLot.length&&motsLot.some(m=>norm(libLots(e.type,e)).includes(m))) score+=5; tokens.forEach(t=>{ if(txt.includes(t)) score+=1; }); return {e,score};
   }).filter(x=>x.score>0||(typeVoulu&&!tokens.length&&!motsLot.length)||(triNote&&x.e.type==='soustraitants'));
   if(triNote) scored=scored.filter(x=>x.e.type==='soustraitants').sort((a,b)=>noteMoyenne(b.e)-noteMoyenne(a.e));
   else scored=scored.sort((a,b)=>b.score-a.score);
@@ -928,7 +953,7 @@ function rechercheLocale(q){
   return { texte:`J'ai trouvé ${resultats.length} résultat${resultats.length>1?'s':''}${c.length?' ('+c.join(', ')+')':''}. Clique pour ouvrir la fiche :`, resultats };
 }
 async function appelClaude(q){
-  const contexte=toutesLesEntreprises().map(e=>{ const lot=lotDe(e.type,e.lotId); return `${e.type==='fournisseurs'?'FOURNISSEUR':'SOUS-TRAITANT'} | ${e.raisonSociale} | Lot: ${lot?lot.libelle:'—'}${e.type==='soustraitants'?' | Note moy: '+noteMoyenne(e).toFixed(1)+'/5 sur '+nbChantiers(e)+' chantiers':''} | Contact: ${e.contact||'—'} | Tel: ${e.tel||'—'} | Email: ${e.email||'—'} | Adresse: ${e.adresse||'—'}`; }).join('\n');
+  const contexte=toutesLesEntreprises().map(e=>{ const lot=lotDe(e.type,e.lotId); return `${e.type==='fournisseurs'?'FOURNISSEUR':'SOUS-TRAITANT'} | ${e.raisonSociale} | Lot(s): ${texteLots(e.type,e)||'—'}${e.type==='soustraitants'?' | Note moy: '+noteMoyenne(e).toFixed(1)+'/5 sur '+nbChantiers(e)+' chantiers':''} | Contact: ${e.contact||'—'} | Tel: ${e.tel||'—'} | Email: ${e.email||'—'} | Adresse: ${e.adresse||'—'}`; }).join('\n');
   try { const r=await fetch('https://api.anthropic.com/v1/messages',{ method:'POST', headers:{'Content-Type':'application/json','x-api-key':IA_CONFIG.cleApi,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({ model:IA_CONFIG.modele, max_tokens:600, system:"Tu es l'assistant de recherche de la base achats & commercial de l'entreprise BTP LAB. Réponds en français, brièvement, en t'appuyant UNIQUEMENT sur la liste fournie.", messages:[{role:'user',content:`Base :\n${contexte}\n\nQuestion : ${q}`}] }) });
     const d=await r.json(); const txt=(d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n'); return { texte: txt || "Réponse indisponible." };
