@@ -180,6 +180,57 @@
   .interv-ajout input { padding:8px 10px; font-size:13.5px; border:1px solid #d1d5db; border-radius:8px; width:100%; }
   .interv-ajout .note-edit .etoile-btn svg { width:22px; height:22px; }
   .interv-ajout .btn { white-space:nowrap; padding:8px 12px; }
+  .crit-det { border-top:1px dashed #cbd5e1; padding-top:8px; }
+  .crit-det summary { cursor:pointer; font-size:12.5px; font-weight:600; color:var(--accent); user-select:none; }
+  .crit-det[open] summary { margin-bottom:8px; }
+  .crit-ligne { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:4px 0; border-bottom:1px solid #eef0f3; }
+  .crit-lib { font-size:12.5px; color:#374151; cursor:help; }
+  .crit-notes { display:flex; gap:4px; flex-shrink:0; }
+  .crit-n { width:28px; height:26px; border:1px solid var(--bord); border-radius:6px; background:#fff; font-family:var(--mono); font-size:12.5px; cursor:pointer; color:#374151; }
+  .crit-n:hover { border-color:var(--accent); }
+  .crit-n.on { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:700; }
+  .crit-moy { font-size:11.5px; color:var(--gris); margin-top:7px; }
+  .crit-res { color:var(--accent) !important; }
+  /* Fiche d'évaluation imprimable */
+  .ev { font-family:inherit; color:#1f2937; -webkit-print-color-adjust:exact; print-color-adjust:exact; font-size:11px; }
+  .ev-tete { background:#1f5fae; color:#fff; border-radius:7px; padding:12px 16px; display:flex; justify-content:space-between; align-items:center; }
+  .ev-tete .sur { font-size:9px; font-weight:700; letter-spacing:.08em; color:#cfe0f7; }
+  .ev-tete h2 { margin:3px 0 2px; font-size:20px; letter-spacing:.01em; }
+  .ev-tete .sous { font-size:10.5px; color:#dbe7f8; }
+  .ev-tete .droite { text-align:right; font-size:10.5px; line-height:2; }
+  .ev-sec { display:flex; align-items:center; gap:7px; margin:13px 0 7px; font-size:12.5px; font-weight:700; color:#1f5fae; }
+  .ev-sec::before { content:''; width:3px; height:13px; background:#1f5fae; }
+  .ev-sec .bareme { margin-left:auto; font-size:10px; font-weight:400; color:#6b7280; }
+  .ev-boite { background:#f6f8fb; border:1px solid #c9d1dc; border-radius:6px; padding:10px 12px; }
+  .ev-grille { display:grid; grid-template-columns:1fr 1fr; gap:10px 22px; margin-bottom:9px; }
+  .ev-champ { display:flex; gap:5px; align-items:flex-end; font-size:10.5px; }
+  .ev-champ b { color:#6b7280; white-space:nowrap; }
+  .ev-champ i { flex:1; border-bottom:1px dotted #9aa5b4; height:12px; }
+  .ev-cases { display:flex; flex-wrap:wrap; gap:4px 14px; align-items:center; font-size:10.5px; margin-top:6px; }
+  .ev-cases b { color:#6b7280; margin-right:2px; }
+  .ev-c { display:inline-block; width:9px; height:9px; border:1px solid #1f2937; margin-right:4px; vertical-align:-1px; background:#fff; }
+  .ev-tab { width:100%; border-collapse:collapse; border:1px solid #c9d1dc; }
+  .ev-tab th { background:#1f2937; color:#fff; font-size:10px; padding:6px 5px; text-align:left; letter-spacing:.03em; }
+  .ev-tab th.n, .ev-tab td.n { text-align:center; width:22px; }
+  .ev-tab th.note, .ev-tab td.note { text-align:center; width:24px; padding:0; border-left:1px solid #c9d1dc; }
+  .ev-tab td { padding:5px 6px; border-top:1px solid #c9d1dc; vertical-align:middle; height:40px; }
+  .ev-tab tr:nth-child(even) td { background:#f6f8fb; }
+  .ev-tab td.n { background:#eaf1fb !important; color:#1f5fae; font-weight:700; font-size:12px; }
+  .ev-tab .crit b { font-size:11px; display:block; }
+  .ev-tab .crit span { font-size:9px; color:#6b7280; line-height:1.25; display:block; margin-top:2px; }
+  .ev-tab td.note .ev-c { width:11px; height:11px; margin:0; }
+  .ev-tab td.com { width:34%; border-left:1px solid #c9d1dc; }
+  .ev-lignes i { display:block; border-bottom:1px dotted #9aa5b4; height:11px; }
+  .ev-total { margin-top:10px; background:#eaf1fb; border:1px solid #1f5fae; border-radius:6px; padding:9px 13px; display:flex; align-items:center; gap:14px; }
+  .ev-total .lab b { display:block; color:#1f5fae; font-size:11.5px; } .ev-total .lab span { font-size:9px; color:#6b7280; }
+  .ev-total .box { width:50px; height:22px; border:1px solid #1f5fae; background:#fff; } .ev-total .sur5 { color:#1f5fae; font-weight:700; font-size:12px; margin-right:16px; }
+  .ev-total .info { margin-left:auto; font-size:9.5px; max-width:150px; }
+  .ev-sign { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .ev-sign > div { border:1px solid #c9d1dc; border-radius:6px; padding:8px 10px; height:62px; font-size:10px; color:#6b7280; }
+  .ev-sign b { color:#1f2937; font-size:10.5px; display:block; margin-bottom:5px; }
+  .ev-report { margin-top:10px; background:#f6f8fb; border:1px solid #c9d1dc; border-radius:6px; padding:8px 12px; font-size:9.5px; display:flex; gap:14px; align-items:center; }
+  .ev-report b.t { color:#1f5fae; white-space:nowrap; font-size:9.5px; letter-spacing:.04em; }
+  .ev-pied { margin-top:8px; display:flex; justify-content:space-between; font-size:8.5px; color:#9ca3af; }
   .interv-moy { margin-top:11px; font-size:13px; color:#374151; display:flex; align-items:center; gap:8px; background:var(--bleu-clair); padding:10px 12px; border-radius:9px; }
   .interv-moy .note-etoiles svg { width:15px; height:15px; }
   .interv-vide { font-size:12.5px; color:var(--gris-clair); margin-bottom:8px; }
@@ -394,6 +445,7 @@
         </div>
         <button class="btn" id="btn-favoris" onclick="toggleFiltreFavori()" title="Afficher seulement les favoris"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.8 5.9 20.4l1.5-6.8L2.2 9l6.9-.7z"/></svg>Favoris</button>
         <button class="btn" onclick="imprimerAnnuaire()" title="Imprimer tout l'annuaire de cette vue"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Annuaire</button>
+        <button class="btn" id="btn-eval" onclick="imprimerEvaluation()" title="Imprimer une fiche d'évaluation sous-traitant vierge (fin de chantier)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>Évaluation</button>
         <button class="btn btn-primaire" style="margin-left:auto" onclick="ouvrirFiche()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5v14"/></svg><span id="txt-ajouter">Ajouter un fournisseur</span></button>
       </div>
 
@@ -426,6 +478,8 @@
         <input id="iv-chantier" placeholder="Nom du chantier / affaire" />
         <div class="rowin"><input id="iv-date" placeholder="Date / période (ex : 06/2026)" /><input id="iv-comment" placeholder="Commentaire (optionnel)" /></div>
         <div class="rowin" style="align-items:center;justify-content:space-between"><div class="note-edit" id="iv-note-edit"></div><button type="button" class="btn btn-primaire" onclick="ajouterIntervention()">+ Ajouter ce chantier</button></div>
+        <details class="crit-det" id="iv-crit-det"><summary>Noter par critère (fiche d'évaluation de fin de chantier)</summary>
+          <div id="iv-crit"></div><div class="crit-moy" id="iv-crit-moy"></div></details>
       </div>
       <div class="interv-moy" id="interv-moy"></div>
       <input type="hidden" id="iv-note" value="0" />
@@ -593,6 +647,7 @@ function changerOnglet(t){
   document.getElementById('titre-section').textContent=f?'Fournisseurs':'Sous-traitants';
   document.getElementById('soustitre-section').textContent=f?'Répertoire achats classé par famille':'Répertoire des sous-traitants classé par lot';
   document.getElementById('txt-ajouter').textContent=f?'Ajouter un fournisseur':'Ajouter un sous-traitant';
+  document.getElementById('btn-eval').style.display=f?'none':'';
   document.getElementById('tb-titre').textContent=f?'Répartition des fournisseurs par lot':'Répartition des sous-traitants par lot';
   remplirFiltreLot(); document.getElementById('filtre-lot').value='tous';
   // Vue par défaut à l'ouverture de l'onglet : Tableau (fournisseurs et sous-traitants)
@@ -620,6 +675,27 @@ function etoileSVG(plein){ return plein
   : '<svg viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.6"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.8 5.9 20.4l1.5-6.8L2.2 9l6.9-.7z"/></svg>'; }
 function etoiles(note){ note=Number(note)||0; let s='<span class="note-etoiles">'; for(let i=1;i<=5;i++) s+=etoileSVG(i<=note); return s+'</span>'; }
 let interventionsForm=[];
+// ===== Critères d'évaluation (fiche de fin de chantier) =====
+const CRITERES=[
+  ['prix','Prix du marché','Prix',"Cohérence du prix avec le marché, respect du devis, maîtrise des travaux supplémentaires."],
+  ['qualite','Qualité du travail sur site','Qualité',"Conformité aux règles de l'art et au CCTP, qualité des finitions, reprises nécessaires."],
+  ['securite','Sécurité sur site (phase travaux)','Sécurité',"Port des EPI, respect du PPSPS, balisage et propreté de la zone de travail."],
+  ['reactivite','Réactivité','Réactivité',"Délai de réponse aux demandes, mobilisation rapide face aux imprévus."],
+  ['encadrement','Encadrement sur chantier','Encadrement',"Chef d'équipe identifié et présent, compétence et stabilité des équipes."],
+  ['gestion','Gestion des travaux sur site','Gestion travaux',"Respect du planning, coordination avec les autres corps d'état, approvisionnements."],
+  ['reserves','Gestion des réserves','Réserves',"Nombre de réserves, rapidité et qualité de leur levée."]
+];
+let ivCriteres={};
+function moyCriteres(c){ const v=Object.values(c||{}).map(Number).filter(n=>n>0); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; }
+function rendreIvCriteres(){
+  const z=document.getElementById('iv-crit'); if(!z) return;
+  z.innerHTML=CRITERES.map(([k,lib,,aide])=>`<div class="crit-ligne"><div class="crit-lib" title="${esc(aide)}">${esc(lib)}</div><div class="crit-notes">${[1,2,3,4,5].map(n=>`<button type="button" class="crit-n${ivCriteres[k]===n?' on':''}" onclick="setIvCritere('${k}',${n})">${n}</button>`).join('')}</div></div>`).join('');
+  const nb=Object.keys(ivCriteres).length, m=moyCriteres(ivCriteres);
+  document.getElementById('iv-crit-moy').innerHTML=nb?`<strong>Moyenne des critères : ${m.toFixed(1)}/5</strong> · ${nb}/7 critère${nb>1?'s':''} noté${nb>1?'s':''} — les étoiles sont calculées automatiquement`:'Barème : 1 Insuffisant · 2 Passable · 3 Satisfaisant · 4 Bon · 5 Excellent';
+}
+function setIvCritere(k,n){ if(ivCriteres[k]===n) delete ivCriteres[k]; else ivCriteres[k]=n;
+  const m=moyCriteres(ivCriteres); document.getElementById('iv-note').value=m?Math.round(m):0; rendreIvNote(); rendreIvCriteres(); }
+function resumeCriteres(c){ if(!c) return ''; return CRITERES.filter(([k])=>c[k]).map(([k,,court])=>`${court} ${c[k]}`).join(' · '); }
 function interventionsArr(e){ return e && e.interventions ? Object.entries(e.interventions).map(([id,i])=>({id,...i})) : []; }
 function noteMoyenne(e){ const a=interventionsArr(e).map(i=>Number(i.note)||0).filter(n=>n>0); if(a.length) return a.reduce((x,y)=>x+y,0)/a.length; return Number(e.note)||0; }
 function nbChantiers(e){ return interventionsArr(e).length; }
@@ -627,14 +703,18 @@ function rendreIvNote(){ const n=Number(document.getElementById('iv-note').value
 function setIvNote(n){ document.getElementById('iv-note').value=n; rendreIvNote(); }
 function ajouterIntervention(){
   const ch=document.getElementById('iv-chantier').value.trim(); if(!ch){ alert('Indique le nom du chantier.'); return; }
-  interventionsForm.push({ id:'iv'+Math.random().toString(36).slice(2,9), chantier:ch, date:document.getElementById('iv-date').value.trim(), commentaire:document.getElementById('iv-comment').value.trim(), note:Number(document.getElementById('iv-note').value)||0 });
+  const nbC=Object.keys(ivCriteres).length, mC=moyCriteres(ivCriteres);
+  const iv={ id:'iv'+Math.random().toString(36).slice(2,9), chantier:ch, date:document.getElementById('iv-date').value.trim(), commentaire:document.getElementById('iv-comment').value.trim(), note:nbC?Math.round(mC*10)/10:(Number(document.getElementById('iv-note').value)||0) };
+  if(nbC) iv.criteres=Object.assign({},ivCriteres);
+  interventionsForm.push(iv);
   document.getElementById('iv-chantier').value=''; document.getElementById('iv-date').value=''; document.getElementById('iv-comment').value=''; document.getElementById('iv-note').value=0;
-  rendreIvNote(); rendreInterventionsForm();
+  ivCriteres={}; document.getElementById('iv-crit-det').open=false;
+  rendreIvNote(); rendreIvCriteres(); rendreInterventionsForm();
 }
 function supprimerInterventionForm(id){ interventionsForm=interventionsForm.filter(i=>i.id!==id); rendreInterventionsForm(); }
 function rendreInterventionsForm(){
   const z=document.getElementById('interv-liste'); document.getElementById('interv-vide').style.display=interventionsForm.length?'none':'block';
-  z.innerHTML=interventionsForm.map(i=>`<div class="interv-row"><div class="ch"><div class="n">${esc(i.chantier)}</div>${i.date?`<div class="d">${esc(i.date)}</div>`:''}${i.commentaire?`<div class="cm">${esc(i.commentaire)}</div>`:''}</div>${etoiles(i.note)}<button type="button" class="ico-btn suppr" onclick="supprimerInterventionForm('${i.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div>`).join('');
+  z.innerHTML=interventionsForm.map(i=>`<div class="interv-row"><div class="ch"><div class="n">${esc(i.chantier)}</div>${i.date?`<div class="d">${esc(i.date)}</div>`:''}${i.commentaire?`<div class="cm">${esc(i.commentaire)}</div>`:''}${i.criteres?`<div class="cm crit-res">${esc(resumeCriteres(i.criteres))}</div>`:''}</div>${etoiles(Math.round(i.note))}${i.criteres?`<span class="mut" style="font-size:12px;font-family:var(--mono)">${Number(i.note).toFixed(1)}</span>`:''}<button type="button" class="ico-btn suppr" onclick="supprimerInterventionForm('${i.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div>`).join('');
   const ns=interventionsForm.map(i=>Number(i.note)||0).filter(n=>n>0); const moy=ns.length?ns.reduce((a,b)=>a+b,0)/ns.length:0;
   document.getElementById('interv-moy').innerHTML = ns.length ? `${etoiles(Math.round(moy))} <span><strong>Moyenne : ${moy.toFixed(1)}/5</strong> sur ${ns.length} chantier${ns.length>1?'s':''} noté${ns.length>1?'s':''}</span>` : "Moyenne : non notée pour l'instant";
 }
@@ -777,7 +857,7 @@ function majTypeFiche(){ const t=document.getElementById('f-type').value;
   selI.innerHTML='<option value="">— Non renseigné —</option>'+(t==='soustraitants'?'<option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option>':'<option value="fs">Fourniture seule</option><option value="fp">Fourniture et pose</option>');
   selI.value=[...selI.options].some(o=>o.value===valI)?valI:'';
   document.getElementById('lbl-adresse').textContent=(t==='soustraitants')?'Adresse':'Adresse de l\u2019agence référente';
-  remplirSelectLotsForm(t); rendreIvNote(); rendreInterventionsForm(); }
+  remplirSelectLotsForm(t); ivCriteres={}; document.getElementById('iv-crit-det').open=false; rendreIvNote(); rendreIvCriteres(); rendreInterventionsForm(); }
 function ouvrirFiche(arg){
   const modif=arg&&arg.id;
   let e={type:ongletActif, lotId:document.getElementById('filtre-lot').value!=='tous'?document.getElementById('filtre-lot').value:''};
@@ -931,7 +1011,7 @@ function feuilleHTML(e,type){
   const ligne=(lab,val,mono)=> val?`<div class="f-ligne"><div class="lab">${lab}</div><div class="val ${mono?'mono':''}">${esc(val)}</div></div>`:'';
   const moy=noteMoyenne(e), arr=interventionsArr(e);
   const ligneNote = st?`<div class="f-ligne"><div class="lab">Note moyenne</div><div class="val">${etoiles(Math.round(moy))} <span style="color:#6b7280;font-size:13px">${moy?moy.toFixed(1)+'/5 sur '+arr.length+' chantier'+(arr.length>1?'s':''):'Non noté'}</span></div></div>`:'';
-  const histoHtml = (st && arr.length)?`<div class="f-notes-bloc"><div class="lab">Historique des chantiers (${arr.length})</div><div class="f-grille">${arr.map(i=>`<div class="f-ligne"><div class="lab" style="width:auto;flex:1;background:#fff;text-transform:none;color:#1f2937;font-weight:600">${esc(i.chantier)}${i.date?' <span style=\"color:#9ca3af;font-weight:400\">· '+esc(i.date)+'</span>':''}${i.commentaire?'<div style=\"font-weight:400;color:#6b7280;font-size:12px;margin-top:3px\">'+esc(i.commentaire)+'</div>':''}</div><div class="val" style="white-space:nowrap">${etoiles(i.note)}</div></div>`).join('')}</div></div>`:'';
+  const histoHtml = (st && arr.length)?`<div class="f-notes-bloc"><div class="lab">Historique des chantiers (${arr.length})</div><div class="f-grille">${arr.map(i=>`<div class="f-ligne"><div class="lab" style="width:auto;flex:1;background:#fff;text-transform:none;color:#1f2937;font-weight:600">${esc(i.chantier)}${i.date?' <span style=\"color:#9ca3af;font-weight:400\">· '+esc(i.date)+'</span>':''}${i.commentaire?'<div style=\"font-weight:400;color:#6b7280;font-size:12px;margin-top:3px\">'+esc(i.commentaire)+'</div>':''}${i.criteres?'<div style=\"font-weight:400;color:#1f5fae;font-size:11.5px;margin-top:3px\">'+esc(resumeCriteres(i.criteres))+'</div>':''}</div><div class="val" style="white-space:nowrap">${etoiles(Math.round(i.note))}</div></div>`).join('')}</div></div>`:'';
   return `<div class="feuille">
       <div class="f-entete">
         <svg class="mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 24 20 12l14 12" stroke="#2b82d9" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 31 20 19l14 12" stroke="#c7ced8" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -974,6 +1054,38 @@ function imprimerAnnuaire(){
   const type=ongletActif, liste=listeFiltree(); if(!liste.length){ alert('Aucune fiche à imprimer dans cette vue.'); return; }
   document.getElementById('pdf-titre').textContent=`Annuaire ${type==='fournisseurs'?'fournisseurs':'sous-traitants'} — ${liste.length} fiche${liste.length>1?'s':''}`;
   document.getElementById('pdf-contenu').innerHTML=liste.map(e=>feuilleHTML(e,type)).join('');
+  document.getElementById('overlay-pdf').classList.add('ouvert');
+}
+function feuilleEvaluationHTML(){
+  const c='<span class="ev-c"></span>', champ=l=>`<div class="ev-champ"><b>${l}</b><i></i></div>`;
+  const lignes=n=>`<div class="ev-lignes">${'<i></i>'.repeat(n)}</div>`;
+  return `<div class="feuille"><div class="ev">
+    <div class="ev-tete"><div><div class="sur">LES ARTISANS BÂTISSEURS · SERVICE ACHATS</div><h2>FICHE D'ÉVALUATION SOUS-TRAITANT</h2><div class="sous">À remplir en fin de chantier avec le conducteur de travaux</div></div>
+      <div class="droite">Date : ____ / ____ / ________<br>Réf. chantier : ______________</div></div>
+    <div class="ev-sec">1. Identification</div>
+    <div class="ev-boite"><div class="ev-grille">${champ('Sous-traitant :')}${champ('Lot(s) :')}${champ('Chantier :')}${champ('Adresse :')}${champ('Conducteur de travaux :')}${champ('Évaluateur :')}</div>
+      <div class="ev-cases"><b>Type de chantier :</b><span>${c}Maisons</span><span>${c}Petit ensemble (10 à 40 lgts)</span><span>${c}Gros ensemble (50 à 200 lgts)</span></div>
+      <div class="ev-cases"><b>Travaux :</b><span>${c}Neuf</span><span>${c}Réhabilitation</span><span>${c}Rénovation</span><b style="margin-left:14px">Milieu occupé :</b><span>${c}Oui</span><span>${c}Non</span></div></div>
+    <div class="ev-sec">2. Évaluation<span class="bareme">Barème : 1 = Insuffisant · 2 = Passable · 3 = Satisfaisant · 4 = Bon · 5 = Excellent</span></div>
+    <table class="ev-tab"><thead><tr><th class="n">N°</th><th>CRITÈRE</th>${[1,2,3,4,5].map(n=>`<th class="note">${n}</th>`).join('')}<th>COMMENTAIRE</th></tr></thead><tbody>
+      ${CRITERES.map(([,lib,,aide],i)=>`<tr><td class="n">${i+1}</td><td class="crit"><b>${lib}</b><span>${aide}</span></td>${('<td class="note">'+c+'</td>').repeat(5)}<td class="com">${lignes(3)}</td></tr>`).join('')}
+    </tbody></table>
+    <div class="ev-total"><div class="lab"><b>TOTAL</b><span>somme des 7 notes</span></div><div class="box"></div><div class="sur5">/ 35</div>
+      <div class="lab"><b>NOTE MOYENNE</b><span>total ÷ 7</span></div><div class="box"></div><div class="sur5">/ 5</div>
+      <div class="info">Ou saisir directement les 7 notes dans la base : le site calcule la moyenne.</div></div>
+    <div class="ev-sec">3. Avis global</div>
+    <div class="ev-cases"><b>À retenir pour les prochaines consultations (AO) :</b><span>${c}Oui</span><span>${c}Oui, avec réserves</span><span>${c}Non</span></div>
+    <div class="ev-cases"><b>Envisageable sur des chantiers luxe (hôtels, villas…) :</b><span>${c}Oui</span><span>${c}Non</span><span>${c}Non évalué</span></div>
+    <div class="ev-cases" style="margin-top:8px"><b>Points forts / points à améliorer :</b></div>${lignes(3)}
+    <div class="ev-sec">4. Signatures</div>
+    <div class="ev-sign"><div><b>Conducteur de travaux</b>Nom :<span style="margin-left:40%">Date :</span><br><br>Signature :</div><div><b>Évaluateur (Service Achats)</b>Nom :<span style="margin-left:40%">Date :</span><br><br>Signature :</div></div>
+    <div class="ev-report"><b class="t">REPORT DANS LA BASE</b><span>Fiche du sous-traitant › <b>Chantiers réalisés &amp; notes</b> : nom du chantier, date, commentaire, puis <b>« Noter par critère »</b> avec les 7 notes. Mettre à jour les <b>Qualités</b> et les cases <b>Consulter AO</b> / <b>Luxe</b> selon l'avis global.</span></div>
+    <div class="ev-pied"><span>Les Artisans Bâtisseurs · Orgeval (78630) · Document interne</span><span>Fiche d'évaluation sous-traitant · v1</span></div>
+  </div></div>`;
+}
+function imprimerEvaluation(){
+  document.getElementById('pdf-titre').textContent="Fiche d'évaluation sous-traitant (vierge)";
+  document.getElementById('pdf-contenu').innerHTML=feuilleEvaluationHTML();
   document.getElementById('overlay-pdf').classList.add('ouvert');
 }
 function imprimerFiche(){ window.print(); }
