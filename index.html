@@ -220,6 +220,16 @@
   label.champ input,label.champ select,label.champ textarea { width:100%; padding:9px 11px; font-size:14px; border:1px solid #d1d5db; border-radius:9px; font-family:inherit; }
   .duo { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
   .bloc-contact2 { border:1px dashed var(--bord); border-radius:11px; padding:13px 14px 2px; margin-bottom:14px; background:#fafbfc; }
+  .bloc-qualites { border:1px solid var(--bord); border-radius:11px; padding:13px 14px 4px; margin-bottom:14px; background:#fafbfc; }
+  .bloc-qualites .q-ligne { margin-bottom:11px; }
+  .bloc-qualites .q-lab { font-size:12px; font-weight:500; color:var(--gris); margin-bottom:6px; }
+  .choix-multi { display:flex; flex-wrap:wrap; gap:7px; }
+  .choix-multi label { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; padding:6px 11px; border:1px solid var(--bord); border-radius:8px; cursor:pointer; user-select:none; background:#fff; transition:all .12s; }
+  .choix-multi label:hover { border-color:var(--accent); }
+  .choix-multi input { display:none; }
+  .choix-multi label.coche { background:var(--bleu-clair); border-color:var(--accent); color:var(--accent); font-weight:600; }
+  .choix-multi small { font-weight:400; color:var(--gris); }
+  .choix-multi label.coche small { color:var(--accent); }
   .bloc-contact2 .titre-bloc { font-size:12px; font-weight:600; color:var(--gris); text-transform:uppercase; letter-spacing:.03em; margin-bottom:10px; }
   .liste-lots { display:flex; flex-direction:column; }
   .ligne-lot { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid #f1f2f4; }
@@ -401,6 +411,13 @@
       <label class="champ" id="champ-lot-simple"><span>Lot</span><select id="f-lot"></select></label></div>
     <div class="champ" id="champ-lots-multi"><span style="display:block;font-size:12px;font-weight:500;color:var(--gris);margin-bottom:5px">Lots (plusieurs choix possibles)</span><div class="lots-choix" id="f-lots"></div></div>
     <label class="champ" id="champ-intervention"><span>Type d'intervention</span><select id="f-intervention"><option value="">— Non renseigné —</option><option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option></select></label>
+    <div class="bloc-qualites" id="champ-qualites">
+      <div class="titre-bloc" style="font-size:12px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:.03em;margin-bottom:10px">Qualités</div>
+      <div class="q-ligne"><div class="q-lab">Taille de chantiers (plusieurs choix possibles)</div><div class="choix-multi" id="q-tailles"></div></div>
+      <div class="q-ligne"><div class="q-lab">Type de travaux (plusieurs choix possibles)</div><div class="choix-multi" id="q-travaux"></div></div>
+      <div class="q-ligne"><div class="q-lab">Travail en milieu occupé</div><div class="choix-multi" id="q-occupe"></div></div>
+      <div class="q-ligne"><div class="q-lab">Capacité à réaliser les études</div><div class="choix-multi" id="q-etudes"></div></div>
+    </div>
     <div class="champ" id="champ-chantiers"><span>Chantiers réalisés & notes</span>
       <div class="interv-vide" id="interv-vide">Aucun chantier enregistré pour l'instant.</div>
       <div class="interv-liste" id="interv-liste"></div>
@@ -635,7 +652,7 @@ function listeFiltree(){
   return Object.entries(entreprises[ongletActif]||{}).map(([id,e])=>({id,...e})).filter(e=>{
     if(filtreFavori && !e.favori) return false;
     if(fl!=='tous'&&!lotsIds(e).includes(fl)) return false; if(!q) return true; const lot=lotDe(ongletActif,e.lotId);
-    return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q);
+    return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),texteTailles(e.qualites),texteTravaux(e.qualites),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q);
   });
 }
 function toggleFiltreFavori(){ filtreFavori=!filtreFavori; document.getElementById('btn-favoris').classList.toggle('actif',filtreFavori); rendre(); }
@@ -738,6 +755,7 @@ function rendreTableau(liste){
 /* ===== CRUD ===== */
 function majTypeFiche(){ const t=document.getElementById('f-type').value;
   document.getElementById('champ-chantiers').style.display=(t==='soustraitants')?'':'none';
+  document.getElementById('champ-qualites').style.display=(t==='soustraitants')?'':'none';
   document.getElementById('champ-lot-simple').style.display='none';
   // Options du type d'intervention selon le type d'entreprise
   const selI=document.getElementById('f-intervention'), valI=selI.value;
@@ -760,6 +778,7 @@ function ouvrirFiche(arg){
   const c2=e.contact2||{}; document.getElementById('f-c2-nom').value=c2.nom||''; document.getElementById('f-c2-role').value=c2.role||'';
   document.getElementById('f-c2-tel').value=c2.tel||''; document.getElementById('f-c2-email').value=c2.email||'';
   document.getElementById('f-lots').innerHTML='';
+  remplirQualitesForm(e.qualites);
   majTypeFiche(); document.getElementById('f-intervention').value=e.typeIntervention||''; document.getElementById('f-lot').value=e.lotId||''; cocherLotsForm(lotsIds(e));
   document.getElementById('overlay-fiche').classList.add('ouvert');
 }
@@ -780,9 +799,10 @@ function enregistrerFiche(){
   if(typeCible==='soustraitants'){
     const obj={}; interventionsForm.forEach(i=>{ const k=i.id||('iv'+Math.random().toString(36).slice(2,9)); obj[k]={chantier:i.chantier||'',date:i.date||'',commentaire:i.commentaire||'',note:Number(i.note)||0}; });
     fiche.interventions=obj;
+    fiche.qualites=lireQualitesForm();
     const ns=interventionsForm.map(i=>Number(i.note)||0).filter(n=>n>0);
     fiche.note=ns.length?+(ns.reduce((a,b)=>a+b,0)/ns.length).toFixed(2):0;
-  } else { fiche.interventions=null; fiche.note=0; }
+  } else { fiche.interventions=null; fiche.note=0; fiche.qualites=null; }
   if(id){ if(typeCible!==ongletActif){ db.ref(ongletActif+'/'+id).remove(); db.ref(typeCible).push(fiche); } else db.ref(ongletActif+'/'+id).update(fiche); }
   else db.ref(typeCible).push(fiche);
   fermer('overlay-fiche');
@@ -823,9 +843,9 @@ function supprimerLot(id){ if(!confirm('Supprimer ce lot ? Les entreprises ratta
 function exporterCSV(){
   if(ongletActif==='dashboard'){ alert('Ouvre l\u2019onglet Fournisseurs ou Sous-traitants pour exporter.'); return; }
   const source=entreprises[ongletActif]||{}, st=(ongletActif==='soustraitants'), echap=v=>`"${String(v||'').replace(/"/g,'""')}"`;
-  const entete=[st?'Lots':'Lot','Raison sociale','Contact','Téléphone','Email','Site web',st?'Adresse':'Adresse agence référente','SIRET','Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention',...(st?['Note moy /5','Nb chantiers','Consulter AO','Chantiers luxe']:[]),'Favori','Notes'];
+  const entete=[st?'Lots':'Lot','Raison sociale','Contact','Téléphone','Email','Site web',st?'Adresse':'Adresse agence référente','SIRET','Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention',...(st?['Note moy /5','Nb chantiers','Consulter AO','Chantiers luxe','Taille de chantiers','Type de travaux','Milieu occupé','Études']:[]),'Favori','Notes'];
   const lignes=Object.values(source).map(e=>{ const lot=lotDe(ongletActif,e.lotId);
-    return [texteLots(ongletActif,e,' / ')||'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),e.consultAO?'Oui':'Non',e.chantiersLuxe?'Oui':'Non']:[]),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
+    return [texteLots(ongletActif,e,' / ')||'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),e.consultAO?'Oui':'Non',e.chantiersLuxe?'Oui':'Non',texteTailles(e.qualites),texteTravaux(e.qualites),texteOuiNon(e.qualites&&e.qualites.milieuOccupe),texteOuiNon(e.qualites&&e.qualites.etudes)]:[]),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+[entete.join(';'),...lignes].join('\n')],{type:'text/csv;charset=utf-8;'})); a.download=`${ongletActif}-lab.csv`; a.click();
 }
 
@@ -834,7 +854,7 @@ function toutesLesEntreprises(){ const r=[]; ['fournisseurs','soustraitants'].fo
 function rechercheGlobale(){
   const q=document.getElementById('recherche-globale').value.trim().toLowerCase(), dd=document.getElementById('dropdown-globale');
   if(!q){ dd.classList.remove('ouvert'); return; }
-  const res=toutesLesEntreprises().filter(e=>{ const lot=lotDe(e.type,e.lotId); return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q); }).slice(0,8);
+  const res=toutesLesEntreprises().filter(e=>{ const lot=lotDe(e.type,e.lotId); return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),texteTailles(e.qualites),texteTravaux(e.qualites),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q); }).slice(0,8);
   dd.innerHTML=res.length?res.map(e=>{ const lot=lotDe(e.type,e.lotId), t=e.type==='fournisseurs'?'Fournisseur':'Sous-traitant', a=avatar(e.raisonSociale);
     return `<div class="dd-item" onclick="allerVers('${e.type}','${e.id}')"><div style="background:${a.coul};height:30px;width:30px;border-radius:50%;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${esc(a.init)}</div><div><div class="dd-nom">${esc(e.raisonSociale)}</div><div class="dd-meta">${t}${texteLots(e.type,e)?' · Lot '+esc(texteLots(e.type,e)):''}</div></div></div>`; }).join('') : '<div class="dd-vide">Aucun résultat</div>';
   dd.classList.add('ouvert');
@@ -851,6 +871,31 @@ document.addEventListener('click',e=>{ if(!e.target.closest('.rg')) document.get
 function lienWeb(u){ u=String(u||'').trim(); if(!u) return '#'; return /^https?:\/\//i.test(u)?u:'https://'+u; }
 // Clic sur une carte / ligne = ouvre la fiche, sauf si on clique sur un bouton, un lien ou la case AO
 function clicFiche(ev,id){ if(ev.target.closest('button,a,label,input,select')) return; ouvrirFiche({id}); }
+// ===== Qualités des sous-traitants =====
+const Q_TAILLES={petits:['Petits chantiers','maisons'],moyens:['Moyens chantiers','petits ensembles 10 à 40 lgts'],grands:['Grands chantiers','gros ensembles 50 à 200 lgts']};
+const Q_TRAVAUX={neuf:'Neuf',rehab:'Réhabilitation',reno:'Rénovation'};
+const Q_OUINON={oui:'Oui',non:'Non'};
+function rendreChoix(idZone,options,valeurs,unique){
+  const z=document.getElementById(idZone); z.dataset.unique=unique?'1':'';
+  z.innerHTML=Object.entries(options).map(([k,v])=>{ const lib=Array.isArray(v)?`${v[0]} <small>(${v[1]})</small>`:v, c=valeurs.includes(k);
+    return `<label class="${c?'coche':''}"><input type="checkbox" value="${k}" ${c?'checked':''} onchange="choixClic(this)">${lib}</label>`; }).join('');
+}
+function choixClic(inp){ const z=inp.closest('.choix-multi');
+  if(z.dataset.unique&&inp.checked) z.querySelectorAll('input').forEach(i=>{ if(i!==inp) i.checked=false; });
+  z.querySelectorAll('input').forEach(i=>i.parentNode.classList.toggle('coche',i.checked)); }
+function lireChoix(idZone){ return [...document.querySelectorAll('#'+idZone+' input:checked')].map(i=>i.value); }
+function listeQ(v){ return v?(Array.isArray(v)?v:Object.values(v)).filter(Boolean):[]; }
+function remplirQualitesForm(q){ q=q||{};
+  rendreChoix('q-tailles',Q_TAILLES,listeQ(q.tailles)); rendreChoix('q-travaux',Q_TRAVAUX,listeQ(q.travaux));
+  rendreChoix('q-occupe',Q_OUINON,q.milieuOccupe===true?['oui']:q.milieuOccupe===false?['non']:[],true);
+  rendreChoix('q-etudes',Q_OUINON,q.etudes===true?['oui']:q.etudes===false?['non']:[],true); }
+function lireQualitesForm(){ const oc=lireChoix('q-occupe')[0], et=lireChoix('q-etudes')[0];
+  const q={ tailles:lireChoix('q-tailles'), travaux:lireChoix('q-travaux'), milieuOccupe:oc?oc==='oui':null, etudes:et?et==='oui':null };
+  if(!q.tailles.length) q.tailles=null; if(!q.travaux.length) q.travaux=null;
+  return (q.tailles||q.travaux||q.milieuOccupe!==null||q.etudes!==null)?q:null; }
+function texteTailles(q){ return listeQ(q&&q.tailles).map(k=>Q_TAILLES[k]?`${Q_TAILLES[k][0]} (${Q_TAILLES[k][1]})`:'').filter(Boolean).join(', '); }
+function texteTravaux(q){ return listeQ(q&&q.travaux).map(k=>Q_TRAVAUX[k]||'').filter(Boolean).join(', '); }
+function texteOuiNon(v){ return v===true?'Oui':v===false?'Non':''; }
 const TYPES_INTERV={fp:'Fourniture et pose',ps:'Pose seule',fs:'Fourniture seule'};
 function libIntervention(e){ return TYPES_INTERV[e.typeIntervention]||''; }
 function chipIntervention(e){ const l=libIntervention(e); return l?`<span class="chip ${e.typeIntervention}">${l}</span>`:''; }
@@ -895,6 +940,8 @@ function feuilleHTML(e,type){
         ${st?ligne('Consultation AO',e.consultAO?'Oui':'Non'):''}
         ${st?ligne('Chantiers luxe',e.chantiersLuxe?'Oui':'Non'):''}
       </div>
+      ${(st&&e.qualites)?`<div class="f-notes-bloc"><div class="lab">Qualités</div><div class="f-grille">
+        ${ligne('Taille de chantiers',texteTailles(e.qualites))}${ligne('Type de travaux',texteTravaux(e.qualites))}${ligne('Milieu occupé',texteOuiNon(e.qualites.milieuOccupe))}${ligne('Études',texteOuiNon(e.qualites.etudes))}</div></div>`:''}
       ${(e.contact2&&(e.contact2.nom||e.contact2.role||e.contact2.tel||e.contact2.email))?`<div class="f-notes-bloc"><div class="lab">Second contact</div><div class="f-grille">
         ${ligne('Nom',e.contact2.nom)}${ligne('Rôle',e.contact2.role)}${ligne('Téléphone',e.contact2.tel,true)}${ligne('Email',e.contact2.email)}</div></div>`:''}
       ${histoHtml}
