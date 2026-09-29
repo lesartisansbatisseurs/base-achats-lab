@@ -704,11 +704,11 @@ function carte(e){
       ${e.siteweb?`<a class="info" href="${lienWeb(e.siteweb)}" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20Z"/></svg>${esc(e.siteweb)}</a>`:''}
       ${e.notes?`<div class="note">${esc(e.notes)}</div>`:''}
     </div>
-    ${st?`<div class="carte-ao">${caseAO(e,true)}</div>`:''}</div>`;
+    ${st?`<div class="carte-ao">${caseAO(e,true)}<div style="height:7px"></div>${caseLuxe(e,true)}</div>`:''}</div>`;
 }
 
 /* ===== TABLEAU ===== */
-function valTri(e){ if(tri.col==='lot'){ const l=lotsObjs(ongletActif,e)[0]; return l?String(l.num):'~'; } if(tri.col==='note') return String(noteMoyenne(e)); if(tri.col==='consultAO') return e.consultAO?'1':'0'; return String(e[tri.col]||'').toLowerCase(); }
+function valTri(e){ if(tri.col==='lot'){ const l=lotsObjs(ongletActif,e)[0]; return l?String(l.num):'~'; } if(tri.col==='note') return String(noteMoyenne(e)); if(tri.col==='consultAO') return e.consultAO?'1':'0'; if(tri.col==='chantiersLuxe') return e.chantiersLuxe?'1':'0'; return String(e[tri.col]||'').toLowerCase(); }
 function trier(col){ if(tri.col===col) tri.dir*=-1; else { tri.col=col; tri.dir=1; } rendre(); }
 function rendreTableau(liste){
   const zone=document.getElementById('contenu'), st=(ongletActif==='soustraitants');
@@ -724,14 +724,14 @@ function rendreTableau(liste){
       <td>${e.contact?esc(e.contact):'<span class="mut">—</span>'}</td>
       <td>${e.tel?`<a class="info" href="tel:${esc(e.tel)}"><span class="tbl-mono">${esc(e.tel)}</span></a>`:'<span class="mut">—</span>'}</td>
       <td>${e.email?`<a class="info" href="mailto:${esc(e.email)}">${esc(e.email)}</a>`:'<span class="mut">—</span>'}</td>
-      ${st?`<td>${caseAO(e,false)}</td>`:`<td>${e.adresse?`<span class="tbl-adr">${esc(e.adresse)}</span>`:'<span class="mut">—</span>'}</td>`}
+      ${st?`<td>${caseAO(e,false)}</td><td>${caseLuxe(e,false)}</td>`:`<td>${e.adresse?`<span class="tbl-adr">${esc(e.adresse)}</span>`:'<span class="mut">—</span>'}</td>`}
       ${st?`<td>${noteMoyenne(e)?etoiles(Math.round(noteMoyenne(e)))+' <span class="tbl-mono">'+noteMoyenne(e).toFixed(1)+'</span>'+(nbChantiers(e)?' <span class="mut">('+nbChantiers(e)+')</span>':''):'<span class="mut">—</span>'}</td>`:''}
       <td><div class="tbl-actions"><button class="ico-btn fav" title="Favori" onclick="toggleFavori('${e.id}')">${etoileSVG(!!e.favori)}</button><button class="ico-btn" title="Fiche PDF" onclick="ouvrirFichePDF('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
         <button class="ico-btn" onclick='ouvrirFiche(${JSON.stringify({id:e.id})})'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         <button class="ico-btn suppr" onclick="supprimer('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div></td></tr>`;
   }).join('');
   zone.innerHTML=`<div class="tableau-wrap"><table class="tbl"><thead><tr>
-    ${th('raisonSociale','Raison sociale')}${th('lot','Lots')}${th('typeIntervention','Intervention')}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${st?th('consultAO','Consulter AO'):th('adresse','Agence référente')}${st?th('note','Note'):''}<th></th>
+    ${th('raisonSociale','Raison sociale')}${th('lot','Lots')}${th('typeIntervention','Intervention')}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${st?th('consultAO','Consulter AO')+th('chantiersLuxe','Luxe'):th('adresse','Agence référente')}${st?th('note','Note'):''}<th></th>
   </tr></thead><tbody>${lignes}</tbody></table></div>`;
 }
 
@@ -823,9 +823,9 @@ function supprimerLot(id){ if(!confirm('Supprimer ce lot ? Les entreprises ratta
 function exporterCSV(){
   if(ongletActif==='dashboard'){ alert('Ouvre l\u2019onglet Fournisseurs ou Sous-traitants pour exporter.'); return; }
   const source=entreprises[ongletActif]||{}, st=(ongletActif==='soustraitants'), echap=v=>`"${String(v||'').replace(/"/g,'""')}"`;
-  const entete=[st?'Lots':'Lot','Raison sociale','Contact','Téléphone','Email','Site web',st?'Adresse':'Adresse agence référente','SIRET','Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention',...(st?['Note moy /5','Nb chantiers','Consulter AO']:[]),'Favori','Notes'];
+  const entete=[st?'Lots':'Lot','Raison sociale','Contact','Téléphone','Email','Site web',st?'Adresse':'Adresse agence référente','SIRET','Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention',...(st?['Note moy /5','Nb chantiers','Consulter AO','Chantiers luxe']:[]),'Favori','Notes'];
   const lignes=Object.values(source).map(e=>{ const lot=lotDe(ongletActif,e.lotId);
-    return [texteLots(ongletActif,e,' / ')||'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),e.consultAO?'Oui':'Non']:[]),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
+    return [texteLots(ongletActif,e,' / ')||'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),e.consultAO?'Oui':'Non',e.chantiersLuxe?'Oui':'Non']:[]),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+[entete.join(';'),...lignes].join('\n')],{type:'text/csv;charset=utf-8;'})); a.download=`${ongletActif}-lab.csv`; a.click();
 }
 
@@ -856,6 +856,10 @@ function libIntervention(e){ return TYPES_INTERV[e.typeIntervention]||''; }
 function chipIntervention(e){ const l=libIntervention(e); return l?`<span class="chip ${e.typeIntervention}">${l}</span>`:''; }
 function caseAO(e,avecLibelle){ const c=!!e.consultAO;
   return `<label class="ao-case${c?' oui':''}" title="À consulter par le service commercial en phase d'appel d'offres"><input type="checkbox" ${c?'checked':''} onchange="toggleAO('${e.id}',this.checked)" />${avecLibelle?'À consulter en appel d\u2019offres':''}</label>`; }
+function caseLuxe(e,avecLibelle){ const c=!!e.chantiersLuxe;
+  return `<label class="ao-case${c?' oui':''}" title="Peut intervenir sur des chantiers haut de gamme (hôtels, villas…)"><input type="checkbox" ${c?'checked':''} onchange="toggleCase('${e.id}','chantiersLuxe',this.checked)" />${avecLibelle?'Chantiers luxe (hôtels, villas…)':''}</label>`; }
+function toggleCase(id,champ,val){ const e=entreprises.soustraitants&&entreprises.soustraitants[id]; if(!e) return;
+  if(db){ db.ref('soustraitants/'+id+'/'+champ).set(!!val); } else { e[champ]=!!val; rendre(); } }
 function toggleAO(id,val){ const e=entreprises.soustraitants&&entreprises.soustraitants[id]; if(!e) return;
   if(db){ db.ref('soustraitants/'+id+'/consultAO').set(!!val); } else { e.consultAO=!!val; rendre(); } }
 function toggleFavori(id){ const e=entreprises[ongletActif]&&entreprises[ongletActif][id]; if(!e) return; const val=!e.favori;
@@ -889,6 +893,7 @@ function feuilleHTML(e,type){
         ${ligne(st?'Adresse':'Agence référente',e.adresse)}
         ${ligne('SIRET',e.siret,true)}
         ${st?ligne('Consultation AO',e.consultAO?'Oui':'Non'):''}
+        ${st?ligne('Chantiers luxe',e.chantiersLuxe?'Oui':'Non'):''}
       </div>
       ${(e.contact2&&(e.contact2.nom||e.contact2.role||e.contact2.tel||e.contact2.email))?`<div class="f-notes-bloc"><div class="lab">Second contact</div><div class="f-grille">
         ${ligne('Nom',e.contact2.nom)}${ligne('Rôle',e.contact2.role)}${ligne('Téléphone',e.contact2.tel,true)}${ligne('Email',e.contact2.email)}</div></div>`:''}
