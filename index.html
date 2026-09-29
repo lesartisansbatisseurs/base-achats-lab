@@ -393,6 +393,7 @@
       <div class="sb-section">Gestion</div>
       <div class="sb-item" onclick="ouvrirLots()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M3 12h18M3 17h18"/></svg><span>Gérer les lots</span></div>
       <div class="sb-item" onclick="exporterCSV()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg><span>Exporter CSV</span></div>
+      <div class="sb-item" onclick="exporterExcel()" title="Toute la base dans un fichier Excel : fournisseurs, sous-traitants et évaluations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg><span id="txt-excel">Exporter Excel</span></div>
     </div>
     <div class="sb-foot"><div id="user-mail" style="color:#c7d2de;margin-bottom:4px;word-break:break-all;font-size:11px"></div>Entreprise générale · TCE — Orgeval (78)<br><button class="sb-logout" onclick="exporterBase()" title="Télécharger une sauvegarde complète de la base (JSON)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Exporter la base</button><br><button class="sb-logout" style="margin-top:6px" onclick="seDeconnecter()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Se déconnecter</button></div>
   </aside>
@@ -998,6 +999,73 @@ function exporterCSV(){
   const lignes=Object.values(source).map(e=>{ const lot=lotDe(ongletActif,e.lotId);
     return [texteLots(ongletActif,e,' / ')||'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),estEvite(e)?'À éviter':'Actif',e.motifEvite||'',dateFr(e.modifieLe),e.modifiePar||'',...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),e.consultAO?'Oui':'Non',e.chantiersLuxe?'Oui':'Non',texteTailles(e.qualites),texteTravaux(e.qualites),texteOuiNon(e.qualites&&e.qualites.milieuOccupe),texteOuiNon(e.qualites&&e.qualites.etudes)]:[]),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+[entete.join(';'),...lignes].join('\n')],{type:'text/csv;charset=utf-8;'})); a.download=`${ongletActif}-lab.csv`; a.click();
+}
+
+/* ===== EXPORT EXCEL (.xlsx) — toute la base, mis en forme ===== */
+function chargerExcelJS(){ return new Promise((ok,ko)=>{ if(window.ExcelJS) return ok();
+  const sc=document.createElement('script'); sc.src='https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';
+  sc.onload=()=>ok(); sc.onerror=()=>ko(new Error('chargement')); document.head.appendChild(sc); }); }
+function colonnesExcel(type){ const st=type==='soustraitants', q=e=>e.qualites||{};
+  return [
+    ['Raison sociale',e=>e.raisonSociale,28],
+    ['Statut',e=>estEvite(e)?'À éviter':'Actif',11],
+    [st?'Lots':'Lots',e=>texteLots(type,e,'\n'),34],
+    ['Type d\'intervention',e=>libIntervention(e),19],
+    ...(st?[['Note moy. /5',e=>noteMoyenne(e)?Math.round(noteMoyenne(e)*10)/10:'',12],['Nb chantiers',e=>nbChantiers(e)||'',12],
+      ['Consulter AO',e=>e.consultAO?'Oui':'Non',13],['Chantiers luxe',e=>e.chantiersLuxe?'Oui':'Non',14],
+      ['Taille de chantiers',e=>listeQ(q(e).tailles).map(k=>Q_TAILLES[k]?Q_TAILLES[k][0]:'').filter(Boolean).join(', '),26],
+      ['Type de travaux',e=>texteTravaux(q(e)),24],['Milieu occupé',e=>texteOuiNon(q(e).milieuOccupe),13],['Études',e=>texteOuiNon(q(e).etudes),10]]:[]),
+    ['Contact référent',e=>e.contact,20],['Rôle',e=>e.contactRole,18],['Téléphone',e=>e.tel,15],['Email',e=>e.email,28],
+    ['Contact 2',e=>(e.contact2||{}).nom,18],['Rôle contact 2',e=>(e.contact2||{}).role,18],['Tél. contact 2',e=>(e.contact2||{}).tel,15],['Email contact 2',e=>(e.contact2||{}).email,26],
+    [st?'Adresse':'Agence référente',e=>e.adresse,34],['SIRET',e=>e.siret,17],['Site web',e=>e.siteweb,24],
+    ['Motif (à éviter)',e=>e.motifEvite,26],['Favori',e=>e.favori?'★':'',8],['Notes',e=>e.notes,40],
+    ['Modifiée le',e=>dateFr(e.modifieLe),18],['Modifiée par',e=>e.modifiePar,24]
+  ]; }
+function styleEntete(ws,coul){ const r=ws.getRow(1); r.height=30;
+  r.eachCell(c=>{ c.font={bold:true,color:{argb:'FFFFFFFF'},size:10.5}; c.fill={type:'pattern',pattern:'solid',fgColor:{argb:coul}};
+    c.alignment={vertical:'middle',horizontal:'center',wrapText:true}; c.border={bottom:{style:'thin',color:{argb:'FF1F2937'}}}; }); }
+function feuilleExcel(wb,nom,type,coul){
+  const cols=colonnesExcel(type), ws=wb.addWorksheet(nom,{views:[{state:'frozen',xSplit:1,ySplit:1}]});
+  ws.columns=cols.map(([h,,w])=>({header:h,width:w}));
+  const liste=Object.values(entreprises[type]||{}).sort((a,b)=>String(a.raisonSociale).localeCompare(String(b.raisonSociale),'fr'));
+  liste.forEach((e,i)=>{ const r=ws.addRow(cols.map(([,f])=>{ const v=f(e); return v===undefined||v===null?'':v; }));
+    r.eachCell({includeEmpty:true},c=>{ c.alignment={vertical:'top',wrapText:true}; c.border={bottom:{style:'hair',color:{argb:'FFD5DBE3'}}};
+      if(i%2) c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF6F8FB'}}; });
+    r.getCell(1).font={bold:true};
+    if(estEvite(e)) r.eachCell({includeEmpty:true},c=>{ c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFDE8E8'}}; c.font=Object.assign({},c.font,{color:{argb:'FFB91C1C'}}); });
+  });
+  styleEntete(ws,coul); ws.autoFilter={from:{row:1,column:1},to:{row:1,column:cols.length}};
+  ws.pageSetup={orientation:'landscape',paperSize:9,fitToPage:true,fitToWidth:1,fitToHeight:0,printTitlesRow:'1:1'};
+  return liste.length; }
+function feuilleEvaluations(wb){
+  const ws=wb.addWorksheet('Évaluations',{views:[{state:'frozen',xSplit:2,ySplit:1}]});
+  ws.columns=[{header:'Sous-traitant',width:26},{header:'Chantier',width:30},{header:'Date',width:12},
+    ...CRITERES.map(([,lib])=>({header:lib,width:14})),{header:'Note /5',width:10},{header:'Commentaire',width:44}];
+  let n=0;
+  Object.values(entreprises.soustraitants||{}).sort((a,b)=>String(a.raisonSociale).localeCompare(String(b.raisonSociale),'fr')).forEach(e=>{
+    interventionsArr(e).forEach(i=>{ const c=i.criteres||{}; n++;
+      const r=ws.addRow([e.raisonSociale,i.chantier,i.date||'',...CRITERES.map(([k])=>c[k]||''),Number(i.note)||'',i.commentaire||'']);
+      r.eachCell({includeEmpty:true},x=>{ x.alignment={vertical:'top',wrapText:true}; x.border={bottom:{style:'hair',color:{argb:'FFD5DBE3'}}}; });
+      for(let k=4;k<=4+CRITERES.length;k++) r.getCell(k).alignment={vertical:'top',horizontal:'center'};
+      r.getCell(4+CRITERES.length).font={bold:true,color:{argb:'FF1F5FAE'}}; }); });
+  styleEntete(ws,'FF1F2937'); ws.autoFilter={from:{row:1,column:1},to:{row:1,column:ws.columns.length}};
+  ws.pageSetup={orientation:'landscape',paperSize:9,fitToPage:true,fitToWidth:1,fitToHeight:0,printTitlesRow:'1:1'};
+  return n; }
+async function exporterExcel(){
+  const lib=document.getElementById('txt-excel'), txt=lib.textContent; lib.textContent='Préparation…';
+  try{
+    await chargerExcelJS();
+    const wb=new ExcelJS.Workbook(); wb.creator=utilisateurCourant(); wb.created=new Date();
+    const nf=feuilleExcel(wb,'Fournisseurs','fournisseurs','FF1F5FAE'), ns=feuilleExcel(wb,'Sous-traitants','soustraitants','FFB7791F'), ne=feuilleEvaluations(wb);
+    const info=wb.addWorksheet('Infos'); info.columns=[{width:26},{width:40}];
+    [['Base Achats & Commercial — LAB',''],['Exporté le',dateFr(new Date().toISOString())],['Exporté par',utilisateurCourant()],['Fournisseurs',nf],['Sous-traitants',ns],['Chantiers évalués',ne]]
+      .forEach((l,i)=>{ const r=info.addRow(l); r.getCell(1).font={bold:true,size:i?11:14,color:{argb:i?'FF374151':'FF1F5FAE'}}; });
+    const buf=await wb.xlsx.writeBuffer(), d=new Date(), a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+    a.download=`base-achats-LAB_${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.xlsx`;
+    document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },800);
+  }catch(err){ console.error(err); alert('Export Excel impossible pour le moment (vérifie ta connexion internet), réessaie dans un instant.'); }
+  finally{ lib.textContent=txt; }
 }
 
 /* ===== RECHERCHE GLOBALE ===== */
