@@ -407,6 +407,19 @@
   .res-actions .act.off { color:var(--gris-clair); font-weight:500; cursor:default; }
   .plus-ia { margin-top:9px; }
   /* Sur téléphone : assistant plein écran, gros boutons */
+  /* Corbeille */
+  .ligne-corb { display:flex; align-items:center; gap:10px; padding:11px 0; border-bottom:1px solid #f1f2f4; }
+  .ligne-corb .av { height:34px; width:34px; border-radius:50%; color:#fff; font-weight:700; font-size:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; opacity:.75; }
+  .ligne-corb .nom { font-size:14px; font-weight:600; } .ligne-corb .meta { font-size:12px; color:var(--gris); margin-top:2px; }
+  .ligne-corb .reste { font-size:11.5px; font-weight:600; color:var(--ambre); } .ligne-corb .reste.urgent { color:#b91c1c; }
+  .ligne-corb .btns { margin-left:auto; display:flex; gap:6px; flex-shrink:0; }
+  .ligne-corb .btn { padding:7px 11px; font-size:12.5px; }
+  .corb-vide { text-align:center; padding:34px 10px; color:var(--gris-clair); font-size:13.5px; }
+  .toast { position:fixed; left:50%; bottom:28px; transform:translate(-50%,20px); background:#1f2937; color:#fff; padding:11px 12px 11px 16px; border-radius:11px; font-size:13.5px; display:flex; align-items:center; gap:14px; box-shadow:0 10px 30px rgba(0,0,0,.25); opacity:0; pointer-events:none; transition:all .2s; z-index:80; max-width:calc(100vw - 32px); }
+  .toast.ouvert { opacity:1; transform:translate(-50%,0); pointer-events:auto; }
+  .toast button { background:none; border:none; color:#7cc0ff; font-weight:700; font-size:13.5px; cursor:pointer; padding:4px 6px; font-family:inherit; }
+  .toast button:empty { display:none; }
+
   /* ===== Tablette & téléphone ===== */
   .burger, .sb-voile { display:none; }
   @media (hover:none){ /* écrans tactiles : actions toujours visibles, zones de clic plus grandes */
@@ -472,6 +485,8 @@
     .interv-ajout .rowin { flex-direction:column; }
     .ajout-lot { flex-wrap:wrap; } .ajout-lot .btn { flex:1 1 100%; justify-content:center; }
     .ms-liste label { padding:11px 12px; }
+    .ligne-corb { flex-wrap:wrap; } .ligne-corb .btns { width:100%; margin-left:44px; } .ligne-corb .btn { flex:1; justify-content:center; padding:10px; }
+    .toast { bottom:calc(92px + env(safe-area-inset-bottom,0px)); }
     /* Fiche consultée / PDF */
     .pdf-bar { flex-wrap:wrap; padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px; }
     .pdf-bar .titre { flex:1 1 100%; font-size:13.5px; }
@@ -535,6 +550,7 @@
         <span>Sous-traitants</span><span class="badge" id="badge-soustraitants">0</span></div>
       <div class="sb-section">Gestion</div>
       <div class="sb-item" onclick="ouvrirLots()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M3 12h18M3 17h18"/></svg><span>Gérer les lots</span></div>
+      <div class="sb-item" onclick="ouvrirCorbeille()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span>Corbeille</span><span class="badge" id="badge-corbeille" style="display:none">0</span></div>
       <div class="sb-item" onclick="exporterCSV()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg><span>Exporter CSV</span></div>
       <div class="sb-item" onclick="exporterExcel()" title="Toute la base dans un fichier Excel : fournisseurs, sous-traitants et évaluations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg><span id="txt-excel">Exporter Excel</span></div>
     </div>
@@ -667,6 +683,17 @@
   <div class="modale-bas"><button class="btn" onclick="fermer('overlay-fiche')">Annuler</button><button class="btn btn-primaire" onclick="enregistrerFiche()">Enregistrer</button></div>
 </div></div>
 
+<!-- Modale corbeille -->
+<div class="overlay" id="overlay-corbeille"><div class="modale">
+  <div class="modale-haut"><h2>Corbeille</h2><button class="ico-btn" onclick="fermer('overlay-corbeille')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+  <div class="modale-corps">
+    <div class="mut" style="font-size:12.5px;line-height:1.5">Les entreprises supprimées restent ici <b>30 jours</b>, puis sont effacées définitivement. Tu peux les restaurer à tout moment d'ici là.</div>
+    <div id="liste-corbeille"></div>
+  </div>
+  <div class="modale-bas"><button class="btn" id="btn-vider-corbeille" onclick="viderCorbeille()" style="color:#b91c1c;margin-right:auto">Vider la corbeille</button><button class="btn" onclick="fermer('overlay-corbeille')">Fermer</button></div>
+</div></div>
+<div class="toast" id="toast"><span id="toast-txt"></span><button type="button" id="toast-btn"></button></div>
+
 <!-- Modale lots -->
 <div class="overlay" id="overlay-lots"><div class="modale">
   <div class="modale-haut"><h2 id="lots-modal-titre">Gérer les lots</h2><button class="ico-btn" onclick="fermer('overlay-lots')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
@@ -731,7 +758,7 @@ const LOTS_SOUSTRAITANTS = [
 ];
 
 /* ===== ÉTAT ===== */
-let db=null, lots={fournisseurs:{},soustraitants:{}}, entreprises={fournisseurs:{},soustraitants:{}}, ongletActif='dashboard';
+let db=null, lots={fournisseurs:{},soustraitants:{}}, entreprises={fournisseurs:{},soustraitants:{}}, corbeille={fournisseurs:{},soustraitants:{}}, ongletActif='dashboard';
 let vueActive='cartes', tri={col:'raisonSociale',dir:1};
 
 const JOURS=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
@@ -778,7 +805,7 @@ let accesRefuse=false;
 function refusAcces(err){ console.warn('Accès refusé',err); if(accesRefuse) return; accesRefuse=true; debrancher(); if(auth) auth.signOut();
   setTimeout(()=>{ document.getElementById('login-err').textContent='Ce compte n\u2019est pas autorisé à accéder à la base. Contacte l\u2019administrateur.'; },50); }
 function debrancher(){ if(!db) return; ['lots','fournisseurs','soustraitants'].forEach(k=>db.ref(k).off()); brancheFait=false;
-  entreprises={fournisseurs:{},soustraitants:{}}; lots={fournisseurs:{},soustraitants:{}}; try{ rendre(); majKpis(); }catch(e){} }
+  entreprises={fournisseurs:{},soustraitants:{}}; corbeille={fournisseurs:{},soustraitants:{}}; lots={fournisseurs:{},soustraitants:{}}; try{ rendre(); majKpis(); }catch(e){} }
 function brancher(){
   db.ref('lots').on('value',s=>{
     lots=s.val()||{}; lots.fournisseurs=lots.fournisseurs||{}; lots.soustraitants=lots.soustraitants||{};
@@ -788,8 +815,8 @@ function brancher(){
     if(document.getElementById('overlay-lots').classList.contains('ouvert')) rendreListeLots();
     synchroNumLots('fournisseurs'); synchroNumLots('soustraitants');
   },refusAcces);
-  db.ref('fournisseurs').on('value',s=>{ entreprises.fournisseurs=s.val()||{}; majKpis(); rendre(); },refusAcces);
-  db.ref('soustraitants').on('value',s=>{ entreprises.soustraitants=s.val()||{}; majKpis(); rendre(); },refusAcces);
+  db.ref('fournisseurs').on('value',s=>{ repartirCorbeille('fournisseurs',s.val()); majKpis(); rendre(); },refusAcces);
+  db.ref('soustraitants').on('value',s=>{ repartirCorbeille('soustraitants',s.val()); majKpis(); rendre(); },refusAcces);
 }
 function semer(type,liste){ const m={}; liste.forEach(l=>{ m[db.ref('lots/'+type).push().key]=l; }); db.ref('lots/'+type).update(m); }
 
@@ -862,15 +889,15 @@ function texteTrace(e){ const l=[];
 function normNom(t){ return String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
   .replace(/\b(sarl|sas|sasu|eurl|sa|sci|ets|etablissements?|entreprise|societe|ste)\b/g,'').replace(/[^a-z0-9]/g,''); }
 function chercherDoublons(raison,siret,idExclu){ const n=normNom(raison), sr=String(siret||'').replace(/\D/g,''), res=[];
-  ['fournisseurs','soustraitants'].forEach(t=>Object.entries(entreprises[t]||{}).forEach(([id,e])=>{ if(id===idExclu) return;
+  ['fournisseurs','soustraitants'].forEach(t=>[[entreprises[t],''],[corbeille[t],' — dans la corbeille, tu peux la restaurer']].forEach(([src,suffixe])=>Object.entries(src||{}).forEach(([id,e])=>{ if(id===idExclu) return;
     const memeNom=n&&normNom(e.raisonSociale)===n, memeSiret=sr.length>=9&&String(e.siret||'').replace(/\D/g,'')===sr;
-    if(memeNom||memeSiret) res.push(`• ${e.raisonSociale} (${t==='fournisseurs'?'fournisseur':'sous-traitant'}${memeSiret?', même SIRET':''})`); }));
+    if(memeNom||memeSiret) res.push(`• ${e.raisonSociale} (${t==='fournisseurs'?'fournisseur':'sous-traitant'}${memeSiret?', même SIRET':''})${suffixe}`); })));
   return res; }
 function emailValide(v){ return !v||/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(v); }
 function telValide(v){ if(!v) return true; const d=v.replace(/[\s.\-()]/g,''); return /^(0[1-9]\d{8}|\+33[1-9]\d{8}|0033[1-9]\d{8})$/.test(d); }
 // ===== Export complet de la base (sauvegarde) =====
 function exporterBase(){
-  const data={ exporteLe:new Date().toISOString(), exportePar:utilisateurCourant(), lots, fournisseurs:entreprises.fournisseurs, soustraitants:entreprises.soustraitants };
+  const data={ exporteLe:new Date().toISOString(), exportePar:utilisateurCourant(), lots, fournisseurs:Object.assign({},entreprises.fournisseurs,corbeille.fournisseurs), soustraitants:Object.assign({},entreprises.soustraitants,corbeille.soustraitants) };
   const nb=Object.keys(data.fournisseurs||{}).length+Object.keys(data.soustraitants||{}).length;
   if(!nb&&!confirm('La base semble vide. Exporter quand même ?')) return;
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}), a=document.createElement('a'), d=new Date();
@@ -1122,7 +1149,47 @@ function enregistrerFiche(){
   else { fiche.creePar=fiche.modifiePar; fiche.creeLe=fiche.modifieLe; db.ref(typeCible).push(fiche); }
   fermer('overlay-fiche');
 }
-function supprimer(id){ if(confirm('Supprimer cette entreprise ?')) db.ref(ongletActif+'/'+id).remove(); }
+/* ===== CORBEILLE (30 jours) =====
+   Une entreprise supprimée n'est pas effacée : elle est marquée "supprime" dans son propre nœud Firebase
+   (aucune nouvelle règle de sécurité nécessaire) et n'apparaît plus nulle part, sauf dans la Corbeille. */
+const CORBEILLE_JOURS=30, _purgeFaite=new Set();
+function repartirCorbeille(type,val){ const actifs={}, corb={}; Object.entries(val||{}).forEach(([id,e])=>{ if(e&&e.supprime) corb[id]=e; else actifs[id]=e; });
+  entreprises[type]=actifs; corbeille[type]=corb; purgerCorbeille(type); majBadgeCorbeille();
+  if(document.getElementById('overlay-corbeille').classList.contains('ouvert')) rendreCorbeille(); }
+function joursRestants(e){ const t=Date.parse(e.supprimeLe||''); if(isNaN(t)) return CORBEILLE_JOURS; return Math.ceil(CORBEILLE_JOURS-(Date.now()-t)/86400000); }
+function purgerCorbeille(type){ if(!db) return; Object.entries(corbeille[type]).forEach(([id,e])=>{ if(joursRestants(e)<=0&&!_purgeFaite.has(id)){ _purgeFaite.add(id); db.ref(type+'/'+id).remove(); } }); }
+function nbCorbeille(){ return Object.keys(corbeille.fournisseurs).length+Object.keys(corbeille.soustraitants).length; }
+function majBadgeCorbeille(){ const b=document.getElementById('badge-corbeille'), n=nbCorbeille(); if(!b) return; b.textContent=n; b.style.display=n?'':'none'; }
+function supprimer(id){ const type=ongletActif, e=entreprises[type]&&entreprises[type][id]; if(!e) return;
+  if(!db){ alert('Firebase non connecté.'); return; }
+  if(!confirm(`Mettre « ${e.raisonSociale} » à la corbeille ?\n\nTu pourras la restaurer pendant ${CORBEILLE_JOURS} jours.`)) return;
+  db.ref(type+'/'+id).update({supprime:true, supprimeLe:new Date().toISOString(), supprimePar:utilisateurCourant()});
+  toast(`« ${e.raisonSociale} » mise à la corbeille`,'Annuler',()=>restaurer(type,id)); }
+function restaurer(type,id){ if(!db) return; const e=corbeille[type]&&corbeille[type][id];
+  db.ref(type+'/'+id).update(Object.assign({supprime:null, supprimeLe:null, supprimePar:null},horodatage()));
+  toast(`« ${e?e.raisonSociale:'Entreprise'} » restaurée`); }
+function supprimerDefinitivement(type,id){ const e=corbeille[type]&&corbeille[type][id]; if(!e||!db) return;
+  if(!confirm(`Supprimer DÉFINITIVEMENT « ${e.raisonSociale} » ?\n\nCette action est irréversible.`)) return;
+  db.ref(type+'/'+id).remove(); }
+function viderCorbeille(){ const n=nbCorbeille(); if(!n||!db) return;
+  if(!confirm(`Supprimer DÉFINITIVEMENT les ${n} entreprise${n>1?'s':''} de la corbeille ?\n\nCette action est irréversible.`)) return;
+  ['fournisseurs','soustraitants'].forEach(t=>{ const m={}; Object.keys(corbeille[t]).forEach(id=>m[id]=null); if(Object.keys(m).length) db.ref(t).update(m); }); }
+function ouvrirCorbeille(){ rendreCorbeille(); document.getElementById('overlay-corbeille').classList.add('ouvert'); }
+function rendreCorbeille(){
+  const liste=[]; ['fournisseurs','soustraitants'].forEach(t=>Object.entries(corbeille[t]).forEach(([id,e])=>liste.push({id,type:t,...e})));
+  liste.sort((a,b)=>String(b.supprimeLe||'').localeCompare(String(a.supprimeLe||'')));
+  document.getElementById('btn-vider-corbeille').style.display=liste.length?'':'none';
+  document.getElementById('liste-corbeille').innerHTML=liste.length?liste.map(e=>{ const a=avatar(e.raisonSociale), j=Math.max(0,joursRestants(e));
+    return `<div class="ligne-corb"><div class="av" style="background:${a.coul}">${esc(a.init)}</div><div style="min-width:0">
+      <div class="nom">${esc(e.raisonSociale)}</div>
+      <div class="meta">${e.type==='fournisseurs'?'Fournisseur':'Sous-traitant'} · supprimée le ${esc(dateFr(e.supprimeLe))}${e.supprimePar?' par '+esc(e.supprimePar):''}</div>
+      <div class="reste${j<=5?' urgent':''}">Effacement définitif dans ${j} jour${j>1?'s':''}</div></div>
+      <div class="btns"><button class="btn btn-primaire" onclick="restaurer('${e.type}','${e.id}')">Restaurer</button><button class="btn" title="Supprimer définitivement" onclick="supprimerDefinitivement('${e.type}','${e.id}')">Effacer</button></div></div>`; }).join('')
+    :'<div class="corb-vide">🗑️ La corbeille est vide.</div>'; }
+let _toastT=null;
+function toast(txt,btnTxt,action){ const t=document.getElementById('toast'), b=document.getElementById('toast-btn');
+  document.getElementById('toast-txt').textContent=txt; b.textContent=btnTxt||''; b.onclick=()=>{ t.classList.remove('ouvert'); if(action) action(); };
+  t.classList.add('ouvert'); clearTimeout(_toastT); _toastT=setTimeout(()=>t.classList.remove('ouvert'),btnTxt?7000:3000); }
 
 /* ===== LOTS ===== */
 function remplirFiltreLot(){
