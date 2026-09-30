@@ -170,14 +170,14 @@
   .sb-logout { margin-top:9px; background:none; border:none; color:#8fa0b3; cursor:pointer; font-size:12px; display:inline-flex; align-items:center; gap:6px; padding:0; }
   .sb-logout:hover { color:#cdd8e3; }
   .interv-liste { display:flex; flex-direction:column; gap:8px; margin-bottom:10px; }
-  .interv-row { display:flex; align-items:center; gap:10px; padding:9px 11px; border:1px solid var(--bord); border-radius:9px; background:#fafbfc; }
+  .interv-row { display:flex; align-items:center; gap:10px; padding:9px 11px; border:1px solid var(--bord); border-radius:9px; background:#fff; }
   .interv-row .ch { flex:1; min-width:0; }
   .interv-row .ch .n { font-size:13px; font-weight:600; }
   .interv-row .ch .d { font-size:11.5px; color:var(--gris); }
   .interv-row .ch .cm { font-size:11.5px; color:var(--gris); margin-top:2px; }
   .interv-ajout { border:1px dashed #cbd5e1; border-radius:10px; padding:11px; display:flex; flex-direction:column; gap:8px; }
   .interv-ajout .rowin { display:flex; gap:8px; }
-  .interv-ajout input { padding:8px 10px; font-size:13.5px; border:1px solid #d1d5db; border-radius:8px; width:100%; }
+  .interv-ajout input { padding:9px 11px; font-size:14px; border:1px solid #d1d5db; border-radius:9px; width:100%; font-family:inherit; background:#fff; }
   .interv-ajout .note-edit .etoile-btn svg { width:22px; height:22px; }
   .interv-ajout .btn { white-space:nowrap; padding:8px 12px; }
   .chip.evite { background:#fde8e8; color:#b91c1c; font-weight:700; }
@@ -273,10 +273,40 @@
   .modale-corps { padding:20px 22px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; }
   .modale-bas { padding:14px 22px; border-top:1px solid var(--bord); display:flex; justify-content:flex-end; gap:8px; }
   label.champ span { display:block; font-size:12px; font-weight:500; color:var(--gris); margin-bottom:5px; }
-  label.champ input,label.champ select,label.champ textarea { width:100%; padding:9px 11px; font-size:14px; border:1px solid #d1d5db; border-radius:9px; font-family:inherit; }
+  label.champ input,label.champ select,label.champ textarea { width:100%; padding:9px 11px; font-size:14px; border:1px solid #d1d5db; border-radius:9px; font-family:inherit; background-color:#fff; color:var(--ink); }
+  /* Listes déroulantes : même rendu que les champs texte (fond blanc, même bordure), flèche personnalisée */
+  label.champ select { -webkit-appearance:none; appearance:none; padding-right:34px; cursor:pointer; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 11px center; }
+  label.champ input:focus,label.champ select:focus,label.champ textarea:focus,.interv-ajout input:focus,.ms-ajout input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(43,130,217,.15); }
+  .champ-lab { display:block; font-size:12px; font-weight:500; color:var(--gris); margin-bottom:5px; }
+  /* Liste déroulante multi-lots */
+  .ms-bouton { width:100%; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 11px; font-size:14px; font-family:inherit; color:var(--ink); border:1px solid #d1d5db; border-radius:9px; background:#fff; cursor:pointer; text-align:left; }
+  .ms-bouton svg { flex-shrink:0; color:var(--gris); transition:transform .15s; }
+  .ms-bouton .ph { color:var(--gris-clair); }
+  #ms-lots-txt { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .ms.ouvert .ms-bouton { border-color:var(--accent); box-shadow:0 0 0 3px rgba(43,130,217,.15); }
+  .ms.ouvert .ms-bouton svg { transform:rotate(180deg); }
+  .ms-panneau { display:none; margin-top:6px; border:1px solid #d1d5db; border-radius:9px; background:#fff; overflow:hidden; box-shadow:0 8px 22px rgba(0,0,0,.08); }
+  .ms.ouvert .ms-panneau { display:block; }
+  .ms-recherche { width:100%; padding:9px 11px; border:none; border-bottom:1px solid var(--bord); font-size:13.5px; font-family:inherit; outline:none; background:#fff; }
+  .ms-liste { max-height:230px; overflow-y:auto; padding:4px 0; }
+  .ms-liste label { display:flex; align-items:center; gap:10px; padding:7px 12px; font-size:13.5px; cursor:pointer; user-select:none; }
+  .ms-liste label:hover { background:var(--bleu-clair); }
+  .ms-liste label.coche { color:var(--accent); font-weight:600; }
+  .ms-liste input { accent-color:var(--accent); width:16px; height:16px; margin:0; flex-shrink:0; cursor:pointer; }
+  .ms-liste .n { font-family:var(--mono); font-size:11.5px; color:var(--gris-clair); width:22px; flex-shrink:0; }
+  .ms-liste .ms-vide { padding:10px 12px; font-size:12.5px; color:var(--gris-clair); }
+  .ms-ajout { display:flex; gap:8px; padding:8px; border-top:1px solid var(--bord); background:#fff; }
+  .ms-ajout input { flex:1; min-width:0; padding:8px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:13.5px; font-family:inherit; background:#fff; }
+  .ms-ajout .btn { padding:8px 12px; white-space:nowrap; }
+  .ms-puces { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .ms-puces:empty { display:none; }
+  .ms-puce { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; padding:4px 6px 4px 10px; border-radius:7px; background:var(--bleu-clair); color:var(--accent); font-weight:500; }
+  .ms-puce button { border:none; background:none; color:inherit; cursor:pointer; font-size:15px; line-height:1; padding:0 2px; opacity:.7; }
+  .ms-puce button:hover { opacity:1; }
   .duo { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-  .bloc-contact2 { border:1px dashed var(--bord); border-radius:11px; padding:13px 14px 2px; margin-bottom:14px; background:#fafbfc; }
-  .bloc-qualites { border:1px solid var(--bord); border-radius:11px; padding:13px 14px 4px; margin-bottom:14px; background:#fafbfc; }
+  .duo:has(> :nth-child(2)[style*="none"]) { grid-template-columns:1fr; } /* champ seul = pleine largeur */
+  .bloc-contact2 { border:1px dashed var(--bord); border-radius:11px; padding:13px 14px 2px; margin-bottom:14px; background:#fff; }
+  .bloc-qualites { border:1px solid var(--bord); border-radius:11px; padding:13px 14px 4px; margin-bottom:14px; background:#fff; }
   .bloc-qualites .q-ligne { margin-bottom:11px; }
   .bloc-qualites .q-lab { font-size:12px; font-weight:500; color:var(--gris); margin-bottom:6px; }
   .choix-multi { display:flex; flex-wrap:wrap; gap:7px; }
@@ -471,8 +501,16 @@
       <label class="champ" id="champ-motif"><span>Motif *</span><input id="f-motif" placeholder="Ex : retards répétés, malfaçons, litige…" /></label></div></div>
     <div class="duo"><label class="champ"><span>Type</span><select id="f-type" onchange="majTypeFiche()"><option value="fournisseurs">Fournisseur</option><option value="soustraitants">Sous-traitant</option></select></label>
       <label class="champ" id="champ-lot-simple"><span>Lot</span><select id="f-lot"></select></label></div>
-    <div class="champ" id="champ-lots-multi"><span style="display:block;font-size:12px;font-weight:500;color:var(--gris);margin-bottom:5px">Lots (plusieurs choix possibles)</span><div class="lots-choix" id="f-lots"></div>
-      <div class="ajout-lot" style="margin:8px 0 0"><input id="f-nouveau-lot" placeholder="Lot absent de la liste ? Saisis son nom…" style="flex:1" onkeydown="if(event.key==='Enter'){event.preventDefault();ajouterLotDepuisFiche();}" /><button type="button" class="btn" onclick="ajouterLotDepuisFiche()">+ Ajouter le lot</button></div></div>
+    <div class="champ" id="champ-lots-multi"><span class="champ-lab">Lots (plusieurs choix possibles)</span>
+      <div class="ms" id="ms-lots">
+        <button type="button" class="ms-bouton" onclick="basculerMsLots()"><span id="ms-lots-txt" class="ph">Sélectionner un ou plusieurs lots</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="ms-panneau">
+          <input class="ms-recherche" id="ms-lots-recherche" placeholder="Rechercher un lot…" oninput="filtrerMsLots()" onkeydown="if(event.key==='Enter')event.preventDefault()" />
+          <div class="ms-liste" id="f-lots"></div>
+          <div class="ms-ajout"><input id="f-nouveau-lot" placeholder="Lot absent ? Saisis son nom…" onkeydown="if(event.key==='Enter'){event.preventDefault();ajouterLotDepuisFiche();}" /><button type="button" class="btn" onclick="ajouterLotDepuisFiche()">+ Ajouter</button></div>
+        </div>
+        <div class="ms-puces" id="ms-lots-puces"></div>
+      </div></div>
     <label class="champ" id="champ-intervention"><span>Type d'intervention</span><select id="f-intervention"><option value="">— Non renseigné —</option><option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option></select></label>
     <div class="bloc-qualites" id="champ-qualites">
       <div class="titre-bloc" style="font-size:12px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:.03em;margin-bottom:10px">Qualités</div>
@@ -520,8 +558,8 @@
 <div class="overlay" id="overlay-lots"><div class="modale">
   <div class="modale-haut"><h2 id="lots-modal-titre">Gérer les lots</h2><button class="ico-btn" onclick="fermer('overlay-lots')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
   <div class="modale-corps">
-    <div class="ajout-lot"><input class="num" id="lot-num" placeholder="N° (auto)" title="Laisser vide pour un numéro automatique" onkeydown="if(event.key==='Enter')ajouterLot()" /><input id="lot-lib" placeholder="Nom du nouveau lot" style="flex:1" onkeydown="if(event.key==='Enter')ajouterLot()" /><button class="btn btn-primaire" onclick="ajouterLot()">+ Ajouter le lot</button></div>
-    <div class="mut" style="font-size:12px;margin:-6px 0 10px">Les lots sont classés par ordre alphabétique.</div>
+    <div class="ajout-lot"><input id="lot-lib" placeholder="Nom du nouveau lot" style="flex:1" onkeydown="if(event.key==='Enter')ajouterLot()" /><button class="btn btn-primaire" onclick="ajouterLot()">+ Ajouter le lot</button></div>
+    <div class="mut" style="font-size:12px;margin:-6px 0 10px">Les lots sont classés par ordre alphabétique et renumérotés automatiquement.</div>
     <div class="liste-lots" id="liste-lots"></div>
   </div>
 </div></div>
@@ -635,6 +673,7 @@ function brancher(){
     if(!Object.keys(lots.soustraitants).length) semer('soustraitants',LOTS_SOUSTRAITANTS);
     remplirFiltreLot(); rendre(); majKpis();
     if(document.getElementById('overlay-lots').classList.contains('ouvert')) rendreListeLots();
+    synchroNumLots('fournisseurs'); synchroNumLots('soustraitants');
   },refusAcces);
   db.ref('fournisseurs').on('value',s=>{ entreprises.fournisseurs=s.val()||{}; majKpis(); rendre(); },refusAcces);
   db.ref('soustraitants').on('value',s=>{ entreprises.soustraitants=s.val()||{}; majKpis(); rendre(); },refusAcces);
@@ -671,8 +710,11 @@ function changerVue(v){ vueActive=v; document.querySelectorAll('.vue-toggle butt
 
 // Tri alphabétique des lots sur le libellé (accents et majuscules ignorés)
 function triLot(a,b){ return String(a.libelle||'').localeCompare(String(b.libelle||''),'fr',{sensitivity:'base',numeric:true}); }
-function lotsTries(type){ type=type||ongletActif; return Object.entries(lots[type]||{}).map(([id,l])=>({id,...l})).sort(triLot); }
-function lotDe(type,id){ return (lots[type]||{})[id]; }
+// Numérotation AUTOMATIQUE : le n° d'un lot = sa position dans l'ordre alphabétique (01, 02, 03…)
+function lotsTries(type){ type=type||ongletActif; return Object.entries(lots[type]||{}).map(([id,l])=>({id,...l})).sort(triLot).map((l,i)=>Object.assign(l,{num:String(i+1).padStart(2,'0')})); }
+function lotDe(type,id){ return lotsTries(type).find(l=>l.id===id); }
+// Aligne les n° enregistrés dans Firebase sur la numérotation automatique (export JSON cohérent)
+function synchroNumLots(type){ if(!db) return; const m={}; lotsTries(type).forEach(l=>{ if((lots[type][l.id]||{}).num!==l.num) m[l.id+'/num']=l.num; }); if(Object.keys(m).length) db.ref('lots/'+type).update(m); }
 // Multi-lots : un sous-traitant peut avoir plusieurs lots (lotIds). lotId = lot principal (1er), conservé pour compatibilité.
 function lotsIds(e){ if(e.lotIds){ const a=(Array.isArray(e.lotIds)?e.lotIds:Object.values(e.lotIds)).filter(Boolean); if(a.length) return a; } return e.lotId?[e.lotId]:[]; }
 function lotsObjs(type,e){ return lotsIds(e).map(id=>lotDe(type,id)).filter(Boolean).sort(triLot); }
@@ -926,7 +968,7 @@ function ouvrirFiche(arg){
   document.getElementById('f-trace').innerHTML=texteTrace(e);
   remplirQualitesForm(e.qualites);
   majTypeFiche(); document.getElementById('f-intervention').value=e.typeIntervention||''; document.getElementById('f-lot').value=e.lotId||''; cocherLotsForm(lotsIds(e));
-  document.getElementById('overlay-fiche').classList.add('ouvert');
+  basculerMsLots(false); document.getElementById('overlay-fiche').classList.add('ouvert');
 }
 function enregistrerFiche(){
   if(!db){ alert('Firebase non connecté. Complète la config en haut du fichier.'); return; }
@@ -980,10 +1022,22 @@ function remplirSelectLotsForm(type,sel){
   document.getElementById('f-lot').innerHTML='<option value="">— Aucun —</option>'+lotsTries(type).map(opt).join('');
   if(sel!==undefined) document.getElementById('f-lot').value=sel||'';
   const coches=lotsCochesForm();
-  document.getElementById('f-lots').innerHTML=lotsTries(type).map(l=>`<label class="${coches.includes(l.id)?'coche':''}"><input type="checkbox" value="${l.id}" ${coches.includes(l.id)?'checked':''} onchange="this.parentNode.classList.toggle('coche',this.checked)"><span class="n">${esc(l.num)}</span>${esc(l.libelle)}</label>`).join('')||'<span class="mut" style="font-size:12.5px">Aucun lot — crée-les via « Gérer les lots »</span>';
+  document.getElementById('f-lots').innerHTML=lotsTries(type).map(l=>`<label class="${coches.includes(l.id)?'coche':''}" data-lib="${esc(normNom(l.libelle))}"><input type="checkbox" value="${l.id}" ${coches.includes(l.id)?'checked':''} onchange="this.parentNode.classList.toggle('coche',this.checked);majMsLots()"><span class="n">${esc(l.num)}</span>${esc(l.libelle)}</label>`).join('')||'<div class="ms-vide">Aucun lot — ajoute-le ci-dessous</div>';
+  filtrerMsLots(); majMsLots();
 }
 function lotsCochesForm(){ return [...document.querySelectorAll('#f-lots input:checked')].map(i=>i.value); }
-function cocherLotsForm(ids){ document.querySelectorAll('#f-lots input').forEach(i=>{ i.checked=ids.includes(i.value); i.parentNode.classList.toggle('coche',i.checked); }); }
+function cocherLotsForm(ids){ document.querySelectorAll('#f-lots input').forEach(i=>{ i.checked=ids.includes(i.value); i.parentNode.classList.toggle('coche',i.checked); }); majMsLots(); }
+// ===== Liste déroulante multi-lots =====
+function basculerMsLots(forcer){ const m=document.getElementById('ms-lots'), o=forcer!==undefined?forcer:!m.classList.contains('ouvert');
+  m.classList.toggle('ouvert',o); if(o){ const r=document.getElementById('ms-lots-recherche'); r.value=''; filtrerMsLots(); setTimeout(()=>r.focus(),30); } }
+function filtrerMsLots(){ const r=document.getElementById('ms-lots-recherche'), q=normNom(r?r.value:'');
+  document.querySelectorAll('#f-lots label').forEach(l=>{ l.style.display=!q||(l.dataset.lib||'').includes(q)?'':'none'; }); }
+function majMsLots(){ const type=document.getElementById('f-type').value, ids=lotsCochesForm(), sel=lotsTries(type).filter(l=>ids.includes(l.id));
+  const t=document.getElementById('ms-lots-txt'); if(!t) return;
+  t.textContent=sel.length?(sel.length===1?'1 lot sélectionné':sel.length+' lots sélectionnés'):'Sélectionner un ou plusieurs lots'; t.classList.toggle('ph',!sel.length);
+  document.getElementById('ms-lots-puces').innerHTML=sel.map(l=>`<span class="ms-puce">${esc(l.num)} – ${esc(l.libelle)}<button type="button" title="Retirer" onclick="retirerLotForm('${l.id}')">×</button></span>`).join(''); }
+function retirerLotForm(id){ cocherLotsForm(lotsCochesForm().filter(x=>x!==id)); }
+document.addEventListener('click',e=>{ const m=document.getElementById('ms-lots'); if(m&&m.classList.contains('ouvert')&&!e.target.closest('#ms-lots')) basculerMsLots(false); });
 function ouvrirLots(){
   if(ongletActif==='dashboard'){ alert('Ouvre l\u2019onglet Fournisseurs ou Sous-traitants pour gérer ses lots.'); return; }
   document.getElementById('lots-modal-titre').textContent='Gérer les lots — '+(ongletActif==='fournisseurs'?'Fournisseurs':'Sous-traitants');
@@ -997,28 +1051,28 @@ function rendreListeLots(){
     <button class="ico-btn" onclick="renommerLot('${l.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
     <button class="ico-btn suppr" onclick="supprimerLot('${l.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div>`).join(''):'<div class="mut" style="font-size:13px;padding:8px 0">Aucun lot pour l\u2019instant.</div>';
 }
-// Crée un lot (numéro auto si vide, refus des doublons). Retourne l'id créé ou null.
-function prochainNumLot(type){ const n=Object.values(lots[type]||{}).map(l=>parseInt(l.num,10)).filter(x=>!isNaN(x)); return String((n.length?Math.max(...n):0)+1).padStart(2,'0'); }
-function creerLot(type,lib,num){
+// Crée un lot (numéro automatique, refus des doublons). Retourne l'id créé ou null.
+function creerLot(type,lib){
   if(!db){ alert('Connecte Firebase pour gérer les lots.'); return null; }
   lib=String(lib||'').trim(); if(!lib){ alert('Saisis le libellé du lot.'); return null; }
   const existe=Object.values(lots[type]||{}).find(l=>normNom(l.libelle)===normNom(lib));
   if(existe){ alert('Le lot « '+existe.libelle+' » existe déjà.'); return null; }
-  const obj={num:String(num||'').trim()||prochainNumLot(type), libelle:lib};
+  const obj={num:'', libelle:lib}; // n° recalculé automatiquement
   const ref=db.ref('lots/'+type).push(obj);
   lots[type]=lots[type]||{}; lots[type][ref.key]=obj; // affichage immédiat, Firebase confirme ensuite
   return ref.key;
 }
 function ajouterLot(){
-  const id=creerLot(ongletActif,document.getElementById('lot-lib').value,document.getElementById('lot-num').value); if(!id) return;
-  document.getElementById('lot-num').value=''; document.getElementById('lot-lib').value='';
+  const id=creerLot(ongletActif,document.getElementById('lot-lib').value); if(!id) return;
+  document.getElementById('lot-lib').value='';
   remplirFiltreLot(); rendreListeLots(); document.getElementById('lot-lib').focus(); }
 function ajouterLotDepuisFiche(){
   const type=document.getElementById('f-type').value, inp=document.getElementById('f-nouveau-lot');
   const coches=lotsCochesForm(), id=creerLot(type,inp.value); if(!id) return;
   inp.value=''; remplirSelectLotsForm(type); cocherLotsForm([...coches,id]); remplirFiltreLot(); }
-function renommerLot(id){ const l=lots[ongletActif][id]; const num=prompt('Numéro du lot :',l.num); if(num===null) return; const lib=prompt('Libellé du lot :',l.libelle); if(lib===null) return;
-  db.ref('lots/'+ongletActif+'/'+id).update({num:num.trim()||'—',libelle:lib.trim()}); setTimeout(rendreListeLots,200); }
+function renommerLot(id){ const l=lots[ongletActif][id]; if(!l) return; const lib=prompt('Nouveau nom du lot :',l.libelle); if(lib===null||!lib.trim()) return;
+  const doublon=Object.entries(lots[ongletActif]).find(([k,x])=>k!==id&&normNom(x.libelle)===normNom(lib)); if(doublon){ alert('Le lot « '+doublon[1].libelle+' » existe déjà.'); return; }
+  db.ref('lots/'+ongletActif+'/'+id).update({libelle:lib.trim()}); setTimeout(rendreListeLots,200); }
 function supprimerLot(id){ if(!confirm('Supprimer ce lot ? Les entreprises rattachées resteront sans lot.')) return;
   db.ref('lots/'+ongletActif+'/'+id).remove(); Object.entries(entreprises[ongletActif]).forEach(([k,e])=>{ const ids=lotsIds(e); if(ids.includes(id)){ const reste=ids.filter(x=>x!==id); db.ref(ongletActif+'/'+k).update({lotId:reste[0]||'', lotIds:reste.length?reste:null}); } }); setTimeout(rendreListeLots,200); }
 
