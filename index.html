@@ -290,7 +290,7 @@
   .liste-lots { display:flex; flex-direction:column; }
   .ligne-lot { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid #f1f2f4; }
   .ligne-lot .mono { font-family:var(--mono); font-size:12px; color:var(--gris-clair); width:34px; }
-  .ajout-lot { display:flex; gap:8px; margin-bottom:14px; } .ajout-lot input.num { width:60px; text-align:center; }
+  .ajout-lot { display:flex; gap:8px; margin-bottom:14px; } .ajout-lot input.num { width:80px; text-align:center; }
 
   /* Fiche PDF */
   #overlay-pdf .modale-pdf { background:#fff; border-radius:14px; width:100%; max-width:840px; max-height:92vh; display:flex; flex-direction:column; overflow:hidden; }
@@ -471,7 +471,8 @@
       <label class="champ" id="champ-motif"><span>Motif *</span><input id="f-motif" placeholder="Ex : retards répétés, malfaçons, litige…" /></label></div></div>
     <div class="duo"><label class="champ"><span>Type</span><select id="f-type" onchange="majTypeFiche()"><option value="fournisseurs">Fournisseur</option><option value="soustraitants">Sous-traitant</option></select></label>
       <label class="champ" id="champ-lot-simple"><span>Lot</span><select id="f-lot"></select></label></div>
-    <div class="champ" id="champ-lots-multi"><span style="display:block;font-size:12px;font-weight:500;color:var(--gris);margin-bottom:5px">Lots (plusieurs choix possibles)</span><div class="lots-choix" id="f-lots"></div></div>
+    <div class="champ" id="champ-lots-multi"><span style="display:block;font-size:12px;font-weight:500;color:var(--gris);margin-bottom:5px">Lots (plusieurs choix possibles)</span><div class="lots-choix" id="f-lots"></div>
+      <div class="ajout-lot" style="margin:8px 0 0"><input id="f-nouveau-lot" placeholder="Lot absent de la liste ? Saisis son nom…" style="flex:1" onkeydown="if(event.key==='Enter'){event.preventDefault();ajouterLotDepuisFiche();}" /><button type="button" class="btn" onclick="ajouterLotDepuisFiche()">+ Ajouter le lot</button></div></div>
     <label class="champ" id="champ-intervention"><span>Type d'intervention</span><select id="f-intervention"><option value="">— Non renseigné —</option><option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option></select></label>
     <div class="bloc-qualites" id="champ-qualites">
       <div class="titre-bloc" style="font-size:12px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:.03em;margin-bottom:10px">Qualités</div>
@@ -519,7 +520,8 @@
 <div class="overlay" id="overlay-lots"><div class="modale">
   <div class="modale-haut"><h2 id="lots-modal-titre">Gérer les lots</h2><button class="ico-btn" onclick="fermer('overlay-lots')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
   <div class="modale-corps">
-    <div class="ajout-lot"><input class="num" id="lot-num" placeholder="N°" /><input id="lot-lib" placeholder="Libellé du lot" style="flex:1" onkeydown="if(event.key==='Enter')ajouterLot()" /><button class="btn btn-primaire" onclick="ajouterLot()">+</button></div>
+    <div class="ajout-lot"><input class="num" id="lot-num" placeholder="N° (auto)" title="Laisser vide pour un numéro automatique" onkeydown="if(event.key==='Enter')ajouterLot()" /><input id="lot-lib" placeholder="Nom du nouveau lot" style="flex:1" onkeydown="if(event.key==='Enter')ajouterLot()" /><button class="btn btn-primaire" onclick="ajouterLot()">+ Ajouter le lot</button></div>
+    <div class="mut" style="font-size:12px;margin:-6px 0 10px">Les lots sont classés par ordre alphabétique.</div>
     <div class="liste-lots" id="liste-lots"></div>
   </div>
 </div></div>
@@ -529,6 +531,7 @@
   <div class="pdf-bar">
     <span class="titre" id="pdf-titre">Aperçu de la fiche contact</span>
     <button class="btn" style="margin-left:auto" onclick="fermer('overlay-pdf')">Fermer</button>
+    <button class="btn" id="btn-pdf-modifier" style="display:none" onclick="modifierDepuisConsultation()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Modifier</button>
     <button class="btn btn-primaire" onclick="imprimerFiche()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimer / PDF</button>
   </div>
   <div class="pdf-scroll" id="pdf-contenu"></div>
@@ -631,6 +634,7 @@ function brancher(){
     if(!Object.keys(lots.fournisseurs).length) semer('fournisseurs',LOTS_FOURNISSEURS);
     if(!Object.keys(lots.soustraitants).length) semer('soustraitants',LOTS_SOUSTRAITANTS);
     remplirFiltreLot(); rendre(); majKpis();
+    if(document.getElementById('overlay-lots').classList.contains('ouvert')) rendreListeLots();
   },refusAcces);
   db.ref('fournisseurs').on('value',s=>{ entreprises.fournisseurs=s.val()||{}; majKpis(); rendre(); },refusAcces);
   db.ref('soustraitants').on('value',s=>{ entreprises.soustraitants=s.val()||{}; majKpis(); rendre(); },refusAcces);
@@ -665,11 +669,13 @@ function changerOnglet(t){
 }
 function changerVue(v){ vueActive=v; document.querySelectorAll('.vue-toggle button').forEach(b=>b.classList.toggle('actif',b.dataset.vue===v)); rendre(); }
 
-function lotsTries(type){ type=type||ongletActif; return Object.entries(lots[type]||{}).map(([id,l])=>({id,...l})).sort((a,b)=>String(a.num).localeCompare(String(b.num),'fr',{numeric:true})); }
+// Tri alphabétique des lots sur le libellé (accents et majuscules ignorés)
+function triLot(a,b){ return String(a.libelle||'').localeCompare(String(b.libelle||''),'fr',{sensitivity:'base',numeric:true}); }
+function lotsTries(type){ type=type||ongletActif; return Object.entries(lots[type]||{}).map(([id,l])=>({id,...l})).sort(triLot); }
 function lotDe(type,id){ return (lots[type]||{})[id]; }
 // Multi-lots : un sous-traitant peut avoir plusieurs lots (lotIds). lotId = lot principal (1er), conservé pour compatibilité.
 function lotsIds(e){ if(e.lotIds){ const a=(Array.isArray(e.lotIds)?e.lotIds:Object.values(e.lotIds)).filter(Boolean); if(a.length) return a; } return e.lotId?[e.lotId]:[]; }
-function lotsObjs(type,e){ return lotsIds(e).map(id=>lotDe(type,id)).filter(Boolean).sort((a,b)=>String(a.num).localeCompare(String(b.num),'fr',{numeric:true})); }
+function lotsObjs(type,e){ return lotsIds(e).map(id=>lotDe(type,id)).filter(Boolean).sort(triLot); }
 function libLots(type,e){ return lotsObjs(type,e).map(l=>l.libelle).join(' '); }
 function texteLots(type,e,sep){ return lotsObjs(type,e).map(l=>`${l.num} – ${l.libelle}`).join(sep||', '); }
 function resumeLots(type,e){ const l=lotsObjs(type,e); if(!l.length) return ''; return l[0].libelle+(l.length>1?` +${l.length-1}`:''); }
@@ -783,13 +789,15 @@ function majDashboard(){
 
 /* ===== RENDU ===== */
 let filtreFavori=false;
+// Tri alphabétique strict des entreprises (accents / majuscules ignorés)
+function triNom(a,b){ return String(a.raisonSociale||'').localeCompare(String(b.raisonSociale||''),'fr',{sensitivity:'base',numeric:true}); }
 function listeFiltree(){
   const q=document.getElementById('recherche').value.trim().toLowerCase(), fl=document.getElementById('filtre-lot').value;
   return Object.entries(entreprises[ongletActif]||{}).map(([id,e])=>({id,...e})).filter(e=>{
     if(filtreFavori && !e.favori) return false;
     if(fl!=='tous'&&!lotsIds(e).includes(fl)) return false; if(!q) return true; const lot=lotDe(ongletActif,e.lotId);
     return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),estEvite(e)?'à éviter eviter '+(e.motifEvite||''):'',texteTailles(e.qualites),texteTravaux(e.qualites),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q);
-  });
+  }).sort(triNom);
 }
 function toggleFiltreFavori(){ filtreFavori=!filtreFavori; document.getElementById('btn-favoris').classList.toggle('actif',filtreFavori); rendre(); }
 function rendre(){
@@ -802,7 +810,7 @@ function rendre(){
   const parLot={}; liste.forEach(e=>{ const ids=lotsIds(e); (ids.length?ids:['sans']).forEach(k=>{ (parLot[k]=parLot[k]||[]).push(e); }); });
   let html=''; [...lotsTries(ongletActif).map(l=>l.id),'sans'].forEach(lotId=>{
     const grp=parLot[lotId]; if(!grp||!grp.length) return; const lot=lotDe(ongletActif,lotId);
-    grp.sort((a,b)=>(b.favori?1:0)-(a.favori?1:0)||a.raisonSociale.localeCompare(b.raisonSociale,'fr'));
+    grp.sort(triNom); // strict A→Z, favoris compris
     html+=`<div class="lot-groupe"><div class="lot-titre"><span class="lot-num">${lot?esc(lot.num):'—'}</span><span class="lot-nom">${lot?esc(lot.libelle):'Sans lot'}</span><span class="lot-compte">${grp.length}</span></div><div class="grille">${grp.map(carte).join('')}</div></div>`;
   });
   zone.innerHTML=html;
@@ -840,14 +848,14 @@ function ajouterPourLot(type,lotId){ changerOnglet(type); ouvrirFiche(); documen
 
 function carte(e){
   const st=ongletActif==='soustraitants', cls=st?'s':'f', label=st?'Sous-traitant':'Fournisseur', a=avatar(e.raisonSociale);
-  return `<div class="carte cliquable${estEvite(e)?' evite':''}" id="carte-${e.id}" onclick="clicFiche(event,'${e.id}')" title="Ouvrir la fiche"><div class="carte-haut">
+  return `<div class="carte cliquable${estEvite(e)?' evite':''}" id="carte-${e.id}" onclick="clicFiche(event,'${e.id}')" title="Voir la fiche"><div class="carte-haut">
       <div class="avatar" style="background:${a.coul}">${esc(a.init)}</div>
       <div style="min-width:0"><h3>${esc(e.raisonSociale)}</h3><span class="chip ${cls}">${label}</span>${estEvite(e)?' '+badgeStatut(e):''}${libIntervention(e)?' '+chipIntervention(e):''}
         ${st?`<div class="note-ligne">${etoiles(Math.round(noteMoyenne(e)))}<span class="note-txt">${noteMoyenne(e)?noteMoyenne(e).toFixed(1)+'/5':'Non noté'}${nbChantiers(e)?' · '+nbChantiers(e)+' chantier'+(nbChantiers(e)>1?'s':''):''}</span></div>`:''}</div>
       <div style="margin-left:auto;display:flex;align-items:flex-start;gap:2px">
       <button class="ico-btn fav" title="Favori" onclick="toggleFavori('${e.id}')">${etoileSVG(!!e.favori)}</button>
       <div class="actions"><button class="ico-btn" title="Fiche PDF" onclick="ouvrirFichePDF('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
-        <button class="ico-btn" onclick='ouvrirFiche(${JSON.stringify({id:e.id})})'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+        <button class="ico-btn" title="Modifier" onclick='ouvrirFiche(${JSON.stringify({id:e.id})})'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         <button class="ico-btn suppr" onclick="supprimer('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div></div></div>
     <div class="infos">
       ${e.contact?`<div class="info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${esc(e.contact)}</div>`:''}
@@ -861,7 +869,7 @@ function carte(e){
 }
 
 /* ===== TABLEAU ===== */
-function valTri(e){ if(tri.col==='lot'){ const l=lotsObjs(ongletActif,e)[0]; return l?String(l.num):'~'; } if(tri.col==='note') return String(noteMoyenne(e)); if(tri.col==='consultAO') return e.consultAO?'1':'0'; if(tri.col==='chantiersLuxe') return e.chantiersLuxe?'1':'0'; return String(e[tri.col]||'').toLowerCase(); }
+function valTri(e){ if(tri.col==='lot'){ const l=lotsObjs(ongletActif,e)[0]; return l?String(l.libelle).toLowerCase():'~'; } if(tri.col==='note') return String(noteMoyenne(e)); if(tri.col==='consultAO') return e.consultAO?'1':'0'; if(tri.col==='chantiersLuxe') return e.chantiersLuxe?'1':'0'; return String(e[tri.col]||'').toLowerCase(); }
 function trier(col){ if(tri.col===col) tri.dir*=-1; else { tri.col=col; tri.dir=1; } rendre(); }
 function rendreTableau(liste){
   const zone=document.getElementById('contenu'), st=(ongletActif==='soustraitants');
@@ -870,7 +878,7 @@ function rendreTableau(liste){
   const fleche=col=>tri.col===col?(tri.dir>0?'▲':'▼'):'⇅';
   const th=(col,l)=>`<th class="${tri.col===col?'tri':''}" onclick="trier('${col}')">${l}<span class="fl">${fleche(col)}</span></th>`;
   const lignes=liste.map(e=>{ const lot=lotDe(ongletActif,e.lotId), a=avatar(e.raisonSociale);
-    return `<tr id="ligne-${e.id}" class="cliquable${estEvite(e)?' evite':''}" onclick="clicFiche(event,'${e.id}')" title="Ouvrir la fiche">
+    return `<tr id="ligne-${e.id}" class="cliquable${estEvite(e)?' evite':''}" onclick="clicFiche(event,'${e.id}')" title="Voir la fiche">
       <td><div class="tbl-nom"><div class="tbl-av" style="background:${a.coul}">${esc(a.init)}</div>${esc(e.raisonSociale)}${estEvite(e)?' '+badgeStatut(e):''}</div></td>
       <td>${celluleLots(ongletActif,e)}</td>
       <td>${chipIntervention(e)||'<span class="mut">—</span>'}</td>
@@ -880,11 +888,11 @@ function rendreTableau(liste){
       ${st?`<td>${caseAO(e,false)}</td><td>${caseLuxe(e,false)}</td>`:`<td>${e.adresse?`<span class="tbl-adr">${esc(e.adresse)}</span>`:'<span class="mut">—</span>'}</td>`}
       ${st?`<td>${noteMoyenne(e)?etoiles(Math.round(noteMoyenne(e)))+' <span class="tbl-mono">'+noteMoyenne(e).toFixed(1)+'</span>'+(nbChantiers(e)?' <span class="mut">('+nbChantiers(e)+')</span>':''):'<span class="mut">—</span>'}</td>`:''}
       <td><div class="tbl-actions"><button class="ico-btn fav" title="Favori" onclick="toggleFavori('${e.id}')">${etoileSVG(!!e.favori)}</button><button class="ico-btn" title="Fiche PDF" onclick="ouvrirFichePDF('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
-        <button class="ico-btn" onclick='ouvrirFiche(${JSON.stringify({id:e.id})})'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+        <button class="ico-btn" title="Modifier" onclick='ouvrirFiche(${JSON.stringify({id:e.id})})'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         <button class="ico-btn suppr" onclick="supprimer('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div></td></tr>`;
   }).join('');
   zone.innerHTML=`<div class="tableau-wrap"><table class="tbl"><thead><tr>
-    ${th('raisonSociale','Raison sociale')}${th('lot','Lots')}${th('typeIntervention','Intervention')}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${st?th('consultAO','Consulter AO')+th('chantiersLuxe','Luxe'):th('adresse','Agence référente')}${st?th('note','Note'):''}<th></th>
+    ${th('raisonSociale','Raison sociale')}${th('lot','Lots')}${th('typeIntervention','Intervention')}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${st?th('consultAO','Service Commercial')+th('chantiersLuxe','Luxe'):th('adresse','Agence référente')}${st?th('note','Note'):''}<th></th>
   </tr></thead><tbody>${lignes}</tbody></table></div>`;
 }
 
@@ -979,23 +987,46 @@ function cocherLotsForm(ids){ document.querySelectorAll('#f-lots input').forEach
 function ouvrirLots(){
   if(ongletActif==='dashboard'){ alert('Ouvre l\u2019onglet Fournisseurs ou Sous-traitants pour gérer ses lots.'); return; }
   document.getElementById('lots-modal-titre').textContent='Gérer les lots — '+(ongletActif==='fournisseurs'?'Fournisseurs':'Sous-traitants');
-  document.getElementById('liste-lots').innerHTML=lotsTries(ongletActif).map(l=>`<div class="ligne-lot"><span class="mono">${esc(l.num)}</span><span style="flex:1">${esc(l.libelle)}</span>
-    <button class="ico-btn" onclick="renommerLot('${l.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
-    <button class="ico-btn suppr" onclick="supprimerLot('${l.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div>`).join('');
+  rendreListeLots();
   document.getElementById('overlay-lots').classList.add('ouvert');
+  setTimeout(()=>document.getElementById('lot-lib').focus(),50);
 }
-function ajouterLot(){ if(!db){ alert('Connecte Firebase pour gérer les lots.'); return; } const num=document.getElementById('lot-num').value.trim()||'—', lib=document.getElementById('lot-lib').value.trim(); if(!lib) return;
-  db.ref('lots/'+ongletActif).push({num,libelle:lib}); document.getElementById('lot-num').value=''; document.getElementById('lot-lib').value=''; setTimeout(ouvrirLots,200); }
+function rendreListeLots(){
+  const l0=lotsTries(ongletActif);
+  document.getElementById('liste-lots').innerHTML=l0.length?l0.map(l=>`<div class="ligne-lot"><span class="mono">${esc(l.num)}</span><span style="flex:1">${esc(l.libelle)}</span>
+    <button class="ico-btn" onclick="renommerLot('${l.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+    <button class="ico-btn suppr" onclick="supprimerLot('${l.id}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div>`).join(''):'<div class="mut" style="font-size:13px;padding:8px 0">Aucun lot pour l\u2019instant.</div>';
+}
+// Crée un lot (numéro auto si vide, refus des doublons). Retourne l'id créé ou null.
+function prochainNumLot(type){ const n=Object.values(lots[type]||{}).map(l=>parseInt(l.num,10)).filter(x=>!isNaN(x)); return String((n.length?Math.max(...n):0)+1).padStart(2,'0'); }
+function creerLot(type,lib,num){
+  if(!db){ alert('Connecte Firebase pour gérer les lots.'); return null; }
+  lib=String(lib||'').trim(); if(!lib){ alert('Saisis le libellé du lot.'); return null; }
+  const existe=Object.values(lots[type]||{}).find(l=>normNom(l.libelle)===normNom(lib));
+  if(existe){ alert('Le lot « '+existe.libelle+' » existe déjà.'); return null; }
+  const obj={num:String(num||'').trim()||prochainNumLot(type), libelle:lib};
+  const ref=db.ref('lots/'+type).push(obj);
+  lots[type]=lots[type]||{}; lots[type][ref.key]=obj; // affichage immédiat, Firebase confirme ensuite
+  return ref.key;
+}
+function ajouterLot(){
+  const id=creerLot(ongletActif,document.getElementById('lot-lib').value,document.getElementById('lot-num').value); if(!id) return;
+  document.getElementById('lot-num').value=''; document.getElementById('lot-lib').value='';
+  remplirFiltreLot(); rendreListeLots(); document.getElementById('lot-lib').focus(); }
+function ajouterLotDepuisFiche(){
+  const type=document.getElementById('f-type').value, inp=document.getElementById('f-nouveau-lot');
+  const coches=lotsCochesForm(), id=creerLot(type,inp.value); if(!id) return;
+  inp.value=''; remplirSelectLotsForm(type); cocherLotsForm([...coches,id]); remplirFiltreLot(); }
 function renommerLot(id){ const l=lots[ongletActif][id]; const num=prompt('Numéro du lot :',l.num); if(num===null) return; const lib=prompt('Libellé du lot :',l.libelle); if(lib===null) return;
-  db.ref('lots/'+ongletActif+'/'+id).update({num:num.trim()||'—',libelle:lib.trim()}); setTimeout(ouvrirLots,200); }
+  db.ref('lots/'+ongletActif+'/'+id).update({num:num.trim()||'—',libelle:lib.trim()}); setTimeout(rendreListeLots,200); }
 function supprimerLot(id){ if(!confirm('Supprimer ce lot ? Les entreprises rattachées resteront sans lot.')) return;
-  db.ref('lots/'+ongletActif+'/'+id).remove(); Object.entries(entreprises[ongletActif]).forEach(([k,e])=>{ const ids=lotsIds(e); if(ids.includes(id)){ const reste=ids.filter(x=>x!==id); db.ref(ongletActif+'/'+k).update({lotId:reste[0]||'', lotIds:reste.length?reste:null}); } }); setTimeout(ouvrirLots,200); }
+  db.ref('lots/'+ongletActif+'/'+id).remove(); Object.entries(entreprises[ongletActif]).forEach(([k,e])=>{ const ids=lotsIds(e); if(ids.includes(id)){ const reste=ids.filter(x=>x!==id); db.ref(ongletActif+'/'+k).update({lotId:reste[0]||'', lotIds:reste.length?reste:null}); } }); setTimeout(rendreListeLots,200); }
 
 /* ===== EXPORT ===== */
 function exporterCSV(){
   if(ongletActif==='dashboard'){ alert('Ouvre l\u2019onglet Fournisseurs ou Sous-traitants pour exporter.'); return; }
   const source=entreprises[ongletActif]||{}, st=(ongletActif==='soustraitants'), echap=v=>`"${String(v||'').replace(/"/g,'""')}"`;
-  const entete=[st?'Lots':'Lot','Raison sociale','Contact','Téléphone','Email','Site web',st?'Adresse':'Adresse agence référente','SIRET','Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention','Statut','Motif','Modifiée le','Modifiée par',...(st?['Note moy /5','Nb chantiers','Consulter AO','Chantiers luxe','Taille de chantiers','Type de travaux','Milieu occupé','Études']:[]),'Favori','Notes'];
+  const entete=[st?'Lots':'Lot','Raison sociale','Contact','Téléphone','Email','Site web',st?'Adresse':'Adresse agence référente','SIRET','Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention','Statut','Motif','Modifiée le','Modifiée par',...(st?['Note moy /5','Nb chantiers','Service Commercial','Chantiers luxe','Taille de chantiers','Type de travaux','Milieu occupé','Études']:[]),'Favori','Notes'];
   const lignes=Object.values(source).map(e=>{ const lot=lotDe(ongletActif,e.lotId);
     return [texteLots(ongletActif,e,' / ')||'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),estEvite(e)?'À éviter':'Actif',e.motifEvite||'',dateFr(e.modifieLe),e.modifiePar||'',...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),e.consultAO?'Oui':'Non',e.chantiersLuxe?'Oui':'Non',texteTailles(e.qualites),texteTravaux(e.qualites),texteOuiNon(e.qualites&&e.qualites.milieuOccupe),texteOuiNon(e.qualites&&e.qualites.etudes)]:[]),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+[entete.join(';'),...lignes].join('\n')],{type:'text/csv;charset=utf-8;'})); a.download=`${ongletActif}-lab.csv`; a.click();
@@ -1012,7 +1043,7 @@ function colonnesExcel(type){ const st=type==='soustraitants', q=e=>e.qualites||
     [st?'Lots':'Lots',e=>texteLots(type,e,'\n'),34],
     ['Type d\'intervention',e=>libIntervention(e),19],
     ...(st?[['Note moy. /5',e=>noteMoyenne(e)?Math.round(noteMoyenne(e)*10)/10:'',12],['Nb chantiers',e=>nbChantiers(e)||'',12],
-      ['Consulter AO',e=>e.consultAO?'Oui':'Non',13],['Chantiers luxe',e=>e.chantiersLuxe?'Oui':'Non',14],
+      ['Service Commercial',e=>e.consultAO?'Oui':'Non',17],['Chantiers luxe',e=>e.chantiersLuxe?'Oui':'Non',14],
       ['Taille de chantiers',e=>listeQ(q(e).tailles).map(k=>Q_TAILLES[k]?Q_TAILLES[k][0]:'').filter(Boolean).join(', '),26],
       ['Type de travaux',e=>texteTravaux(q(e)),24],['Milieu occupé',e=>texteOuiNon(q(e).milieuOccupe),13],['Études',e=>texteOuiNon(q(e).etudes),10]]:[]),
     ['Contact référent',e=>e.contact,20],['Rôle',e=>e.contactRole,18],['Téléphone',e=>e.tel,15],['Email',e=>e.email,28],
@@ -1088,8 +1119,18 @@ document.addEventListener('click',e=>{ if(!e.target.closest('.rg')) document.get
 
 /* ===== FICHE PDF / ANNUAIRE ===== */
 function lienWeb(u){ u=String(u||'').trim(); if(!u) return '#'; return /^https?:\/\//i.test(u)?u:'https://'+u; }
-// Clic sur une carte / ligne = ouvre la fiche, sauf si on clique sur un bouton, un lien ou la case AO
-function clicFiche(ev,id){ if(ev.target.closest('button,a,label,input,select')) return; ouvrirFiche({id}); }
+// Clic sur une carte / ligne = ouvre la fiche en LECTURE SEULE (modification uniquement via le stylo)
+function clicFiche(ev,id){ if(ev.target.closest('button,a,label,input,select')) return; ouvrirConsultation(id); }
+let ficheConsultee=null;
+function boutonModifierPdf(id){ ficheConsultee=id||null; document.getElementById('btn-pdf-modifier').style.display=id?'':'none'; }
+function ouvrirConsultation(id){
+  const type=ongletActif, e=entreprises[type]&&entreprises[type][id]; if(!e) return;
+  document.getElementById('pdf-titre').textContent='Fiche — '+(e.raisonSociale||'');
+  document.getElementById('pdf-contenu').innerHTML=feuilleHTML(e,type);
+  boutonModifierPdf(id);
+  document.getElementById('overlay-pdf').classList.add('ouvert');
+}
+function modifierDepuisConsultation(){ const id=ficheConsultee; if(!id) return; fermer('overlay-pdf'); ouvrirFiche({id}); }
 // ===== Qualités des sous-traitants =====
 const Q_TAILLES={petits:['Petits chantiers','maisons'],moyens:['Moyens chantiers','petits ensembles 10 à 40 lgts'],grands:['Grands chantiers','gros ensembles 50 à 200 lgts']};
 const Q_TRAVAUX={neuf:'Neuf',rehab:'Réhabilitation',reno:'Rénovation'};
@@ -1119,7 +1160,7 @@ const TYPES_INTERV={fp:'Fourniture et pose',ps:'Pose seule',fs:'Fourniture seule
 function libIntervention(e){ return TYPES_INTERV[e.typeIntervention]||''; }
 function chipIntervention(e){ const l=libIntervention(e); return l?`<span class="chip ${e.typeIntervention}">${l}</span>`:''; }
 function caseAO(e,avecLibelle){ const c=!!e.consultAO;
-  return `<label class="ao-case${c?' oui':''}" title="À consulter par le service commercial en phase d'appel d'offres"><input type="checkbox" ${c?'checked':''} onchange="toggleAO('${e.id}',this.checked)" />${avecLibelle?'À consulter en appel d\u2019offres':''}</label>`; }
+  return `<label class="ao-case${c?' oui':''}" title="À consulter par le service commercial en phase d'appel d'offres"><input type="checkbox" ${c?'checked':''} onchange="toggleAO('${e.id}',this.checked)" />${avecLibelle?'Service Commercial':''}</label>`; }
 function caseLuxe(e,avecLibelle){ const c=!!e.chantiersLuxe;
   return `<label class="ao-case${c?' oui':''}" title="Peut intervenir sur des chantiers haut de gamme (hôtels, villas…)"><input type="checkbox" ${c?'checked':''} onchange="toggleCase('${e.id}','chantiersLuxe',this.checked)" />${avecLibelle?'Chantiers luxe (hôtels, villas…)':''}</label>`; }
 function toggleCase(id,champ,val){ const e=entreprises.soustraitants&&entreprises.soustraitants[id]; if(!e) return;
@@ -1157,7 +1198,7 @@ function feuilleHTML(e,type){
         ${ligne(st?'Adresse':'Agence référente',e.adresse)}
         ${estEvite(e)?`<div class="f-ligne"><div class="lab">Statut</div><div class="val" style="color:#b91c1c;font-weight:700">À éviter — ${esc(e.motifEvite||'motif non précisé')}</div></div>`:''}
         ${ligne('SIRET',e.siret,true)}
-        ${st?ligne('Consultation AO',e.consultAO?'Oui':'Non'):''}
+        ${st?ligne('Service Commercial',e.consultAO?'Oui':'Non'):''}
         ${st?ligne('Chantiers luxe',e.chantiersLuxe?'Oui':'Non'):''}
       </div>
       ${(st&&e.qualites)?`<div class="f-notes-bloc"><div class="lab">Qualités</div><div class="f-grille">
@@ -1172,12 +1213,12 @@ function feuilleHTML(e,type){
 function ouvrirFichePDF(id){
   const type=ongletActif, e=entreprises[type]&&entreprises[type][id]; if(!e) return;
   document.getElementById('pdf-titre').textContent='Aperçu de la fiche contact';
-  document.getElementById('pdf-contenu').innerHTML=feuilleHTML(e,type);
+  document.getElementById('pdf-contenu').innerHTML=feuilleHTML(e,type); boutonModifierPdf(id);
   document.getElementById('overlay-pdf').classList.add('ouvert');
 }
 function imprimerAnnuaire(){
   const type=ongletActif, liste=listeFiltree(); if(!liste.length){ alert('Aucune fiche à imprimer dans cette vue.'); return; }
-  document.getElementById('pdf-titre').textContent=`Annuaire ${type==='fournisseurs'?'fournisseurs':'sous-traitants'} — ${liste.length} fiche${liste.length>1?'s':''}`;
+  boutonModifierPdf(null); document.getElementById('pdf-titre').textContent=`Annuaire ${type==='fournisseurs'?'fournisseurs':'sous-traitants'} — ${liste.length} fiche${liste.length>1?'s':''}`;
   document.getElementById('pdf-contenu').innerHTML=liste.map(e=>feuilleHTML(e,type)).join('');
   document.getElementById('overlay-pdf').classList.add('ouvert');
 }
@@ -1204,12 +1245,12 @@ function feuilleEvaluationHTML(){
     <div class="ev-cases" style="margin-top:8px"><b>Points forts / points à améliorer :</b></div>${lignes(3)}
     <div class="ev-sec">4. Signatures</div>
     <div class="ev-sign"><div><b>Conducteur de travaux</b>Nom :<span style="margin-left:40%">Date :</span><br><br>Signature :</div><div><b>Évaluateur (Service Achats)</b>Nom :<span style="margin-left:40%">Date :</span><br><br>Signature :</div></div>
-    <div class="ev-report"><b class="t">REPORT DANS LA BASE</b><span>Fiche du sous-traitant › <b>Chantiers réalisés &amp; notes</b> : nom du chantier, date, commentaire, puis <b>« Noter par critère »</b> avec les 7 notes. Mettre à jour les <b>Qualités</b> et les cases <b>Consulter AO</b> / <b>Luxe</b> selon l'avis global.</span></div>
+    <div class="ev-report"><b class="t">REPORT DANS LA BASE</b><span>Fiche du sous-traitant › <b>Chantiers réalisés &amp; notes</b> : nom du chantier, date, commentaire, puis <b>« Noter par critère »</b> avec les 7 notes. Mettre à jour les <b>Qualités</b> et les cases <b>Service Commercial</b> / <b>Luxe</b> selon l'avis global.</span></div>
     <div class="ev-pied"><span>Les Artisans Bâtisseurs · Orgeval (78630) · Document interne</span><span>Fiche d'évaluation sous-traitant · v1</span></div>
   </div></div>`;
 }
 function imprimerEvaluation(){
-  document.getElementById('pdf-titre').textContent="Fiche d'évaluation sous-traitant (vierge)";
+  boutonModifierPdf(null); document.getElementById('pdf-titre').textContent="Fiche d'évaluation sous-traitant (vierge)";
   document.getElementById('pdf-contenu').innerHTML=feuilleEvaluationHTML();
   document.getElementById('overlay-pdf').classList.add('ouvert');
 }
