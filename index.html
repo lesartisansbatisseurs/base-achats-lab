@@ -183,7 +183,7 @@
   .chip.evite { background:#fde8e8; color:#b91c1c; font-weight:700; }
   table.tbl tbody tr.evite td { opacity:.62; } table.tbl tbody tr.evite:hover td { opacity:1; }
   .carte.evite { border-left:3px solid #dc2626; }
-  .bloc-statut.evite { background:#fef2f2; border-color:#fca5a5; }
+  .bloc-statut.evite select, .bloc-statut.evite input { border-color:#f87171; background-color:#fef2f2; color:#b91c1c; }
   .f-trace { font-size:11.5px; color:var(--gris); border-top:1px dashed var(--bord); padding-top:9px; margin-top:4px; line-height:1.6; }
   .crit-det { border-top:1px dashed #cbd5e1; padding-top:8px; }
   .crit-det summary { cursor:pointer; font-size:12.5px; font-weight:600; color:var(--accent); user-select:none; }
@@ -273,10 +273,10 @@
   .modale-corps { padding:20px 22px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; }
   .modale-bas { padding:14px 22px; border-top:1px solid var(--bord); display:flex; justify-content:flex-end; gap:8px; }
   label.champ span { display:block; font-size:12px; font-weight:500; color:var(--gris); margin-bottom:5px; }
-  label.champ input,label.champ select,label.champ textarea { width:100%; padding:9px 11px; font-size:14px; border:1px solid #d1d5db; border-radius:9px; font-family:inherit; background-color:#fff; color:var(--ink); }
+  label.champ input,label.champ select,label.champ textarea,select.q-select { width:100%; padding:9px 11px; font-size:14px; border:1px solid #d1d5db; border-radius:9px; font-family:inherit; background-color:#fff; color:var(--ink); }
   /* Listes déroulantes : même rendu que les champs texte (fond blanc, même bordure), flèche personnalisée */
-  label.champ select { -webkit-appearance:none; appearance:none; padding-right:34px; cursor:pointer; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 11px center; }
-  label.champ input:focus,label.champ select:focus,label.champ textarea:focus,.interv-ajout input:focus,.ms-ajout input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(43,130,217,.15); }
+  label.champ select, select.q-select { -webkit-appearance:none; appearance:none; padding-right:34px; cursor:pointer; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 11px center; }
+  label.champ input:focus,label.champ select:focus,select.q-select:focus,label.champ textarea:focus,.interv-ajout input:focus,.ms-ajout input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(43,130,217,.15); }
   .champ-lab { display:block; font-size:12px; font-weight:500; color:var(--gris); margin-bottom:5px; }
   /* Liste déroulante multi-lots */
   .ms-bouton { width:100%; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 11px; font-size:14px; font-family:inherit; color:var(--ink); border:1px solid #d1d5db; border-radius:9px; background:#fff; cursor:pointer; text-align:left; }
@@ -294,6 +294,8 @@
   .ms-liste label.coche { color:var(--accent); font-weight:600; }
   .ms-liste input { accent-color:var(--accent); width:16px; height:16px; margin:0; flex-shrink:0; cursor:pointer; }
   .ms-liste .n { font-family:var(--mono); font-size:11.5px; color:var(--gris-clair); width:22px; flex-shrink:0; }
+  .ms-liste small { font-weight:400; color:var(--gris-clair); }
+  .ms-liste label.coche small { color:var(--accent); }
   .ms-liste .ms-vide { padding:10px 12px; font-size:12.5px; color:var(--gris-clair); }
   .ms-ajout { display:flex; gap:8px; padding:8px; border-top:1px solid var(--bord); background:#fff; }
   .ms-ajout input { flex:1; min-width:0; padding:8px 10px; border:1px solid #d1d5db; border-radius:8px; font-size:13.5px; font-family:inherit; background:#fff; }
@@ -305,10 +307,10 @@
   .ms-puce button:hover { opacity:1; }
   .duo { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
   .duo:has(> :nth-child(2)[style*="none"]) { grid-template-columns:1fr; } /* champ seul = pleine largeur */
-  .bloc-contact2 { border:1px dashed var(--bord); border-radius:11px; padding:13px 14px 2px; margin-bottom:14px; background:#fff; }
-  .bloc-qualites { border:1px solid var(--bord); border-radius:11px; padding:13px 14px 4px; margin-bottom:14px; background:#fff; }
-  .bloc-qualites .q-ligne { margin-bottom:11px; }
-  .bloc-qualites .q-lab { font-size:12px; font-weight:500; color:var(--gris); margin-bottom:6px; }
+  .bloc-contact2 { border:none; border-radius:0; padding:0; margin:0; background:none; display:flex; flex-direction:column; gap:14px; }
+  .bloc-qualites { border:none; border-radius:0; padding:0; margin:0; background:none; display:flex; flex-direction:column; gap:14px; }
+  .bloc-qualites .q-ligne { margin:0; }
+  .bloc-qualites .q-lab { font-size:12px; font-weight:500; color:var(--gris); margin-bottom:5px; }
   .choix-multi { display:flex; flex-wrap:wrap; gap:7px; }
   .choix-multi label { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; padding:6px 11px; border:1px solid var(--bord); border-radius:8px; cursor:pointer; user-select:none; background:#fff; transition:all .12s; }
   .choix-multi label:hover { border-color:var(--accent); }
@@ -316,7 +318,7 @@
   .choix-multi label.coche { background:var(--bleu-clair); border-color:var(--accent); color:var(--accent); font-weight:600; }
   .choix-multi small { font-weight:400; color:var(--gris); }
   .choix-multi label.coche small { color:var(--accent); }
-  .bloc-contact2 .titre-bloc { font-size:12px; font-weight:600; color:var(--gris); text-transform:uppercase; letter-spacing:.03em; margin-bottom:10px; }
+  .bloc-contact2 .titre-bloc, .bloc-qualites .titre-bloc { font-size:12px; font-weight:600; color:var(--gris); text-transform:uppercase; letter-spacing:.03em; margin:6px 0 -4px !important; }
   .liste-lots { display:flex; flex-direction:column; }
   .ligne-lot { display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid #f1f2f4; }
   .ligne-lot .mono { font-family:var(--mono); font-size:12px; color:var(--gris-clair); width:34px; }
@@ -513,11 +515,11 @@
       </div></div>
     <label class="champ" id="champ-intervention"><span>Type d'intervention</span><select id="f-intervention"><option value="">— Non renseigné —</option><option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option></select></label>
     <div class="bloc-qualites" id="champ-qualites">
-      <div class="titre-bloc" style="font-size:12px;font-weight:600;color:var(--gris);text-transform:uppercase;letter-spacing:.03em;margin-bottom:10px">Qualités</div>
-      <div class="q-ligne"><div class="q-lab">Taille de chantiers (plusieurs choix possibles)</div><div class="choix-multi" id="q-tailles"></div></div>
-      <div class="q-ligne"><div class="q-lab">Type de travaux (plusieurs choix possibles)</div><div class="choix-multi" id="q-travaux"></div></div>
-      <div class="q-ligne"><div class="q-lab">Travail en milieu occupé</div><div class="choix-multi" id="q-occupe"></div></div>
-      <div class="q-ligne"><div class="q-lab">Capacité à réaliser les études</div><div class="choix-multi" id="q-etudes"></div></div>
+      <div class="titre-bloc">Qualités</div>
+      <div class="q-ligne"><div class="q-lab">Taille de chantiers (plusieurs choix possibles)</div><div class="ms ms-q" id="q-tailles"></div></div>
+      <div class="q-ligne"><div class="q-lab">Type de travaux (plusieurs choix possibles)</div><div class="ms ms-q" id="q-travaux"></div></div>
+      <div class="q-ligne"><div class="q-lab">Travail en milieu occupé</div><div id="q-occupe"></div></div>
+      <div class="q-ligne"><div class="q-lab">Capacité à réaliser les études</div><div id="q-etudes"></div></div>
     </div>
     <div class="champ" id="champ-chantiers"><span>Chantiers réalisés & notes</span>
       <div class="interv-vide" id="interv-vide">Aucun chantier enregistré pour l'instant.</div>
@@ -1037,7 +1039,7 @@ function majMsLots(){ const type=document.getElementById('f-type').value, ids=lo
   t.textContent=sel.length?(sel.length===1?'1 lot sélectionné':sel.length+' lots sélectionnés'):'Sélectionner un ou plusieurs lots'; t.classList.toggle('ph',!sel.length);
   document.getElementById('ms-lots-puces').innerHTML=sel.map(l=>`<span class="ms-puce">${esc(l.num)} – ${esc(l.libelle)}<button type="button" title="Retirer" onclick="retirerLotForm('${l.id}')">×</button></span>`).join(''); }
 function retirerLotForm(id){ cocherLotsForm(lotsCochesForm().filter(x=>x!==id)); }
-document.addEventListener('click',e=>{ const m=document.getElementById('ms-lots'); if(m&&m.classList.contains('ouvert')&&!e.target.closest('#ms-lots')) basculerMsLots(false); });
+document.addEventListener('click',e=>{ if(!e.target.isConnected) return; const m=document.getElementById('ms-lots'); if(m&&m.classList.contains('ouvert')&&!e.target.closest('#ms-lots')) basculerMsLots(false); });
 function ouvrirLots(){
   if(ongletActif==='dashboard'){ alert('Ouvre l\u2019onglet Fournisseurs ou Sous-traitants pour gérer ses lots.'); return; }
   document.getElementById('lots-modal-titre').textContent='Gérer les lots — '+(ongletActif==='fournisseurs'?'Fournisseurs':'Sous-traitants');
@@ -1189,15 +1191,29 @@ function modifierDepuisConsultation(){ const id=ficheConsultee; if(!id) return; 
 const Q_TAILLES={petits:['Petits chantiers','maisons'],moyens:['Moyens chantiers','petits ensembles 10 à 40 lgts'],grands:['Grands chantiers','gros ensembles 50 à 200 lgts']};
 const Q_TRAVAUX={neuf:'Neuf',rehab:'Réhabilitation',reno:'Rénovation'};
 const Q_OUINON={oui:'Oui',non:'Non'};
+// Qualités : liste déroulante simple (Oui / Non) ou liste déroulante à choix multiples
 function rendreChoix(idZone,options,valeurs,unique){
   const z=document.getElementById(idZone); z.dataset.unique=unique?'1':'';
-  z.innerHTML=Object.entries(options).map(([k,v])=>{ const lib=Array.isArray(v)?`${v[0]} <small>(${v[1]})</small>`:v, c=valeurs.includes(k);
-    return `<label class="${c?'coche':''}"><input type="checkbox" value="${k}" ${c?'checked':''} onchange="choixClic(this)">${lib}</label>`; }).join('');
+  if(unique){ z.innerHTML=`<select class="q-select"><option value="">— Non renseigné —</option>${Object.entries(options).map(([k,v])=>`<option value="${k}" ${valeurs.includes(k)?'selected':''}>${Array.isArray(v)?v[0]:v}</option>`).join('')}</select>`; return; }
+  z.classList.remove('ouvert');
+  z.innerHTML=`<button type="button" class="ms-bouton" onclick="basculerMs('${idZone}')"><span class="ms-txt ph">Sélectionner</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+    <div class="ms-panneau"><div class="ms-liste">${Object.entries(options).map(([k,v])=>{ const lib=Array.isArray(v)?`${v[0]} <small>(${v[1]})</small>`:v, c=valeurs.includes(k);
+      return `<label class="${c?'coche':''}"><input type="checkbox" value="${k}" ${c?'checked':''} onchange="this.parentNode.classList.toggle('coche',this.checked);majMs('${idZone}')">${lib}</label>`; }).join('')}</div></div>
+    <div class="ms-puces"></div>`;
+  z._options=options; majMs(idZone);
 }
+function libCourt(v){ return Array.isArray(v)?v[0]:v; }
+function majMs(idZone){ const z=document.getElementById(idZone), o=z._options||{}, ids=[...z.querySelectorAll('.ms-liste input:checked')].map(i=>i.value);
+  const t=z.querySelector('.ms-txt'); t.textContent=ids.length?ids.length+' sélectionné'+(ids.length>1?'s':''):'Sélectionner'; t.classList.toggle('ph',!ids.length);
+  z.querySelector('.ms-puces').innerHTML=ids.map(k=>`<span class="ms-puce">${esc(libCourt(o[k]))}<button type="button" title="Retirer" onclick="retirerMs('${idZone}','${k}')">×</button></span>`).join(''); }
+function retirerMs(idZone,k){ const i=document.querySelector('#'+idZone+' .ms-liste input[value="'+k+'"]'); if(i){ i.checked=false; i.parentNode.classList.remove('coche'); } majMs(idZone); }
+function basculerMs(idZone){ const z=document.getElementById(idZone), o=!z.classList.contains('ouvert');
+  document.querySelectorAll('.ms.ouvert').forEach(m=>{ if(m!==z) m.classList.remove('ouvert'); }); z.classList.toggle('ouvert',o); }
+document.addEventListener('click',e=>{ if(!e.target.isConnected) return; document.querySelectorAll('.ms-q.ouvert').forEach(m=>{ if(!m.contains(e.target)) m.classList.remove('ouvert'); }); });
 function choixClic(inp){ const z=inp.closest('.choix-multi');
   if(z.dataset.unique&&inp.checked) z.querySelectorAll('input').forEach(i=>{ if(i!==inp) i.checked=false; });
   z.querySelectorAll('input').forEach(i=>i.parentNode.classList.toggle('coche',i.checked)); }
-function lireChoix(idZone){ return [...document.querySelectorAll('#'+idZone+' input:checked')].map(i=>i.value); }
+function lireChoix(idZone){ const s=document.querySelector('#'+idZone+' select'); if(s) return s.value?[s.value]:[]; return [...document.querySelectorAll('#'+idZone+' input:checked')].map(i=>i.value); }
 function listeQ(v){ return v?(Array.isArray(v)?v:Object.values(v)).filter(Boolean):[]; }
 function remplirQualitesForm(q){ q=q||{};
   rendreChoix('q-tailles',Q_TAILLES,listeQ(q.tailles)); rendreChoix('q-travaux',Q_TRAVAUX,listeQ(q.travaux));
