@@ -381,7 +381,36 @@
   .res-mini .nom { font-size:13px; font-weight:600; } .res-mini .meta { font-size:11.5px; color:var(--gris); }
   .ia-saisie { display:flex; gap:8px; padding:12px; border-top:1px solid var(--bord); background:#fff; }
   .ia-saisie input { flex:1; padding:10px 12px; font-size:14px; border:1px solid var(--bord); border-radius:11px; } .ia-saisie input:focus { outline:none; border-color:var(--accent); }
-  .ia-saisie button { background:var(--accent); color:#fff; border:none; border-radius:11px; width:42px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .ia-saisie button { background:var(--accent); color:#fff; border:none; border-radius:11px; width:42px; flex-shrink:0; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .ia-saisie button.micro { background:var(--bleu-clair); color:var(--accent); }
+  .ia-saisie button.micro.ecoute { background:#dc2626; color:#fff; animation:pulse-ia 1.2s infinite; }
+  @keyframes pulse-ia { 0%,100%{ box-shadow:0 0 0 0 rgba(220,38,38,.45);} 50%{ box-shadow:0 0 0 7px rgba(220,38,38,0);} }
+  .msg.large { max-width:100%; width:100%; }
+  .filtres-ia { display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
+  .filtres-ia span { font-size:11.5px; padding:3px 8px; border-radius:6px; background:var(--bleu-clair); color:var(--accent); font-weight:500; }
+  .res-ia { background:#fff; border:1px solid var(--bord); border-radius:12px; margin-top:8px; overflow:hidden; }
+  .res-ia.evite { border-color:#fca5a5; }
+  .res-ia .res-haut { display:flex; gap:10px; padding:10px 11px 8px; cursor:pointer; }
+  .res-ia .av { height:34px; width:34px; border-radius:50%; color:#fff; font-weight:700; font-size:12.5px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .res-ia .nom { font-size:14px; font-weight:600; line-height:1.3; }
+  .res-ia .meta { font-size:12px; color:var(--gris); margin-top:2px; line-height:1.35; }
+  .res-ia .meta .note-etoiles svg { width:12px; height:12px; vertical-align:-1px; }
+  .res-ia .fav-ia { color:var(--or); } .res-ia .ev-ia { font-size:10.5px; font-weight:700; color:#b91c1c; background:#fde8e8; padding:2px 6px; border-radius:5px; vertical-align:2px; }
+  .res-actions { display:flex; gap:6px; padding:0 11px 10px; }
+  .res-actions .act { flex:1; display:flex; align-items:center; justify-content:center; gap:5px; min-height:38px; padding:0 8px; font-size:13px; font-weight:600; border-radius:9px; border:1px solid var(--bord); background:#fff; color:var(--ink); text-decoration:none; cursor:pointer; font-family:inherit; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .res-actions .act.appel { flex:2; background:#16a34a; border-color:#16a34a; color:#fff; }
+  .res-actions .act.off { color:var(--gris-clair); font-weight:500; cursor:default; }
+  .plus-ia { margin-top:9px; }
+  /* Sur téléphone : assistant plein écran, gros boutons */
+  @media (max-width:600px){
+    .ia-panneau { inset:0; width:100%; max-width:none; height:100%; max-height:none; border-radius:0; bottom:0; right:0; }
+    .ia-haut { padding-top:calc(15px + env(safe-area-inset-top,0px)); }
+    .ia-saisie { padding-bottom:calc(12px + env(safe-area-inset-bottom,0px)); }
+    .ia-saisie input { font-size:16px; } .ia-saisie button { width:46px; min-height:46px; }
+    .ia-bulle { height:62px; width:62px; bottom:18px; right:18px; }
+    .ex { font-size:13.5px; padding:8px 13px; }
+    .msg { font-size:14.5px; }
+  }
 </style>
 </head>
 <body>
@@ -581,10 +610,11 @@
 <button class="ia-bulle" id="ia-bulle" onclick="basculerIA()" title="Assistant recherche"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.6L19.5 9l-5.6 1.9L12 16l-1.9-5.1L4.5 9l5.6-1.4L12 2zM19 15l.9 2.6L22.5 18l-2.6.9L19 21l-.9-2.1L15.5 18l2.6-.4L19 15z"/></svg></button>
 <div class="ia-panneau" id="ia-panneau">
   <div class="ia-haut"><div class="av"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.9 5.6L19.5 9l-5.6 1.9L12 16l-1.9-5.1L4.5 9l5.6-1.4L12 2z"/></svg></div>
-    <div><div class="t">Assistant recherche</div><div class="st" id="ia-mode">Recherche intelligente</div></div>
-    <button onclick="basculerIA()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    <div><div class="t">Assistant recherche</div><div class="st" id="ia-mode">Trouve un contact en 2 secondes</div></div>
+    <button onclick="nouvelleConversation()" title="Nouvelle recherche" style="margin-left:auto"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+    <button onclick="basculerIA()" title="Fermer" style="margin-left:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
   <div class="ia-msgs" id="ia-msgs"></div>
-  <div class="ia-saisie"><input id="ia-input" placeholder="Ex : un plombier sur Orgeval…" onkeydown="if(event.key==='Enter')envoyerIA()" /><button onclick="envoyerIA()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button></div>
+  <div class="ia-saisie"><button type="button" class="micro" id="ia-micro" title="Dicter"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5"/></svg></button><input id="ia-input" placeholder="Ex : un peintre en milieu occupé…" enterkeyhint="search" autocomplete="off" onkeydown="if(event.key==='Enter')envoyerIA()" /><button onclick="envoyerIA()" title="Envoyer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button></div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -1177,16 +1207,19 @@ document.addEventListener('click',e=>{ if(!e.target.closest('.rg')) document.get
 function lienWeb(u){ u=String(u||'').trim(); if(!u) return '#'; return /^https?:\/\//i.test(u)?u:'https://'+u; }
 // Clic sur une carte / ligne = ouvre la fiche en LECTURE SEULE (modification uniquement via le stylo)
 function clicFiche(ev,id){ if(ev.target.closest('button,a,label,input,select')) return; ouvrirConsultation(id); }
-let ficheConsultee=null;
-function boutonModifierPdf(id){ ficheConsultee=id||null; document.getElementById('btn-pdf-modifier').style.display=id?'':'none'; }
-function ouvrirConsultation(id){
-  const type=ongletActif, e=entreprises[type]&&entreprises[type][id]; if(!e) return;
+let ficheConsultee=null, ficheConsulteeType=null;
+function boutonModifierPdf(id,type){ ficheConsultee=id||null; ficheConsulteeType=type||ongletActif; document.getElementById('btn-pdf-modifier').style.display=id?'':'none'; }
+function ouvrirConsultation(id,type){
+  type=type||ongletActif; const e=entreprises[type]&&entreprises[type][id]; if(!e) return;
   document.getElementById('pdf-titre').textContent='Fiche — '+(e.raisonSociale||'');
   document.getElementById('pdf-contenu').innerHTML=feuilleHTML(e,type);
-  boutonModifierPdf(id);
+  boutonModifierPdf(id,type);
   document.getElementById('overlay-pdf').classList.add('ouvert');
 }
-function modifierDepuisConsultation(){ const id=ficheConsultee; if(!id) return; fermer('overlay-pdf'); ouvrirFiche({id}); }
+function modifierDepuisConsultation(){ const id=ficheConsultee; if(!id) return; fermer('overlay-pdf');
+  if(ficheConsulteeType&&ficheConsulteeType!==ongletActif) changerOnglet(ficheConsulteeType);
+  const p=document.getElementById('ia-panneau'); if(p&&p.classList.contains('ouvert')) basculerIA();
+  ouvrirFiche({id}); }
 // ===== Qualités des sous-traitants =====
 const Q_TAILLES={petits:['Petits chantiers','maisons'],moyens:['Moyens chantiers','petits ensembles 10 à 40 lgts'],grands:['Grands chantiers','gros ensembles 50 à 200 lgts']};
 const Q_TRAVAUX={neuf:'Neuf',rehab:'Réhabilitation',reno:'Rénovation'};
@@ -1327,50 +1360,229 @@ function imprimerEvaluation(){
 function imprimerFiche(){ window.print(); }
 
 /* ===== ASSISTANT IA ===== */
+/* ===== ASSISTANT CHANTIER — moteur local (gratuit, sans clé API, rien ne sort de la base) ===== */
+let iaContexte=null, iaReco=null;
 function basculerIA(){
   const p=document.getElementById('ia-panneau'), b=document.getElementById('ia-bulle');
   const ouvert=p.classList.toggle('ouvert'); b.style.display=ouvert?'none':'flex';
-  if(ouvert && !document.getElementById('ia-msgs').dataset.init){ msgBot(accueilIA()); document.getElementById('ia-msgs').dataset.init='1'; document.getElementById('ia-input').focus(); }
-  if(IA_CONFIG.cleApi) document.getElementById('ia-mode').textContent='IA Claude connectée';
+  if(ouvert && !document.getElementById('ia-msgs').dataset.init){ msgBot(accueilIA()); document.getElementById('ia-msgs').dataset.init='1'; }
+  if(ouvert && window.matchMedia('(min-width:601px)').matches) setTimeout(()=>document.getElementById('ia-input').focus(),50);
+  document.getElementById('ia-mode').textContent=IA_CONFIG.cleApi?'IA Claude connectée':'Trouve un contact en 2 secondes';
 }
-function accueilIA(){ return { texte:`Bonjour${(auth&&auth.currentUser&&auth.currentUser.displayName)?' '+auth.currentUser.displayName.split(' ')[0]:''} 👋 Je cherche dans ta base fournisseurs et sous-traitants. Pose ta question :`, exemples:["Un plombier sur Orgeval","Sous-traitants peinture avec email","Fournisseurs matériel électrique","Sous-traitant le mieux noté"] }; }
+function accueilIA(){ const u=auth&&auth.currentUser, prenom=u&&u.displayName?' '+u.displayName.split(' ')[0]:'';
+  return { texte:`Salut${prenom} 👋 Dis-moi ce qu'il te faut, comme tu le dirais à un collègue. Tu peux aussi parler avec le micro 🎤`,
+    exemples:["Un plombier","Peintre milieu occupé","Le meilleur électricien","Numéro de…","Location nacelle","Sous-traitants qui font les études"] }; }
+function nouvelleConversation(){ iaContexte=null; const z=document.getElementById('ia-msgs'); z.innerHTML=''; msgBot(accueilIA()); }
 function msgMoi(t){ const d=document.createElement('div'); d.className='msg moi'; d.textContent=t; ajoutMsg(d); }
+function ajoutMsg(el){ const z=document.getElementById('ia-msgs'); z.appendChild(el); z.scrollTop=z.scrollHeight; }
+function exemplesHTML(liste){ const w=document.createElement('div'); w.className='exemples';
+  liste.forEach(x=>{ const b=document.createElement('button'); b.className='ex'; b.textContent=x;
+    b.onclick=()=>{ if(/…$/.test(x)){ const i=document.getElementById('ia-input'); i.value=x.replace('…',''); i.focus(); return; } document.getElementById('ia-input').value=x; envoyerIA(); }; w.appendChild(b); });
+  return w; }
+function carteIA(e){
+  const st=e.type==='soustraitants', a=avatar(e.raisonSociale), moy=noteMoyenne(e), lotsTxt=lotsObjs(e.type,e).map(l=>l.libelle).join(', ');
+  const r=document.createElement('div'); r.className='res-ia'+(estEvite(e)?' evite':'');
+  const badges=[st?'Sous-traitant':'Fournisseur']; if(lotsTxt) badges.push(lotsTxt);
+  r.innerHTML=`<div class="res-haut" title="Voir la fiche"><div class="av" style="background:${a.coul}">${esc(a.init)}</div><div style="min-width:0;flex:1">
+      <div class="nom">${esc(e.raisonSociale)}${e.favori?' <span class="fav-ia">★</span>':''}${estEvite(e)?' <span class="ev-ia">À éviter</span>':''}</div>
+      <div class="meta">${esc(badges.join(' · '))}</div>
+      ${st?`<div class="meta">${moy?etoiles(Math.round(moy))+' <b>'+moy.toFixed(1)+'/5</b>'+(nbChantiers(e)?' · '+nbChantiers(e)+' chantier'+(nbChantiers(e)>1?'s':''):''):'Pas encore noté'}</div>`:''}
+      ${e.contact?`<div class="meta">👤 ${esc(e.contact)}${e.contactRole?' ('+esc(e.contactRole)+')':''}</div>`:''}
+      ${estEvite(e)&&e.motifEvite?`<div class="meta" style="color:#b91c1c">Motif : ${esc(e.motifEvite)}</div>`:''}</div></div>
+    <div class="res-actions">
+      ${e.tel?`<a class="act appel" href="tel:${esc(String(e.tel).replace(/\s/g,''))}">📞 ${esc(e.tel)}</a>`:'<span class="act off">Pas de tél.</span>'}
+      ${e.email?`<a class="act" href="mailto:${esc(e.email)}">✉️ Mail</a>`:''}
+      <button class="act" type="button">Fiche</button></div>`;
+  const voir=()=>ouvrirConsultation(e.id,e.type);
+  r.querySelector('.res-haut').onclick=voir; r.querySelector('button.act').onclick=voir;
+  return r;
+}
 function msgBot(o){
-  const d=document.createElement('div'); d.className='msg bot'; d.innerHTML=esc(o.texte).replace(/\n/g,'<br>');
-  if(o.exemples){ const w=document.createElement('div'); w.className='exemples'; o.exemples.forEach(x=>{ const b=document.createElement('button'); b.className='ex'; b.textContent=x; b.onclick=()=>{ document.getElementById('ia-input').value=x; envoyerIA(); }; w.appendChild(b); }); d.appendChild(w); }
-  if(o.resultats) o.resultats.forEach(e=>{ const lot=lotDe(e.type,e.lotId), t=e.type==='fournisseurs'?'Fournisseur':'Sous-traitant', a=avatar(e.raisonSociale);
-    const r=document.createElement('div'); r.className='res-mini'; r.onclick=()=>allerVers(e.type,e.id);
-    const noteStr=(e.type==='soustraitants'&&noteMoyenne(e))?' · '+noteMoyenne(e).toFixed(1)+'/5 ★':'';
-    r.innerHTML=`<div class="av" style="background:${a.coul}">${esc(a.init)}</div><div><div class="nom">${esc(e.raisonSociale)}${estEvite(e)?' <span style=\"color:#b91c1c;font-size:11px\">· À éviter</span>':''}</div><div class="meta">${t}${lotsObjs(e.type,e).length?' · Lot '+lotsObjs(e.type,e).map(l=>esc(l.num)).join(', '):''}${noteStr}${e.tel?' · '+esc(e.tel):''}</div></div>`; d.appendChild(r); });
+  const d=document.createElement('div'); d.className='msg bot'+(o.resultats&&o.resultats.length?' large':'');
+  const t=document.createElement('div'); t.innerHTML=esc(o.texte).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>'); d.appendChild(t);
+  if(o.filtres&&o.filtres.length){ const f=document.createElement('div'); f.className='filtres-ia'; f.innerHTML=o.filtres.map(x=>`<span>${esc(x)}</span>`).join(''); d.appendChild(f); }
+  (o.resultats||[]).forEach(e=>d.appendChild(carteIA(e)));
+  if(o.plus){ const b=document.createElement('button'); b.className='ex plus-ia'; b.textContent=`Voir ${o.plus} de plus`; b.onclick=()=>{ b.remove(); msgBot(pageSuivante()); }; d.appendChild(b); }
+  if(o.exemples&&o.exemples.length) d.appendChild(exemplesHTML(o.exemples));
   ajoutMsg(d);
 }
-function ajoutMsg(el){ const z=document.getElementById('ia-msgs'); z.appendChild(el); z.scrollTop=z.scrollHeight; }
-async function envoyerIA(){ const input=document.getElementById('ia-input'), q=input.value.trim(); if(!q) return; msgMoi(q); input.value=''; if(IA_CONFIG.cleApi){ msgBot(await appelClaude(q)); } else msgBot(rechercheLocale(q)); }
-function norm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
-const SYN_LOTS={'plombier':'plomberie','plomberie':'plomberie','cvc':'cvc','chauffage':'chauffage','sanitaire':'sanitaire','electricien':'electricite','electricite':'electricite','electrique':'electricite','peintre':'peinture','peinture':'peinture','macon':'maconnerie','maconnerie':'maconnerie','gros oeuvre':'gros','beton':'beton','ciment':'ciment','menuisier':'menuiseries','menuiserie':'menuiseries','carreleur':'carrelage','carrelage':'carrelage','serrurier':'serrurerie','serrurerie':'serrurerie','metallerie':'metallerie','couvreur':'couverture','couverture':'couverture','etancheite':'etancheite','toiture':'couverture','terrassement':'terrassement','vrd':'vrd','charpente':'charpente','ascenseur':'ascenseurs','platrier':'platre','platrerie':'platre','placo':'placo','cloison':'cloisons','isolation':'isolation','quincaillerie':'quincaillerie','outillage':'outillage','epi':'epi','location':'location','paysagiste':'espaces','jardin':'espaces'};
-function rechercheLocale(q){
-  const n=norm(q), tokens=n.split(/[^a-z0-9]+/).filter(t=>t.length>2);
-  let typeVoulu=null; if(/fournisseur/.test(n)) typeVoulu='fournisseurs'; if(/sous.?trait|traitant/.test(n)) typeVoulu='soustraitants';
-  const besoinEmail=/(e-?mail|mail|courriel)/.test(n), besoinTel=/(tel|telephone|numero|joindre|appeler|joignable)/.test(n), besoinSiret=/siret/.test(n);
-  const triNote=/(mieux note|meilleur|meilleure note|bien note|top note|plus haute note)/.test(n);
-  let motsLot=[]; Object.keys(SYN_LOTS).forEach(k=>{ if(n.includes(k)) motsLot.push(SYN_LOTS[k]); });
-  [...lotsTries('fournisseurs'),...lotsTries('soustraitants')].forEach(l=>{ norm(l.libelle).split(/[^a-z]+/).filter(w=>w.length>3).forEach(w=>{ if(n.includes(w)) motsLot.push(w); }); });
-  let base=toutesLesEntreprises(); if(typeVoulu) base=base.filter(e=>e.type===typeVoulu);
-  if(besoinEmail) base=base.filter(e=>e.email); if(besoinTel) base=base.filter(e=>e.tel); if(besoinSiret) base=base.filter(e=>e.siret);
-  let scored=base.map(e=>{ const lot=lotDe(e.type,e.lotId), txt=norm([e.raisonSociale,e.contact,e.adresse,e.notes,e.email,libLots(e.type,e)].filter(Boolean).join(' '));
-    let score=0; if(motsLot.length&&motsLot.some(m=>norm(libLots(e.type,e)).includes(m))) score+=5; tokens.forEach(t=>{ if(txt.includes(t)) score+=1; }); return {e,score};
-  }).filter(x=>x.score>0||(typeVoulu&&!tokens.length&&!motsLot.length)||(triNote&&x.e.type==='soustraitants'));
-  if(triNote) scored=scored.filter(x=>x.e.type==='soustraitants').sort((a,b)=>noteMoyenne(b.e)-noteMoyenne(a.e));
-  else scored=scored.sort((a,b)=>b.score-a.score);
-  const resultats=scored.slice(0,6).map(x=>x.e);
-  if(!resultats.length) return { texte:"Je n'ai rien trouvé. Essaie un métier (plomberie, peinture…), une ville, « avec email », ou « le mieux noté ».", exemples:["Fournisseurs peinture","Sous-traitants avec téléphone"] };
-  const c=[]; if(typeVoulu) c.push(typeVoulu==='fournisseurs'?'fournisseur(s)':'sous-traitant(s)'); if(triNote) c.push('classés par note'); if(besoinEmail) c.push('avec email'); if(besoinTel) c.push('joignable(s)');
-  return { texte:`J'ai trouvé ${resultats.length} résultat${resultats.length>1?'s':''}${c.length?' ('+c.join(', ')+')':''}. Clique pour ouvrir la fiche :`, resultats };
+async function envoyerIA(){ const input=document.getElementById('ia-input'), q=input.value.trim(); if(!q) return; msgMoi(q); input.value='';
+  if(IA_CONFIG.cleApi){ msgBot(await appelClaude(q)); } else msgBot(rechercheLocale(q)); }
+
+/* --- Compréhension de la question --- */
+function norm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/œ/g,'oe').replace(/[’']/g,' '); }
+const IA_STOP=new Set(('un une des les le la de du d l a au aux en et ou pour sur sous dans par avec sans qui que quoi quel quelle quels quelles est sont il elle ils on je j tu me m moi nous vous ton ta tes mon ma mes ses son sa leur leurs ce c cet cette ces ca y ai as a avez ont faut peux peut pouvez pourrais pourrait donne donnes donner trouve trouves trouver cherche cherches chercher besoin veux voudrais aimerais svp stp merci bonjour salut hello coucou liste lister montre montrer affiche afficher recherche rechercher quelqu entreprise entreprises boite boites societe societes gars mec type personne quelqu contact contacts coordonnees coordonnee infos info information informations dispo disponible disponibles bon bonne bons bonnes chantier chantiers lot lots urgent urgence vite rapide rapidement asap ici tout tous toutes quelque chose truc plus moins tres bien fait font faire qu n ne pas oui non numero numeros tel telephone portable mail email mails emails courriel appeler joindre joignable mobile adresse siret fiche fiches aussi encore maintenant aujourd hui demain alors voila connais connait as tu il y').split(' '));
+const IA_METIERS=[
+ ['plomberie',['plombier','plombiers','plomberie','plombie','sanitaire','sanitaires','chauffagiste','chauffage','chaudiere','cvc','clim','climatisation','ventilation','vmc','pac','ballon','cumulus','fuite','radiateur'],['plomberie','cvc','sanitaire']],
+ ['électricité',['electricien','electriciens','electricite','elec','electrique','cfo','cfa','courant','eclairage','luminaire','prise','prises'],['electricite']],
+ ['peinture',['peintre','peintres','peinture','peintures','peindre','papier peint','droguerie','enduit','enduits','ravalement'],['peinture']],
+ ['gros œuvre',['macon','macons','maconnerie','gros oeuvre','beton','ciment','dalle','fondation','fondations','agglo','agglos','parpaing','parpaings','brique','briques','demolition'],['gros','maconnerie','beton','agglos']],
+ ['menuiserie',['menuisier','menuisiers','menuiserie','menuiseries','fenetre','fenetres','porte','portes','volet','volets','fermeture','fermetures','placard','placards','huisserie'],['menuiseries','menuiserie']],
+ ['sols / carrelage',['carreleur','carreleurs','carrelleur','carrelage','faience','sol','sols','chape','parquet','sol souple','lino','moquette'],['carrelage','sols']],
+ ['serrurerie',['serrurier','serrurerie','metallerie','metallier','garde corps','rampe','grille','portail'],['serrurerie','metallerie']],
+ ['couverture',['couvreur','couvreurs','couverture','toiture','toit','tuile','tuiles','zinguerie','zingueur','gouttiere','etancheite','etancheur','terrasse'],['couverture','etancheite']],
+ ['terrassement / VRD',['terrassement','terrassier','vrd','voirie','reseaux','assainissement','tranchee','enrobe'],['terrassement','vrd']],
+ ['charpente',['charpentier','charpente','structure','ossature','bois'],['charpente','bois','structure']],
+ ['ascenseurs',['ascenseur','ascenseurs','ascensoriste','elevateur'],['ascenseurs']],
+ ['plâtrerie',['platrier','platriers','plaquiste','plaquistes','platrerie','placo','platre','cloison','cloisons','doublage','doublages','faux plafond','faux plafonds','plafond'],['platre','placo','cloisons','platrerie']],
+ ['isolation',['isolation','isolant','isolants','ite','iti','laine de verre','laine de roche'],['isolation']],
+ ['quincaillerie',['quincaillerie','visserie','vis','cheville','chevilles','boulon'],['quincaillerie','visserie']],
+ ['outillage / EPI',['outillage','outil','outils','epi','casque','gants','chaussures de securite'],['outillage','epi']],
+ ['location matériel',['location','louer','loue','nacelle','nacelles','echafaudage','echafaudages','benne','bennes','engin','engins','mini pelle','minipelle','pelle','grue','compacteur','groupe electrogene','materiel'],['location']],
+ ['espaces verts',['paysagiste','paysagistes','espaces verts','jardin','jardinier','amenagement exterieur','cloture','clotures','gazon','plantation','elagage'],['espaces','verts']],
+];
+function distance(a,b){ if(Math.abs(a.length-b.length)>2) return 9; const d=Array.from({length:a.length+1},(_,i)=>[i]);
+  for(let j=1;j<=b.length;j++) d[0][j]=j;
+  for(let i=1;i<=a.length;i++) for(let j=1;j<=b.length;j++) d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  return d[a.length][b.length]; }
+function motProche(t,w){ if(t===w) return true; if(t.length<5||w.length<5) return false; return distance(t,w)<=(w.length>=9?2:1); }
+function contientMot(txt,terme){ return (' '+txt+' ').includes(' '+terme+' '); }
+function analyserQuestion(q){
+  let n=' '+norm(q).replace(/[^a-z0-9/]+/g,' ')+' ';
+  const brut=norm(q).replace(/[^a-z0-9]+/g,' ').trim().split(' ').filter(w=>w.length>1&&!IA_STOP.has(w));
+  const c={ brut, type:null, lots:{fournisseurs:new Set(),soustraitants:new Set()}, metiers:[], filtres:[], f:{}, noteMin:0, tri:null, combien:false, veutEvites:false, tokens:[], infoVoulue:null };
+  const prendre=(re,cb)=>{ const m=n.match(re); if(m){ cb(m); n=n.replace(re,' '); return true; } return false; };
+  prendre(/\bcombien\b/,()=>c.combien=true);
+  prendre(/\b(fournisseurs?|negoce|negociant|grossiste|magasin|acheter|commander|approvisionn\w*)\b/g,()=>c.type='fournisseurs');
+  prendre(/\b(sous ?traitants?|sous ?traitance|sst|artisans?|poseurs?|entreprises? de pose)\b/g,()=>c.type='soustraitants');
+  prendre(/\b(a eviter|eviter|blacklist\w*|ne plus (consulter|prendre|travailler)|interdits?|bannis?)\b/g,()=>c.veutEvites=true);
+  prendre(/\b(favoris?|preferes?|habituels?)\b/g,()=>{ c.f.favori=true; c.filtres.push('⭐ Favoris'); });
+  prendre(/\b(mieux notes?|meilleurs?|meilleures?|top|recommand\w*|conseill\w*|fiables?|serieux|serieuses?|le plus fiable|la plus fiable)\b/g,()=>c.tri='note');
+  prendre(/\b([1-5])(?: ?[,.]5)? ?(etoiles?|\/ ?5|sur 5)( minimum| mini| et plus| ou plus)?\b/,m=>{ c.noteMin=Number(m[1]); c.filtres.push('≥ '+m[1]+'★'); });
+  prendre(/\b(milieu occupe|site occupe|occupe|occupes|habite|logements? occupes?|en presence des? (locataires|occupants|habitants))\b/g,()=>{ c.f.occupe=true; c.filtres.push('Milieu occupé'); });
+  prendre(/\b(bureau d etudes?|etudes?|dimensionnement|note de calcul|plans? d execution|conception)\b/g,()=>{ c.f.etudes=true; c.filtres.push('Fait les études'); });
+  prendre(/\b(petits? chantiers?|maisons?|pavillons?|individuels?|particuliers?)\b/g,()=>{ c.f.taille='petits'; c.filtres.push('Petits chantiers'); });
+  prendre(/\b(moyens? chantiers?|petits? ensembles?|petits? collectifs?)\b/g,()=>{ c.f.taille='moyens'; c.filtres.push('Moyens chantiers'); });
+  prendre(/\b(grands? chantiers?|gros chantiers?|gros ensembles?|grands? ensembles?|collectifs?|logements? sociaux|bailleurs?|\d{2,3} (logements|lgts))\b/g,()=>{ c.f.taille='grands'; c.filtres.push('Grands chantiers'); });
+  prendre(/\b(neuf|neuve|construction neuve)\b/g,()=>{ c.f.travaux='neuf'; c.filtres.push('Neuf'); });
+  prendre(/\b(rehab\w*)\b/g,()=>{ c.f.travaux='rehab'; c.filtres.push('Réhabilitation'); });
+  prendre(/\b(reno|renov\w*)\b/g,()=>{ c.f.travaux='reno'; c.filtres.push('Rénovation'); });
+  prendre(/\b(luxe|haut de gamme|prestige|standing|hotels?|villas?)\b/g,()=>{ c.f.luxe=true; c.filtres.push('Chantiers luxe'); });
+  prendre(/\b(service commercial|appels? d offres?|ao|consultations?|consulter)\b/g,()=>{ c.f.ao=true; c.filtres.push('Service Commercial'); });
+  prendre(/\b(fourniture et pose|fourni pose|f ?p)\b/g,()=>{ c.f.interv='fp'; c.filtres.push('Fourniture et pose'); });
+  prendre(/\b(pose seule|main d oeuvre seule|mo seule)\b/g,()=>{ c.f.interv='ps'; c.filtres.push('Pose seule'); });
+  prendre(/\b(fourniture seule)\b/g,()=>{ c.f.interv='fs'; c.filtres.push('Fourniture seule'); });
+  if(/\b(e ?mail|mail|mails|courriel|adresse mail)\b/.test(n)) c.infoVoulue='email';
+  if(/\b(tel|telephone|numero|num|portable|mobile|appeler|joindre|joignable|coordonnees?)\b/.test(n)) c.infoVoulue=c.infoVoulue||'tel';
+  if(/\bsiret\b/.test(n)) c.infoVoulue='siret';
+  if(/\badresse\b/.test(n)&&c.infoVoulue!=='email') c.infoVoulue=c.infoVoulue||'adresse';
+  // Métiers (synonymes + fautes de frappe)
+  IA_METIERS.forEach(([nom,termes,cles])=>{ let ok=false;
+    termes.forEach(t=>{ if(t.includes(' ')){ if(contientMot(n.trim(),t)){ ok=true; n=n.replace(' '+t+' ',' '); } } });
+    n.trim().split(' ').forEach(w=>{ if(termes.some(t=>!t.includes(' ')&&motProche(w,t))){ ok=true; n=(' '+n+' ').replace(' '+w+' ',' '); } });
+    if(ok){ c.metiers.push(nom); ['fournisseurs','soustraitants'].forEach(ty=>lotsTries(ty).forEach(l=>{ if(cles.some(k=>norm(l.libelle).includes(k))) c.lots[ty].add(l.id); })); } });
+  // Mots restants : comparés aux libellés de lots (lots ajoutés à la main compris)
+  const restants=n.trim().split(/\s+/).filter(w=>w.length>1&&!IA_STOP.has(w));
+  const libres=[];
+  restants.forEach(w=>{ let lot=false;
+    ['fournisseurs','soustraitants'].forEach(ty=>lotsTries(ty).forEach(l=>{ if(w.length>=4&&norm(l.libelle).split(/[^a-z0-9]+/).some(x=>x.length>=4&&motProche(w,x))){ c.lots[ty].add(l.id); lot=true; if(!c.metiers.includes(l.libelle)) c.metiers.push(l.libelle); } }));
+    if(!lot) libres.push(w); });
+  c.tokens=libres;
+  return c;
 }
+function aDesLots(c){ return c.lots.fournisseurs.size+c.lots.soustraitants.size>0; }
+function passeFiltres(e,c){ const q=e.qualites||{}, liste=v=>v?(Array.isArray(v)?v:Object.values(v)):[];
+  if(c.type&&e.type!==c.type) return false;
+  if((c.f.email||c.infoVoulue==='email')&&!e.email) return false;
+  if(c.infoVoulue==='tel'&&!e.tel) return false;
+  if(c.f.favori&&!e.favori) return false;
+  if(c.f.occupe&&q.milieuOccupe!==true) return false;
+  if(c.f.etudes&&q.etudes!==true) return false;
+  if(c.f.taille&&!liste(q.tailles).includes(c.f.taille)) return false;
+  if(c.f.travaux&&!liste(q.travaux).includes(c.f.travaux)) return false;
+  if(c.f.luxe&&!e.chantiersLuxe) return false;
+  if(c.f.ao&&!e.consultAO) return false;
+  if(c.f.interv&&e.typeIntervention!==c.f.interv) return false;
+  if(c.noteMin&&noteMoyenne(e)<c.noteMin) return false;
+  if(aDesLots(c)&&!lotsIds(e).some(id=>c.lots[e.type].has(id))) return false;
+  if(c.veutEvites!==estEvite(e)) return false;
+  return true; }
+function texteEntreprise(e){ return norm([e.raisonSociale,e.contact,e.contactRole,e.adresse,e.notes,e.email,e.siteweb,e.contact2&&e.contact2.nom,libLots(e.type,e),interventionsArr(e).map(i=>i.chantier+' '+(i.commentaire||'')).join(' ')].filter(Boolean).join(' ')); }
+function estTermeMetier(t){ return IA_METIERS.some(([,termes])=>termes.some(x=>!x.includes(' ')&&motProche(t,x))); }
+// Score de correspondance sur le nom de l'entreprise / des contacts : {s, tous, exact}
+function scoreNom(e,tokens){ const r={s:0,tous:false,exact:true}; if(!tokens.length) return r;
+  const noms=norm([e.raisonSociale,e.contact,e.contact2&&e.contact2.nom].filter(Boolean).join(' ')).split(/[^a-z0-9]+/).filter(Boolean); let ok=0;
+  tokens.forEach(t=>{ if(noms.includes(t)){ r.s+=3; ok++; } else if(t.length>=3&&noms.some(w=>w.startsWith(t))){ r.s+=2; ok++; r.exact=false; } else if(noms.some(w=>motProche(t,w))){ r.s+=2; ok++; r.exact=false; } else r.exact=false; });
+  r.tous=ok===tokens.length; return r; }
+function classer(liste,c){ return liste.sort((a,b)=>{
+    if(c.tri==='note'||aDesLots(c)){ const d=noteMoyenne(b)-noteMoyenne(a); if(d) return d; }
+    return (b.favori?1:0)-(a.favori?1:0)||triNom(a,b); }); }
+const IA_PAGE=5;
+function repondre(c,textePrefixe){
+  const toutes=toutesLesEntreprises();
+  // 1) Recherche d'une entreprise / d'une personne par son nom
+  const mots=c.brut||[], nonMetier=mots.some(t=>!estTermeMetier(t));
+  const parNom=toutes.map(e=>({e,...scoreNom(e,mots)})).filter(x=>x.tous&&(nonMetier||x.exact)).sort((a,b)=>b.s-a.s);
+  if(parNom.length){ const top=parNom.filter(x=>x.s===parNom[0].s).map(x=>x.e).slice(0,4); iaContexte=null;
+    if(top.length===1){ const e=top[0]; let t=`**${e.raisonSociale}**`;
+      if(c.infoVoulue==='email') t+=e.email?` — mail : ${e.email}`:' — pas d’email enregistré.';
+      else if(c.infoVoulue==='siret') t+=e.siret?` — SIRET : ${e.siret}`:' — pas de SIRET enregistré.';
+      else if(c.infoVoulue==='adresse') t+=e.adresse?` — ${e.adresse}`:' — pas d’adresse enregistrée.';
+      else t+=e.tel?` — ${e.contact?e.contact+' : ':''}${e.tel}`:' — pas de téléphone enregistré.';
+      if(estEvite(e)) t+=`\n⚠️ Attention : entreprise marquée « à éviter »${e.motifEvite?' ('+e.motifEvite+')':''}.`;
+      if(e.contact2&&e.contact2.nom&&c.infoVoulue!=='siret') t+=`\nSecond contact : ${e.contact2.nom}${e.contact2.role?' ('+e.contact2.role+')':''}${e.contact2.tel?' — '+e.contact2.tel:''}`;
+      return { texte:t, resultats:[e] }; }
+    return { texte:`J’en ai ${top.length} qui correspondent à ce nom :`, resultats:top }; }
+  // 2) Recherche par métier / critères
+  let base=toutes.filter(e=>passeFiltres(e,c));
+  const matchMots=e=>{ const t=texteEntreprise(e); return c.tokens.every(k=>t.includes(k)||t.split(/[^a-z0-9]+/).some(w=>motProche(k,w))); };
+  const evitesMasques=c.veutEvites?0:toutes.filter(e=>estEvite(e)&&passeFiltres(Object.assign({},e,{statut:''}),c)&&(!c.tokens.length||matchMots(e)||aDesLots(c))).length;
+  let texteLieu='';
+  if(c.tokens.length){ const stricts=base.filter(matchMots);
+    if(stricts.length) base=stricts;
+    else if(aDesLots(c)||Object.keys(c.f).length||c.type||c.tri) texteLieu=`Rien pour « ${c.tokens.join(' ')} » précisément, voici ce que j’ai de plus proche.\n`;
+    else base=[]; }
+  const rien=!aDesLots(c)&&!Object.keys(c.f).length&&!c.type&&!c.tri&&!c.noteMin&&!c.veutEvites&&!c.tokens.length;
+  if(rien) return { texte:"Je n’ai pas compris ce que tu cherches 🤔 Donne-moi un métier, un nom d’entreprise ou un critère.", exemples:["Un plombier","Peintre milieu occupé","Le mieux noté","Sous-traitants à éviter"] };
+  if(c.tri==='note'&&!c.type) base=base.filter(e=>e.type==='soustraitants'||noteMoyenne(e));
+  base=classer(base,c);
+  const libCrit=[...c.metiers.slice(0,3), ...(c.type?[c.type==='fournisseurs'?'fournisseurs':'sous-traitants']:[]), ...c.filtres, ...(c.tri==='note'?['classés par note']:[]), ...((c.f.email||c.infoVoulue==='email')?['Avec email']:[]), ...(c.tokens.length&&!texteLieu?['« '+c.tokens.join(' ')+' »']:[])];
+  iaContexte={c, liste:base, vus:Math.min(IA_PAGE,base.length)};
+  if(!base.length){ const sugg=[]; if(Object.keys(c.f).length) sugg.push('Sans les critères'); if(evitesMasques) sugg.push('Voir les « à éviter »');
+    return { texte:`${textePrefixe||''}Aucun résultat${libCrit.length?' pour : '+libCrit.join(', '):''}.${evitesMasques?`\n(${evitesMasques} entreprise${evitesMasques>1?'s':''} « à éviter » correspond${evitesMasques>1?'ent':''}, je les ai masquées.)`:''}`, exemples:sugg.length?sugg:["Un plombier","Le mieux noté","Aide"] }; }
+  if(c.combien) return { texte:`${textePrefixe||''}**${base.length}** ${base.length>1?'entreprises':'entreprise'}${libCrit.length?' — '+libCrit.join(', '):''}.`, exemples:["Montre-les"] };
+  const page=base.slice(0,IA_PAGE);
+  let t=`${textePrefixe||''}${texteLieu}${base.length===1?'1 résultat':base.length+' résultats'}${base.length>1&&(c.tri==='note'||aDesLots(c))?', les mieux notés en premier':''} :`;
+  if(evitesMasques) t+=`\n(${evitesMasques} « à éviter » masqué${evitesMasques>1?'s':''})`;
+  const sugg=[]; if(!c.f.occupe&&c.type!=='fournisseurs') sugg.push('Milieu occupé'); if(!c.infoVoulue) sugg.push('Avec email'); if(c.tri!=='note') sugg.push('Le mieux noté'); if(!c.f.ao&&c.type!=='fournisseurs') sugg.push('Service Commercial');
+  return { texte:t, filtres:libCrit, resultats:page, plus:base.length>IA_PAGE?Math.min(IA_PAGE,base.length-IA_PAGE):0, exemples:sugg.slice(0,3).map(s=>'Et '+s.toLowerCase()) };
+}
+function pageSuivante(){ if(!iaContexte) return { texte:"Pose-moi d’abord une question 🙂" };
+  const {liste,vus}=iaContexte, page=liste.slice(vus,vus+IA_PAGE); iaContexte.vus=vus+page.length;
+  if(!page.length) return { texte:"C’est tout ce que j’ai." };
+  const reste=liste.length-iaContexte.vus; return { texte:`Suite (${iaContexte.vus}/${liste.length}) :`, resultats:page, plus:reste>0?Math.min(IA_PAGE,reste):0 }; }
+function fusionner(a,b){ const c=JSON.parse(JSON.stringify({...a,lots:null})); c.lots=aDesLots(b)?b.lots:a.lots;
+  c.metiers=b.metiers.length?b.metiers:a.metiers; c.type=b.type||a.type; c.f=Object.assign({},a.f,b.f);
+  c.filtres=[...new Set([...a.filtres,...b.filtres])]; c.tri=b.tri||a.tri; c.noteMin=b.noteMin||a.noteMin; c.combien=b.combien;
+  c.brut=[]; c.veutEvites=b.veutEvites||a.veutEvites; c.tokens=b.tokens.length?b.tokens:a.tokens; c.infoVoulue=b.infoVoulue||a.infoVoulue; return c; }
+function rechercheLocale(q){
+  const n=norm(q).trim();
+  if(/^(plus|encore|la suite|suite|voir plus|d autres|les autres|autres|montre les|montre-les|affiche les)\b/.test(n)){
+    if(/montre|affiche/.test(n)&&iaContexte){ const c=iaContexte.c; c.combien=false; return repondre(c); } return pageSuivante(); }
+  if(/^(sans les criteres|reset|recommence|nouvelle recherche|on recommence)/.test(n)){ if(iaContexte){ const c=iaContexte.c; c.f={}; c.filtres=[]; c.noteMin=0; return repondre(c); } }
+  if(/^voir les .*eviter/.test(n)&&iaContexte){ const c=iaContexte.c; c.veutEvites=true; return repondre(c); }
+  if(/^(merci|ok|super|parfait|top|nickel|genial|cool)\b/.test(n)&&n.split(' ').length<=3) return { texte:"Avec plaisir 👍 Autre chose ?" };
+  if(/^(aide|help|que sais tu faire|tu sais faire quoi|comment ca marche)/.test(n)) return { texte:"Tu peux me demander :\n• un métier : « un couvreur », « plaquiste »\n• un nom : « numéro de Lider Sols », « mail de Serhat »\n• avec des critères : « peintre milieu occupé », « électricien 4 étoiles », « maçon grands chantiers »\n• le classement : « le meilleur carreleur »\n• un comptage : « combien de sous-traitants en peinture »\n• puis affiner : « et avec email », « et en réhab »", exemples:["Un plombier","Le meilleur peintre"] };
+  const c=analyserQuestion(q);
+  const relance=iaContexte&&(/^(et|mais|plutot|seulement|uniquement|juste|que|parmi eux|parmi)\b/.test(n)||(!aDesLots(c)&&!c.type&&!c.tokens.length&&(Object.keys(c.f).length||c.tri||c.noteMin||c.infoVoulue)));
+  if(relance){ const m=fusionner(iaContexte.c,c); if(c.infoVoulue==='email') m.f.email=true; return repondre(m); }
+  return repondre(c);
+}
+
+/* --- Dictée vocale (Chrome / Edge / Android) --- */
+function initMicro(){ const SR=window.SpeechRecognition||window.webkitSpeechRecognition, b=document.getElementById('ia-micro'); if(!SR||!b){ if(b) b.style.display='none'; return; }
+  b.onclick=()=>{ if(iaReco){ iaReco.stop(); return; } const r=new SR(); r.lang='fr-FR'; r.interimResults=true; r.maxAlternatives=1; iaReco=r; b.classList.add('ecoute');
+    const i=document.getElementById('ia-input'); i.placeholder='Je t’écoute…';
+    r.onresult=ev=>{ let t=''; for(const res of ev.results) t+=res[0].transcript; i.value=t; if(ev.results[ev.results.length-1].isFinal){ r.stop(); setTimeout(envoyerIA,150); } };
+    r.onerror=()=>{}; r.onend=()=>{ iaReco=null; b.classList.remove('ecoute'); i.placeholder='Ex : un peintre en milieu occupé…'; };
+    r.start(); }; }
+initMicro();
+
+/* --- Mode Claude API (optionnel) — ⚠️ ne JAMAIS mettre de clé dans ce fichier publié sur GitHub Pages --- */
 async function appelClaude(q){
-  const contexte=toutesLesEntreprises().map(e=>{ const lot=lotDe(e.type,e.lotId); return `${e.type==='fournisseurs'?'FOURNISSEUR':'SOUS-TRAITANT'} | ${e.raisonSociale} | Lot(s): ${texteLots(e.type,e)||'—'}${e.type==='soustraitants'?' | Note moy: '+noteMoyenne(e).toFixed(1)+'/5 sur '+nbChantiers(e)+' chantiers':''} | Contact: ${e.contact||'—'} | Tel: ${e.tel||'—'} | Email: ${e.email||'—'} | Adresse: ${e.adresse||'—'}`; }).join('\n');
+  const contexte=toutesLesEntreprises().map(e=>`${e.type==='fournisseurs'?'FOURNISSEUR':'SOUS-TRAITANT'} | ${e.raisonSociale} | Lot(s): ${texteLots(e.type,e)||'—'}${e.type==='soustraitants'?' | Note moy: '+noteMoyenne(e).toFixed(1)+'/5 sur '+nbChantiers(e)+' chantiers':''} | Contact: ${e.contact||'—'} | Tel: ${e.tel||'—'} | Email: ${e.email||'—'} | Adresse: ${e.adresse||'—'}${estEvite(e)?' | À ÉVITER: '+(e.motifEvite||''):''}`).join('\n');
   try { const r=await fetch('https://api.anthropic.com/v1/messages',{ method:'POST', headers:{'Content-Type':'application/json','x-api-key':IA_CONFIG.cleApi,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({ model:IA_CONFIG.modele, max_tokens:600, system:"Tu es l'assistant de recherche de la base achats & commercial de l'entreprise BTP LAB. Réponds en français, brièvement, en t'appuyant UNIQUEMENT sur la liste fournie.", messages:[{role:'user',content:`Base :\n${contexte}\n\nQuestion : ${q}`}] }) });
+      body:JSON.stringify({ model:IA_CONFIG.modele, max_tokens:600, system:"Tu es l'assistant de recherche de la base achats & commercial de l'entreprise BTP LAB, utilisé par des conducteurs de travaux pressés sur chantier. Réponds en français, très brièvement, en t'appuyant UNIQUEMENT sur la liste fournie. Donne toujours le téléphone. Signale les entreprises à éviter.", messages:[{role:'user',content:`Base :\n${contexte}\n\nQuestion : ${q}`}] }) });
     const d=await r.json(); const txt=(d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n'); return { texte: txt || "Réponse indisponible." };
   } catch(err){ console.warn(err); return rechercheLocale(q); }
 }
