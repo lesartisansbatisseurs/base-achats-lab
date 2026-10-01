@@ -1109,7 +1109,13 @@ function rendre(){
   if(vueActive==='tableau'&&!estMobile()) return rendreTableau(liste);
   const zone=document.getElementById('contenu');
   if(!liste.length){ zone.innerHTML=videHtml(); return; }
-  const parLot={}; liste.forEach(e=>{ const ids=lotsIds(e); (ids.length?ids:['sans']).forEach(k=>{ (parLot[k]=parLot[k]||[]).push(e); }); });
+  // Un sous-traitant multi-lots apparaît sous chacun de ses lots… sauf quand on cherche un lot :
+  // il n'apparaît alors QUE sous le lot recherché (une seule fois).
+  const flR=document.getElementById('filtre-lot').value, qR=document.getElementById('recherche').value.trim().toLowerCase();
+  const parLot={}; liste.forEach(e=>{ let ids=lotsIds(e);
+    if(flR!=='tous') ids=ids.filter(id=>id===flR);
+    else if(qR&&ids.length>1){ const m=ids.filter(id=>{ const l=lotDe(ongletActif,id); return l&&String(l.libelle||'').toLowerCase().includes(qR); }); ids=m.length?m:[ids[0]]; }
+    (ids.length?ids:['sans']).forEach(k=>{ (parLot[k]=parLot[k]||[]).push(e); }); });
   let html=''; [...lotsTries(ongletActif).map(l=>l.id),'sans'].forEach(lotId=>{
     const grp=parLot[lotId]; if(!grp||!grp.length) return; const lot=lotDe(ongletActif,lotId);
     grp.sort(triNom); // strict A→Z, favoris compris
