@@ -851,9 +851,11 @@ function seDeconnecter(){ if(auth) auth.signOut(); }
 let accesRefuse=false;
 function refusAcces(err){ console.warn('Accès refusé',err); if(accesRefuse) return; accesRefuse=true; debrancher(); if(auth) auth.signOut();
   setTimeout(()=>{ document.getElementById('login-err').textContent='Ce compte n\u2019est pas autorisé à accéder à la base. Contacte l\u2019administrateur.'; },50); }
-function debrancher(){ if(!db) return; ['lots','fournisseurs','soustraitants'].forEach(k=>db.ref(k).off()); brancheFait=false;
+function debrancher(){ if(!db) return; ['lots','fournisseurs','soustraitants','achats/relation'].forEach(k=>db.ref(k).off()); brancheFait=false; relations={};
   entreprises={fournisseurs:{},soustraitants:{}}; corbeille={fournisseurs:{},soustraitants:{}}; lots={fournisseurs:{},soustraitants:{}}; try{ rendre(); majKpis(); }catch(e){} }
 function brancher(){
+  relations={}; majVisibiliteAchats();
+  if(estAchats()) db.ref('achats/relation').on('value',s=>{ relations=s.val()||{}; rendre(); },err=>console.warn('achats/relation',err));
   db.ref('lots').on('value',s=>{
     lots=s.val()||{}; lots.fournisseurs=lots.fournisseurs||{}; lots.soustraitants=lots.soustraitants||{};
     if(!Object.keys(lots.fournisseurs).length) semer('fournisseurs',LOTS_FOURNISSEURS);
@@ -888,8 +890,7 @@ function changerOnglet(t){
   document.getElementById('soustitre-section').textContent=f?'Répertoire achats classé par famille':'Répertoire des sous-traitants classé par lot';
   document.getElementById('txt-ajouter').textContent=f?'Ajouter un fournisseur':'Ajouter un sous-traitant';
   document.getElementById('btn-eval').style.display=f?'none':'';
-  document.getElementById('btn-consult').style.display=f?'none':'';
-  { const fr=document.getElementById('filtre-rel'); fr.style.display=f?'none':''; if(f){ fr.value='tous'; fr.classList.remove('actif'); } }
+  majVisibiliteAchats();
   document.getElementById('tb-titre').textContent=f?'Répartition des fournisseurs par lot':'Répartition des sous-traitants par lot';
   remplirFiltreLot(); document.getElementById('filtre-lot').value='tous';
   // Vue par défaut à l'ouverture de l'onglet : Tableau (fournisseurs et sous-traitants)
@@ -926,27 +927,37 @@ let interventionsForm=[];
 function estEvite(e){ return e&&e.statut==='eviter'; }
 /* ===== RELATION AVEC LAB : HABITUÉ / NOUVEAU (sous-traitants) =====
    Case « Nouveau / à consulter » cochée => relation:'nouveau'. Non cochée => sous-traitant déjà connu (habitué). */
-function relation(e){ return e&&e.relation==='nouveau'?'nouveau':'habitue'; }
+/* Info RÉSERVÉE AU SERVICE ACHATS : stockée à part dans achats/relation/{id} (lisible uniquement par ces comptes,
+   cf. règles Firebase). Les autres services ne la chargent pas et ne la voient nulle part. */
+const ACHATS_EMAILS=['souwab@aborgeval.fr','aalves@aborgeval.fr'];
+let relations={};
+function estAchats(){ const m=(auth&&auth.currentUser&&auth.currentUser.email||'').toLowerCase(); return ACHATS_EMAILS.includes(m); }
+function idSst(e){ if(!e) return ''; if(e.id) return e.id; const s=entreprises.soustraitants||{}; return Object.keys(s).find(k=>s[k]===e)||''; }
+function relation(e){ return relations[idSst(e)]==='nouveau'?'nouveau':'habitue'; }
+function majVisibiliteAchats(){ const a=estAchats(), st=(ongletActif==='soustraitants');
+  document.getElementById('btn-consult').style.display=(a&&st)?'':'none';
+  const fr=document.getElementById('filtre-rel'); fr.style.display=(a&&st)?'':'none'; if(!(a&&st)){ fr.value='tous'; fr.classList.remove('actif'); } }
 function estHabitue(e){ return relation(e)==='habitue'; }
 function libRelation(e){ return estHabitue(e)?'Habitué':'Nouveau'; }
 const ICO_HAB='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>';
 const ICO_NEW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>';
-function pastilleRel(e,lecture){ const h=estHabitue(e);
+function pastilleRel(e,lecture){ if(!estAchats()) return ''; const h=estHabitue(e);
   const titre=lecture?libRelation(e):(h?'Déjà connu de LAB. Cliquer pour le passer en « Nouveau / à consulter »':'Nouveau / à consulter : jamais travaillé avec LAB. Cliquer pour le passer en « Habitué »');
   return `<button type="button" class="rel ${h?'habitue':'nouveau'}${lecture?' lecture':''}" title="${esc(titre)}" ${lecture?'':`onclick="event.stopPropagation();basculerRelation('${e.id}')"`}>${h?ICO_HAB:ICO_NEW}${h?'Habitué':'Nouveau'}</button>`; }
 function basculerRelation(id){ const e=entreprises.soustraitants&&entreprises.soustraitants[id]; if(!e) return;
-  const val=estHabitue(e)?'nouveau':'habitue';
-  if(db){ db.ref('soustraitants/'+id).update(Object.assign({relation:val},horodatage())); } else { e.relation=val; rendre(); }
+  if(!estAchats()) return; const val=estHabitue(e)?'nouveau':'habitue';
+  if(db){ db.ref('achats/relation/'+id).set(val==='nouveau'?'nouveau':null).catch(erreurAchats); } else { relations[id]=val; rendre(); }
   toast(`« ${e.raisonSociale} » passé en ${val==='habitue'?'Habitué':'Nouveau'}`); }
+function erreurAchats(err){ console.warn(err); alert("Enregistrement de « Nouveau / à consulter » refusé par Firebase.\nVérifie que les règles de sécurité « achats » ont bien été publiées."); }
 function majFiltreRel(){ const s=document.getElementById('filtre-rel'); s.classList.toggle('actif',s.value!=='tous'); rendre(); }
 function majCompteursRel(){ const s=document.getElementById('filtre-rel'); if(!s) return;
-  const l=Object.values(entreprises.soustraitants||{}), nh=l.filter(estHabitue).length;
+  const l=Object.entries(entreprises.soustraitants||{}).map(([id,e])=>({id,...e})), nh=l.filter(estHabitue).length;
   s.options[1].textContent=`Habitués · ${nh}`; s.options[2].textContent=`Nouveaux · ${l.length-nh}`; }
-function comptesRel(grp){ const nh=grp.filter(e=>estHabitue(e)&&!estEvite(e)).length, nn=grp.filter(e=>!estHabitue(e)&&!estEvite(e)).length;
+function comptesRel(grp){ if(!estAchats()) return ''; const nh=grp.filter(e=>estHabitue(e)&&!estEvite(e)).length, nn=grp.filter(e=>!estHabitue(e)&&!estEvite(e)).length;
   return `<span class="rel-compte habitue" title="Habitués disponibles">${nh} habitué${nh>1?'s':''}</span><span class="rel-compte nouveau" title="Nouveaux disponibles">${nn} nouveau${nn>1?'x':''}</span>`; }
 
 /* ===== PRÉPARER UNE CONSULTATION : 2 habitués + 2 nouveaux par lot ===== */
-function ouvrirConsultationLot(lotId){ const sel=document.getElementById('cs-lot');
+function ouvrirConsultationLot(lotId){ if(!estAchats()) return; const sel=document.getElementById('cs-lot');
   sel.innerHTML='<option value="">— Choisir un lot —</option>'+lotsTries('soustraitants').map(l=>`<option value="${l.id}">${esc(l.num)} – ${esc(l.libelle)}</option>`).join('');
   const fl=document.getElementById('filtre-lot').value;
   sel.value=lotId||(ongletActif==='soustraitants'&&fl!=='tous'?fl:'');
@@ -1078,9 +1089,9 @@ function listeFiltree(){
   return Object.entries(entreprises[ongletActif]||{}).map(([id,e])=>({id,...e})).filter(e=>{
     if(filtreFavori && !e.favori) return false;
     if(fl!=='tous'&&!lotsIds(e).includes(fl)) return false;
-    if(ongletActif==='soustraitants'){ const fr=document.getElementById('filtre-rel').value; if(fr!=='tous'&&relation(e)!==fr) return false; }
+    if(ongletActif==='soustraitants'&&estAchats()){ const fr=document.getElementById('filtre-rel').value; if(fr!=='tous'&&relation(e)!==fr) return false; }
     if(!q) return true; const lot=lotDe(ongletActif,e.lotId);
-    return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),estEvite(e)?'à éviter eviter '+(e.motifEvite||''):'',(e.type||ongletActif)==='soustraitants'?(estHabitue(e)?'habitué habitue':'nouveau'):'',texteTailles(e.qualites),texteTravaux(e.qualites),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q);
+    return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),estEvite(e)?'à éviter eviter '+(e.motifEvite||''):'',(e.type||ongletActif)==='soustraitants'&&estAchats()?(estHabitue(e)?'habitué habitue':'nouveau à consulter'):'',texteTailles(e.qualites),texteTravaux(e.qualites),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q);
   }).sort(triNom);
 }
 function toggleFiltreFavori(){ filtreFavori=!filtreFavori; document.getElementById('btn-favoris').classList.toggle('actif',filtreFavori); rendre(); }
@@ -1150,7 +1161,7 @@ function carte(e){
       ${e.siteweb?`<a class="info" href="${lienWeb(e.siteweb)}" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20Z"/></svg>${esc(e.siteweb)}</a>`:''}
       ${e.notes?`<div class="note">${esc(e.notes)}</div>`:''}
     </div>
-    ${st?`<div class="carte-ao"><div style="margin-bottom:9px">${pastilleRel(e)}</div>${caseAO(e,true)}<div style="height:7px"></div>${caseLuxe(e,true)}</div>`:''}</div>`;
+    ${st?`<div class="carte-ao">${estAchats()?`<div style="margin-bottom:9px">${pastilleRel(e)}</div>`:''}${caseAO(e,true)}<div style="height:7px"></div>${caseLuxe(e,true)}</div>`:''}</div>`;
 }
 
 /* ===== TABLEAU ===== */
@@ -1170,14 +1181,14 @@ function rendreTableau(liste){
       <td>${e.contact?esc(e.contact):'<span class="mut">—</span>'}</td>
       <td>${e.tel?`<a class="info" href="tel:${esc(e.tel)}"><span class="tbl-mono">${esc(e.tel)}</span></a>`:'<span class="mut">—</span>'}</td>
       <td>${e.email?`<a class="info" href="mailto:${esc(e.email)}">${esc(e.email)}</a>`:'<span class="mut">—</span>'}</td>
-      ${st?`<td>${pastilleRel(e)}</td><td>${caseAO(e,false)}</td><td>${caseLuxe(e,false)}</td>`:`<td>${e.adresse?`<span class="tbl-adr">${esc(e.adresse)}</span>`:'<span class="mut">—</span>'}</td>`}
+      ${st?`${estAchats()?`<td>${pastilleRel(e)}</td>`:''}<td>${caseAO(e,false)}</td><td>${caseLuxe(e,false)}</td>`:`<td>${e.adresse?`<span class="tbl-adr">${esc(e.adresse)}</span>`:'<span class="mut">—</span>'}</td>`}
       ${st?`<td>${noteMoyenne(e)?etoiles(Math.round(noteMoyenne(e)))+' <span class="tbl-mono">'+noteMoyenne(e).toFixed(1)+'</span>'+(nbChantiers(e)?' <span class="mut">('+nbChantiers(e)+')</span>':''):'<span class="mut">—</span>'}</td>`:''}
       <td><div class="tbl-actions"><button class="ico-btn fav" title="Favori" onclick="toggleFavori('${e.id}')">${etoileSVG(!!e.favori)}</button><button class="ico-btn" title="Fiche PDF" onclick="ouvrirFichePDF('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
         <button class="ico-btn" title="Modifier" onclick='ouvrirFiche(${JSON.stringify({id:e.id})})'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         <button class="ico-btn suppr" onclick="supprimer('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div></td></tr>`;
   }).join('');
   zone.innerHTML=`<div class="tableau-wrap"><table class="tbl"><thead><tr>
-    ${th('raisonSociale','Raison sociale')}${th('lot','Lots')}${th('typeIntervention','Intervention')}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${st?th('relation','Relation')+th('consultAO','Service Commercial')+th('chantiersLuxe','Luxe'):th('adresse','Agence référente')}${st?th('note','Note'):''}<th></th>
+    ${th('raisonSociale','Raison sociale')}${th('lot','Lots')}${th('typeIntervention','Intervention')}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${st?(estAchats()?th('relation','Relation'):'')+th('consultAO','Service Commercial')+th('chantiersLuxe','Luxe'):th('adresse','Agence référente')}${st?th('note','Note'):''}<th></th>
   </tr></thead><tbody>${lignes}</tbody></table></div>`;
 }
 
@@ -1185,7 +1196,7 @@ function rendreTableau(liste){
 function majTypeFiche(){ const t=document.getElementById('f-type').value;
   document.getElementById('champ-chantiers').style.display=(t==='soustraitants')?'':'none';
   document.getElementById('champ-qualites').style.display=(t==='soustraitants')?'':'none';
-  document.getElementById('champ-relation').style.display=(t==='soustraitants')?'':'none';
+  document.getElementById('champ-relation').style.display=(t==='soustraitants'&&estAchats())?'':'none';
   document.getElementById('champ-lot-simple').style.display='none';
   // Options du type d'intervention selon le type d'entreprise
   const selI=document.getElementById('f-intervention'), valI=selI.value;
@@ -1210,11 +1221,13 @@ function ouvrirFiche(arg){
   document.getElementById('f-lots').innerHTML='';
   document.getElementById('f-statut').value=e.statut==='eviter'?'eviter':''; document.getElementById('f-motif').value=e.motifEvite||''; majStatutForm();
   document.getElementById('f-trace').innerHTML=texteTrace(e);
-  { const cn=document.getElementById('f-nouveau'); cn.checked=(e.relation==='nouveau'); document.getElementById('lbl-nouveau').classList.toggle('oui',cn.checked); }
+  { const cn=document.getElementById('f-nouveau'); cn.checked=!!(modif&&relations[arg.id]==='nouveau'); document.getElementById('lbl-nouveau').classList.toggle('oui',cn.checked); }
   remplirQualitesForm(e.qualites);
   majTypeFiche(); document.getElementById('f-intervention').value=e.typeIntervention||''; document.getElementById('f-lot').value=e.lotId||''; cocherLotsForm(lotsIds(e));
   basculerMsLots(false); document.getElementById('overlay-fiche').classList.add('ouvert');
 }
+function majRelationApresEnreg(id){ if(!estAchats()||!id||!db) return; const n=document.getElementById('f-nouveau').checked;
+  if((relations[id]==='nouveau')!==n) db.ref('achats/relation/'+id).set(n?'nouveau':null).catch(erreurAchats); }
 function enregistrerFiche(){
   if(!db){ alert('Firebase non connecté. Complète la config en haut du fichier.'); return; }
   const raison=document.getElementById('f-raison').value.trim(); if(!raison){ alert('La raison sociale est obligatoire.'); return; }
@@ -1244,15 +1257,15 @@ function enregistrerFiche(){
     const obj={}; interventionsForm.forEach(i=>{ const k=i.id||('iv'+Math.random().toString(36).slice(2,9)); obj[k]={chantier:i.chantier||'',date:i.date||'',commentaire:i.commentaire||'',note:Number(i.note)||0}; });
     fiche.interventions=obj;
     fiche.qualites=lireQualitesForm();
-    fiche.relation=document.getElementById('f-nouveau').checked?'nouveau':'habitue';
     const ns=interventionsForm.map(i=>Number(i.note)||0).filter(n=>n>0);
     fiche.note=ns.length?+(ns.reduce((a,b)=>a+b,0)/ns.length).toFixed(2):0;
-  } else { fiche.interventions=null; fiche.note=0; fiche.qualites=null; fiche.relation=null; }
+  } else { fiche.interventions=null; fiche.note=0; fiche.qualites=null; }
   fiche.statut=statut||null; fiche.motifEvite=statut?motif:null;
   Object.assign(fiche,horodatage());
   if(id){ if(typeCible!==ongletActif){ const ancien=entreprises[ongletActif][id]||{}; db.ref(ongletActif+'/'+id).remove(); db.ref(typeCible).push(Object.assign({},ancien,fiche,{consultAO:typeCible==='soustraitants'?(ancien.consultAO||null):null,chantiersLuxe:typeCible==='soustraitants'?(ancien.chantiersLuxe||null):null})); }
     else db.ref(ongletActif+'/'+id).update(fiche); }
-  else { fiche.creePar=fiche.modifiePar; fiche.creeLe=fiche.modifieLe; db.ref(typeCible).push(fiche); }
+  else { fiche.creePar=fiche.modifiePar; fiche.creeLe=fiche.modifieLe; const ref=db.ref(typeCible).push(fiche); if(typeCible==='soustraitants') majRelationApresEnreg(ref.key); }
+  if(id&&typeCible==='soustraitants'&&typeCible===ongletActif) majRelationApresEnreg(id);
   fermer('overlay-fiche');
 }
 /* ===== CORBEILLE (30 jours) =====
@@ -1366,9 +1379,9 @@ function supprimerLot(id){ if(!confirm('Supprimer ce lot ? Les entreprises ratta
 function exporterCSV(){
   if(ongletActif==='dashboard'){ alert('Ouvre l\u2019onglet Fournisseurs ou Sous-traitants pour exporter.'); return; }
   const source=entreprises[ongletActif]||{}, st=(ongletActif==='soustraitants'), echap=v=>`"${String(v||'').replace(/"/g,'""')}"`;
-  const entete=[st?'Lots':'Lot','Raison sociale','Contact','Téléphone','Email','Site web',st?'Adresse':'Adresse agence référente','SIRET','Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention','Statut','Motif','Modifiée le','Modifiée par',...(st?['Note moy /5','Nb chantiers','Relation','Service Commercial','Chantiers luxe','Taille de chantiers','Type de travaux','Milieu occupé','Études']:[]),'Favori','Notes'];
+  const entete=[st?'Lots':'Lot','Raison sociale','Contact','Téléphone','Email','Site web',st?'Adresse':'Adresse agence référente','SIRET','Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention','Statut','Motif','Modifiée le','Modifiée par',...(st?['Note moy /5','Nb chantiers',...(estAchats()?['Relation']:[]),'Service Commercial','Chantiers luxe','Taille de chantiers','Type de travaux','Milieu occupé','Études']:[]),'Favori','Notes'];
   const lignes=Object.values(source).map(e=>{ const lot=lotDe(ongletActif,e.lotId);
-    return [texteLots(ongletActif,e,' / ')||'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),estEvite(e)?'À éviter':'Actif',e.motifEvite||'',dateFr(e.modifieLe),e.modifiePar||'',...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),libRelation(e),e.consultAO?'Oui':'Non',e.chantiersLuxe?'Oui':'Non',texteTailles(e.qualites),texteTravaux(e.qualites),texteOuiNon(e.qualites&&e.qualites.milieuOccupe),texteOuiNon(e.qualites&&e.qualites.etudes)]:[]),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
+    return [texteLots(ongletActif,e,' / ')||'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),estEvite(e)?'À éviter':'Actif',e.motifEvite||'',dateFr(e.modifieLe),e.modifiePar||'',...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),...(estAchats()?[libRelation(e)]:[]),e.consultAO?'Oui':'Non',e.chantiersLuxe?'Oui':'Non',texteTailles(e.qualites),texteTravaux(e.qualites),texteOuiNon(e.qualites&&e.qualites.milieuOccupe),texteOuiNon(e.qualites&&e.qualites.etudes)]:[]),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+[entete.join(';'),...lignes].join('\n')],{type:'text/csv;charset=utf-8;'})); a.download=`${ongletActif}-lab.csv`; a.click();
 }
 
@@ -1383,7 +1396,7 @@ function colonnesExcel(type){ const st=type==='soustraitants', q=e=>e.qualites||
     [st?'Lots':'Lots',e=>texteLots(type,e,'\n'),34],
     ['Type d\'intervention',e=>libIntervention(e),19],
     ...(st?[['Note moy. /5',e=>noteMoyenne(e)?Math.round(noteMoyenne(e)*10)/10:'',12],['Nb chantiers',e=>nbChantiers(e)||'',12],
-      ['Relation',e=>libRelation(e),12],['Service Commercial',e=>e.consultAO?'Oui':'Non',17],['Chantiers luxe',e=>e.chantiersLuxe?'Oui':'Non',14],
+      ...(estAchats()?[['Relation',e=>libRelation(e),12]]:[]),['Service Commercial',e=>e.consultAO?'Oui':'Non',17],['Chantiers luxe',e=>e.chantiersLuxe?'Oui':'Non',14],
       ['Taille de chantiers',e=>listeQ(q(e).tailles).map(k=>Q_TAILLES[k]?Q_TAILLES[k][0]:'').filter(Boolean).join(', '),26],
       ['Type de travaux',e=>texteTravaux(q(e)),24],['Milieu occupé',e=>texteOuiNon(q(e).milieuOccupe),13],['Études',e=>texteOuiNon(q(e).etudes),10]]:[]),
     ['Contact référent',e=>e.contact,20],['Rôle',e=>e.contactRole,18],['Téléphone',e=>e.tel,15],['Email',e=>e.email,28],
@@ -1444,7 +1457,7 @@ function toutesLesEntreprises(){ const r=[]; ['fournisseurs','soustraitants'].fo
 function rechercheGlobale(){
   const q=document.getElementById('recherche-globale').value.trim().toLowerCase(), dd=document.getElementById('dropdown-globale');
   if(!q){ dd.classList.remove('ouvert'); return; }
-  const res=toutesLesEntreprises().filter(e=>{ const lot=lotDe(e.type,e.lotId); return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),estEvite(e)?'à éviter eviter '+(e.motifEvite||''):'',(e.type||ongletActif)==='soustraitants'?(estHabitue(e)?'habitué habitue':'nouveau'):'',texteTailles(e.qualites),texteTravaux(e.qualites),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q); }).slice(0,8);
+  const res=toutesLesEntreprises().filter(e=>{ const lot=lotDe(e.type,e.lotId); return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),estEvite(e)?'à éviter eviter '+(e.motifEvite||''):'',(e.type||ongletActif)==='soustraitants'&&estAchats()?(estHabitue(e)?'habitué habitue':'nouveau à consulter'):'',texteTailles(e.qualites),texteTravaux(e.qualites),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q); }).slice(0,8);
   dd.innerHTML=res.length?res.map(e=>{ const lot=lotDe(e.type,e.lotId), t=e.type==='fournisseurs'?'Fournisseur':'Sous-traitant', a=avatar(e.raisonSociale);
     return `<div class="dd-item" onclick="allerVers('${e.type}','${e.id}')"><div style="background:${a.coul};height:30px;width:30px;border-radius:50%;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${esc(a.init)}</div><div><div class="dd-nom">${esc(e.raisonSociale)}</div><div class="dd-meta">${t}${texteLots(e.type,e)?' · Lot '+esc(texteLots(e.type,e)):''}</div></div></div>`; }).join('') : '<div class="dd-vide">Aucun résultat</div>';
   dd.classList.add('ouvert');
@@ -1553,7 +1566,7 @@ function feuilleHTML(e,type){
         ${ligne(st?'Adresse':'Agence référente',e.adresse)}
         ${estEvite(e)?`<div class="f-ligne"><div class="lab">Statut</div><div class="val" style="color:#b91c1c;font-weight:700">À éviter — ${esc(e.motifEvite||'motif non précisé')}</div></div>`:''}
         ${ligne('SIRET',e.siret,true)}
-        ${st?ligne('Relation avec LAB',estHabitue(e)?'Habitué (déjà travaillé ensemble)':'Nouveau (jamais travaillé ensemble)'):''}
+        ${st&&estAchats()?ligne('Relation avec LAB',estHabitue(e)?'Habitué (déjà travaillé ensemble)':'Nouveau (jamais travaillé ensemble)'):''}
         ${st?ligne('Service Commercial',e.consultAO?'Oui':'Non'):''}
         ${st?ligne('Chantiers luxe',e.chantiersLuxe?'Oui':'Non'):''}
       </div>
