@@ -193,6 +193,11 @@
   .rel.nouveau { background:#f1eefc; color:#6d4fc9; border-color:#d9d0f7; }
   .rel.lecture { cursor:default; }
   .case-nouveau.oui { color:#6d4fc9; } .case-nouveau.oui input { background:#6d4fc9; border-color:#6d4fc9; }
+  /* Lecture seule : tout sauf le service Achats */
+  body.lecture-seule .reserve-achats, body.lecture-seule .ico-btn[title="Modifier"], body.lecture-seule .ico-btn.suppr { display:none !important; }
+  body.lecture-seule .ico-btn.fav, body.lecture-seule .ao-case, body.lecture-seule .lot-chip { pointer-events:none; cursor:default; }
+  .badge-lecture { display:none; margin:6px 0 4px; font-size:10.5px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:#fbbf24; }
+  body.lecture-seule .badge-lecture { display:block; }
   .rel-compte { font-size:11.5px; font-weight:600; padding:2px 8px; border-radius:999px; margin-left:4px; }
   .rel-compte.habitue { background:#e7f6ee; color:#15803d; } .rel-compte.nouveau { background:#f1eefc; color:#6d4fc9; }
   .filtre-rel.actif { border-color:#6d4fc9; color:#6d4fc9; font-weight:600; }
@@ -576,12 +581,12 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         <span>Sous-traitants</span><span class="badge" id="badge-soustraitants">0</span></div>
       <div class="sb-section">Gestion</div>
-      <div class="sb-item" onclick="ouvrirLots()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M3 12h18M3 17h18"/></svg><span>Gérer les lots</span></div>
-      <div class="sb-item" onclick="ouvrirCorbeille()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span>Corbeille</span><span class="badge" id="badge-corbeille" style="display:none">0</span></div>
+      <div class="sb-item reserve-achats" onclick="ouvrirLots()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M3 12h18M3 17h18"/></svg><span>Gérer les lots</span></div>
+      <div class="sb-item reserve-achats" onclick="ouvrirCorbeille()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg><span>Corbeille</span><span class="badge" id="badge-corbeille" style="display:none">0</span></div>
       <div class="sb-item" onclick="exporterCSV()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg><span>Exporter CSV</span></div>
       <div class="sb-item" onclick="exporterExcel()" title="Toute la base dans un fichier Excel : fournisseurs, sous-traitants et évaluations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg><span id="txt-excel">Exporter Excel</span></div>
     </div>
-    <div class="sb-foot"><div id="user-mail" style="color:#c7d2de;margin-bottom:4px;word-break:break-all;font-size:11px"></div>Entreprise générale · TCE — Orgeval (78)<br><button class="sb-logout" onclick="exporterBase()" title="Télécharger une sauvegarde complète de la base (JSON)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Exporter la base</button><br><button class="sb-logout" style="margin-top:6px" onclick="seDeconnecter()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Se déconnecter</button></div>
+    <div class="sb-foot"><div id="user-mail" style="color:#c7d2de;margin-bottom:4px;word-break:break-all;font-size:11px"></div><div class="badge-lecture" title="Seul le service Achats peut ajouter ou modifier des fiches">Lecture seule</div>Entreprise générale · TCE — Orgeval (78)<br><button class="sb-logout" onclick="exporterBase()" title="Télécharger une sauvegarde complète de la base (JSON)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Exporter la base</button><br><button class="sb-logout" style="margin-top:6px" onclick="seDeconnecter()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Se déconnecter</button></div>
   </aside>
 
   <div class="main">
@@ -640,7 +645,7 @@
         <button class="btn" onclick="imprimerAnnuaire()" title="Imprimer tout l'annuaire de cette vue"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Annuaire</button>
         <button class="btn" id="btn-consult" onclick="ouvrirConsultationLot()" title="Choisir les sous-traitants à consulter sur un lot : 2 habitués + 2 nouveaux"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>Consultation</button>
         <button class="btn" id="btn-eval" onclick="imprimerEvaluation()" title="Imprimer une fiche d'évaluation sous-traitant vierge (fin de chantier)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>Évaluation</button>
-        <button class="btn btn-primaire" style="margin-left:auto" onclick="ouvrirFiche()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5v14"/></svg><span id="txt-ajouter">Ajouter un fournisseur</span></button>
+        <button class="btn btn-primaire reserve-achats" style="margin-left:auto" onclick="ouvrirFiche()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5v14"/></svg><span id="txt-ajouter">Ajouter un fournisseur</span></button>
       </div>
 
       <main id="contenu"></main>
@@ -934,7 +939,8 @@ let relations={};
 function estAchats(){ const m=(auth&&auth.currentUser&&auth.currentUser.email||'').toLowerCase(); return ACHATS_EMAILS.includes(m); }
 function idSst(e){ if(!e) return ''; if(e.id) return e.id; const s=entreprises.soustraitants||{}; return Object.keys(s).find(k=>s[k]===e)||''; }
 function relation(e){ return relations[idSst(e)]==='nouveau'?'nouveau':'habitue'; }
-function majVisibiliteAchats(){ const a=estAchats(), st=(ongletActif==='soustraitants');
+function peutModifier(){ return estAchats(); }
+function majVisibiliteAchats(){ const a=estAchats(), st=(ongletActif==='soustraitants'); document.body.classList.toggle('lecture-seule',!a);
   document.getElementById('btn-consult').style.display=(a&&st)?'':'none';
   const fr=document.getElementById('filtre-rel'); fr.style.display=(a&&st)?'':'none'; if(!(a&&st)){ fr.value='tous'; fr.classList.remove('actif'); } }
 function estHabitue(e){ return relation(e)==='habitue'; }
@@ -1865,6 +1871,14 @@ let _largeurMobile=estMobile(); window.addEventListener('resize',()=>{ const m=e
 function fermer(id){ document.getElementById(id).classList.remove('ouvert'); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('ouvert'); }));
+/* ===== LECTURE SEULE : seuls les comptes Achats peuvent créer / modifier / supprimer =====
+   (doublé par les règles Firebase : les écritures des autres comptes sont refusées côté serveur) */
+['ouvrirFiche','enregistrerFiche','supprimer','restaurer','supprimerDefinitivement','viderCorbeille','toggleFavori','toggleCase','toggleAO',
+ 'ouvrirLots','ajouterLot','renommerLot','supprimerLot','ajouterLotDepuisFiche','ouvrirCorbeille','ajouterPourLot','basculerRelation'].forEach(n=>{
+  const f=window[n]; if(typeof f!=='function') return;
+  window[n]=function(...a){ if(!peutModifier()){ toast('Lecture seule : seul le service Achats peut modifier la base.'); return; } return f.apply(this,a); }; });
+['semer','synchroNumLots','purgerCorbeille'].forEach(n=>{ const f=window[n]; if(typeof f!=='function') return;
+  window[n]=function(...a){ if(!peutModifier()) return; return f.apply(this,a); }; });
 changerOnglet('dashboard'); majKpis();
 </script>
 </body>
