@@ -192,6 +192,7 @@
   .rel.habitue { background:#e7f6ee; color:#15803d; border-color:#b7e4c9; }
   .rel.nouveau { background:#f1eefc; color:#6d4fc9; border-color:#d9d0f7; }
   .rel.lecture { cursor:default; }
+  .case-nouveau.oui { color:#6d4fc9; } .case-nouveau.oui input { background:#6d4fc9; border-color:#6d4fc9; }
   .rel-compte { font-size:11.5px; font-weight:600; padding:2px 8px; border-radius:999px; margin-left:4px; }
   .rel-compte.habitue { background:#e7f6ee; color:#15803d; } .rel-compte.nouveau { background:#f1eefc; color:#6d4fc9; }
   .filtre-rel.actif { border-color:#6d4fc9; color:#6d4fc9; font-weight:600; }
@@ -669,7 +670,9 @@
         <div class="ms-puces" id="ms-lots-puces"></div>
       </div></div>
     <label class="champ" id="champ-intervention"><span>Type d'intervention</span><select id="f-intervention"><option value="">— Non renseigné —</option><option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option></select></label>
-    <label class="champ" id="champ-relation"><span>Relation avec LAB</span><select id="f-relation"><option value="">Automatique (habitué dès qu'un chantier est enregistré)</option><option value="habitue">Habitué — on a déjà travaillé ensemble</option><option value="nouveau">Nouveau — jamais travaillé ensemble</option></select></label>
+    <div class="champ" id="champ-relation"><span class="champ-lab">Relation avec LAB</span>
+      <label class="ao-case case-nouveau" id="lbl-nouveau"><input type="checkbox" id="f-nouveau" onchange="this.parentNode.classList.toggle('oui',this.checked)" />Nouveau / à consulter <span class="mut" style="font-weight:400">— jamais travaillé avec LAB</span></label>
+      <div class="mut" style="font-size:11.5px;margin-top:5px">Case non cochée = sous-traitant déjà connu (habitué).</div></div>
     <div class="bloc-qualites" id="champ-qualites">
       <div class="titre-bloc">Qualités</div>
       <div class="q-ligne"><div class="q-lab">Taille de chantiers (plusieurs choix possibles)</div><div class="ms ms-q" id="q-tailles"></div></div>
@@ -922,14 +925,14 @@ let interventionsForm=[];
 // ===== Statut, traçabilité, doublons, contrôles de saisie =====
 function estEvite(e){ return e&&e.statut==='eviter'; }
 /* ===== RELATION AVEC LAB : HABITUÉ / NOUVEAU (sous-traitants) =====
-   Champ "relation" ('habitue' | 'nouveau'). S'il n'est pas renseigné : habitué dès qu'au moins un chantier est enregistré. */
-function relation(e){ if(!e) return 'nouveau'; if(e.relation==='habitue'||e.relation==='nouveau') return e.relation; return nbChantiers(e)>0?'habitue':'nouveau'; }
+   Case « Nouveau / à consulter » cochée => relation:'nouveau'. Non cochée => sous-traitant déjà connu (habitué). */
+function relation(e){ return e&&e.relation==='nouveau'?'nouveau':'habitue'; }
 function estHabitue(e){ return relation(e)==='habitue'; }
 function libRelation(e){ return estHabitue(e)?'Habitué':'Nouveau'; }
 const ICO_HAB='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>';
 const ICO_NEW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>';
 function pastilleRel(e,lecture){ const h=estHabitue(e);
-  const titre=lecture?libRelation(e):(h?'Habitué : on a déjà travaillé ensemble. Cliquer pour le passer en « Nouveau »':'Nouveau : jamais travaillé ensemble. Cliquer pour le passer en « Habitué »');
+  const titre=lecture?libRelation(e):(h?'Déjà connu de LAB. Cliquer pour le passer en « Nouveau / à consulter »':'Nouveau / à consulter : jamais travaillé avec LAB. Cliquer pour le passer en « Habitué »');
   return `<button type="button" class="rel ${h?'habitue':'nouveau'}${lecture?' lecture':''}" title="${esc(titre)}" ${lecture?'':`onclick="event.stopPropagation();basculerRelation('${e.id}')"`}>${h?ICO_HAB:ICO_NEW}${h?'Habitué':'Nouveau'}</button>`; }
 function basculerRelation(id){ const e=entreprises.soustraitants&&entreprises.soustraitants[id]; if(!e) return;
   const val=estHabitue(e)?'nouveau':'habitue';
@@ -1207,7 +1210,7 @@ function ouvrirFiche(arg){
   document.getElementById('f-lots').innerHTML='';
   document.getElementById('f-statut').value=e.statut==='eviter'?'eviter':''; document.getElementById('f-motif').value=e.motifEvite||''; majStatutForm();
   document.getElementById('f-trace').innerHTML=texteTrace(e);
-  document.getElementById('f-relation').value=(e.relation==='habitue'||e.relation==='nouveau')?e.relation:'';
+  { const cn=document.getElementById('f-nouveau'); cn.checked=(e.relation==='nouveau'); document.getElementById('lbl-nouveau').classList.toggle('oui',cn.checked); }
   remplirQualitesForm(e.qualites);
   majTypeFiche(); document.getElementById('f-intervention').value=e.typeIntervention||''; document.getElementById('f-lot').value=e.lotId||''; cocherLotsForm(lotsIds(e));
   basculerMsLots(false); document.getElementById('overlay-fiche').classList.add('ouvert');
@@ -1241,7 +1244,7 @@ function enregistrerFiche(){
     const obj={}; interventionsForm.forEach(i=>{ const k=i.id||('iv'+Math.random().toString(36).slice(2,9)); obj[k]={chantier:i.chantier||'',date:i.date||'',commentaire:i.commentaire||'',note:Number(i.note)||0}; });
     fiche.interventions=obj;
     fiche.qualites=lireQualitesForm();
-    fiche.relation=document.getElementById('f-relation').value||null;
+    fiche.relation=document.getElementById('f-nouveau').checked?'nouveau':'habitue';
     const ns=interventionsForm.map(i=>Number(i.note)||0).filter(n=>n>0);
     fiche.note=ns.length?+(ns.reduce((a,b)=>a+b,0)/ns.length).toFixed(2):0;
   } else { fiche.interventions=null; fiche.note=0; fiche.qualites=null; fiche.relation=null; }
