@@ -186,7 +186,7 @@
   .interv-ajout .note-edit .etoile-btn svg { width:22px; height:22px; }
   .interv-ajout .btn { white-space:nowrap; padding:8px 12px; }
   .chip.evite { background:#fde8e8; color:#b91c1c; font-weight:700; }
-  /* Relation avec LAB : habitué / nouveau */
+  /* Relation avec LAB : partenaire / nouveau */
   .rel { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:4px 10px; border-radius:999px; border:1px solid transparent; cursor:pointer; font-family:inherit; white-space:nowrap; line-height:1.3; transition:filter .15s; }
   .rel:hover { filter:brightness(.96); }
   .rel svg { width:13px; height:13px; flex-shrink:0; }
@@ -202,7 +202,7 @@
   .rel-compte { font-size:11.5px; font-weight:600; padding:2px 8px; border-radius:999px; margin-left:4px; }
   .rel-compte.habitue { background:#e7f6ee; color:#15803d; } .rel-compte.nouveau { background:#f1eefc; color:#6d4fc9; }
   .filtre-rel.actif { border-color:#6d4fc9; color:#6d4fc9; font-weight:600; }
-  /* Préparer une consultation (2 habitués + 2 nouveaux) */
+  /* Préparer une consultation (2 partenaires + 2 nouveaux) */
   #overlay-consult .modale { max-width:760px; }
   .cs-cols { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
   .cs-col { border:1px solid var(--bord); border-radius:12px; overflow:hidden; }
@@ -381,6 +381,14 @@
   .f-ligne .lab { width:175px; flex-shrink:0; background:#f7f8fa; padding:13px 16px; font-size:11.5px; font-weight:600; color:var(--gris); text-transform:uppercase; letter-spacing:.03em; }
   .f-ligne .val { padding:13px 16px; font-size:14px; } .f-ligne .val.mono { font-family:var(--mono); }
   .f-notes-bloc { margin-top:20px; }
+  .f-histo-resume { text-transform:none; letter-spacing:0; font-weight:500; color:var(--accent); margin-left:8px; }
+  .f-chantier { align-items:center; gap:14px; padding:12px 16px; }
+  .f-ch-info { flex:1; min-width:0; } .f-ch-nom { font-size:14px; font-weight:600; color:#1f2937; }
+  .f-ch-date { font-weight:400; color:#9ca3af; margin-left:8px; font-size:12.5px; }
+  .f-ch-com { color:#6b7280; font-size:12.5px; margin-top:3px; line-height:1.45; } .f-ch-crit { color:#1f5fae; font-size:11.5px; margin-top:3px; }
+  .f-ch-note { white-space:nowrap; display:flex; align-items:center; gap:7px; font-size:13px; flex-shrink:0; } .f-ch-note span { color:#6b7280; font-weight:600; }
+  .f-histo-vide { color:var(--gris-clair) !important; font-size:13.5px !important; }
+  @media (max-width:700px){ .f-chantier { align-items:flex-start; gap:6px; } }
   .f-notes-bloc .lab { font-size:11.5px; font-weight:600; color:var(--gris); text-transform:uppercase; letter-spacing:.03em; margin-bottom:7px; }
   .f-notes-bloc .txt { font-size:14px; line-height:1.5; border:1px solid var(--bord); border-radius:10px; padding:14px 16px; background:#fafbfc; }
   .f-pied { margin-top:32px; padding-top:14px; border-top:1px solid var(--bord); font-size:11px; color:var(--gris-clair); display:flex; justify-content:space-between; gap:12px; }
@@ -640,14 +648,14 @@
           <input id="recherche" placeholder="Filtrer cette vue…" oninput="rendreDiffere()" enterkeyhint="search" autocomplete="off" />
         </div>
         <select class="filtre" id="filtre-lot" onchange="rendre()"><option value="tous">Tous les lots</option></select>
-        <select class="filtre filtre-rel" id="filtre-rel" onchange="majFiltreRel()" style="display:none" title="Habitués ou nouveaux"><option value="tous">Habitués et nouveaux</option><option value="habitue">Habitués</option><option value="nouveau">Nouveaux</option></select>
+        <select class="filtre filtre-rel" id="filtre-rel" onchange="majFiltreRel()" style="display:none" title="Partenaires ou nouveaux"><option value="tous">Partenaires et nouveaux</option><option value="habitue">Partenaires</option><option value="nouveau">Nouveaux</option></select>
         <div class="vue-toggle">
           <button data-vue="cartes" class="actif" onclick="changerVue('cartes')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Cartes</button>
           <button data-vue="tableau" onclick="changerVue('tableau')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>Tableau</button>
         </div>
         <button class="btn" id="btn-favoris" onclick="toggleFiltreFavori()" title="Afficher seulement les favoris"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.8 5.9 20.4l1.5-6.8L2.2 9l6.9-.7z"/></svg>Favoris</button>
         <button class="btn" onclick="imprimerAnnuaire()" title="Imprimer tout l'annuaire de cette vue"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Annuaire</button>
-        <button class="btn" id="btn-consult" onclick="ouvrirConsultationLot()" title="Choisir les sous-traitants à consulter sur un lot : 2 habitués + 2 nouveaux"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>Consultation</button>
+        <button class="btn" id="btn-consult" onclick="ouvrirConsultationLot()" title="Choisir les sous-traitants à consulter sur un lot : 2 partenaires + 2 nouveaux"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>Consultation</button>
         <button class="btn" id="btn-eval" onclick="imprimerEvaluation()" title="Imprimer une fiche d'évaluation sous-traitant vierge (fin de chantier)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>Évaluation</button>
         <button class="btn btn-primaire reserve-achats" style="margin-left:auto" onclick="ouvrirFiche()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5v14"/></svg><span id="txt-ajouter">Ajouter un fournisseur</span></button>
       </div>
@@ -681,7 +689,7 @@
     <label class="champ" id="champ-intervention"><span>Type d'intervention</span><select id="f-intervention"><option value="">— Non renseigné —</option><option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option></select></label>
     <div class="champ" id="champ-relation"><span class="champ-lab">Relation avec LAB</span>
       <label class="ao-case case-nouveau" id="lbl-nouveau"><input type="checkbox" id="f-nouveau" onchange="this.parentNode.classList.toggle('oui',this.checked)" />Nouveau / à consulter <span class="mut" style="font-weight:400">— jamais travaillé avec LAB</span></label>
-      <div class="mut" style="font-size:11.5px;margin-top:5px">Case non cochée = sous-traitant déjà connu (habitué).</div></div>
+      <div class="mut" style="font-size:11.5px;margin-top:5px">Case non cochée = sous-traitant déjà connu (partenaire).</div></div>
     <div class="bloc-qualites" id="champ-qualites">
       <div class="titre-bloc">Qualités</div>
       <div class="q-ligne"><div class="q-lab">Taille de chantiers (plusieurs choix possibles)</div><div class="ms ms-q" id="q-tailles"></div></div>
@@ -728,11 +736,11 @@
 <div class="overlay" id="overlay-consult"><div class="modale">
   <div class="modale-haut"><h2>Préparer une consultation</h2><button class="ico-btn" onclick="fermer('overlay-consult')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
   <div class="modale-corps">
-    <div class="mut" style="font-size:12.5px;line-height:1.5">Choisis le lot : la base te propose <b>2 habitués</b> (les mieux notés) et <b>2 nouveaux</b>. Tu peux cocher / décocher librement. Les entreprises « à éviter » sont exclues.</div>
+    <div class="mut" style="font-size:12.5px;line-height:1.5">Choisis le lot : la base te propose <b>2 partenaires</b> (les mieux notés) et <b>2 nouveaux</b>. Tu peux cocher / décocher librement. Les entreprises « à éviter » sont exclues.</div>
     <label class="champ"><span>Lot à consulter</span><select id="cs-lot" onchange="rendreConsultation(true)"></select></label>
     <div id="cs-alerte"></div>
     <div class="cs-cols">
-      <div class="cs-col"><div class="cs-col-titre habitue">Habitués<span class="cpt" id="cs-cpt-h"></span></div><div class="cs-liste" id="cs-habitues"></div></div>
+      <div class="cs-col"><div class="cs-col-titre habitue">Partenaires<span class="cpt" id="cs-cpt-h"></span></div><div class="cs-liste" id="cs-habitues"></div></div>
       <div class="cs-col"><div class="cs-col-titre nouveau">Nouveaux<span class="cpt" id="cs-cpt-n"></span></div><div class="cs-liste" id="cs-nouveaux"></div></div>
     </div>
   </div>
@@ -944,7 +952,7 @@ function libLots(type,e){ return lotsObjs(type,e).map(l=>l.libelle).join(' '); }
 function texteLots(type,e,sep){ return lotsObjs(type,e).map(l=>`${l.num} – ${l.libelle}`).join(sep||', '); }
 function resumeLots(type,e){ const l=lotsObjs(type,e); if(!l.length) return ''; return l[0].libelle+(l.length>1?` +${l.length-1}`:''); }
 function celluleLots(type,e){ const l=lotsObjs(type,e); if(!l.length) return '<span class="mut">—</span>';
-  return `<div class="lots-cell">${l.map(x=>`<div><span class="lot-num">${esc(x.num)}</span> ${esc(x.libelle)}</div>`).join('')}</div>`; }
+  return `<div class="lots-cell">${l.map(x=>`<div>${esc(x.libelle)}</div>`).join('')}</div>`; }
 const COULEURS=['#2b82d9','#16a34a','#7c3aed','#db2777','#ea580c','#0891b2','#ca8a04'];
 function avatar(nom){ const p=String(nom||'?').trim().split(/\s+/); const init=((p[0]||'')[0]||'')+((p[1]||'')[0]||'')||(p[0]||'?')[0];
   const h=[...String(nom||'')].reduce((a,c)=>a+c.charCodeAt(0),0); return {init:init.toUpperCase(),coul:COULEURS[h%COULEURS.length]}; }
@@ -958,41 +966,53 @@ let interventionsForm=[];
 // ===== Statut, traçabilité, doublons, contrôles de saisie =====
 function estEvite(e){ return e&&e.statut==='eviter'; }
 /* ===== RELATION AVEC LAB : HABITUÉ / NOUVEAU (sous-traitants) =====
-   Case « Nouveau / à consulter » cochée => relation:'nouveau'. Non cochée => sous-traitant déjà connu (habitué). */
+   Case « Nouveau / à consulter » cochée => relation:'nouveau'. Non cochée => sous-traitant déjà connu (partenaire). */
 /* Info RÉSERVÉE AU SERVICE ACHATS : stockée à part dans achats/relation/{id} (lisible uniquement par ces comptes,
    cf. règles Firebase). Les autres services ne la chargent pas et ne la voient nulle part. */
 const ACHATS_EMAILS=['souwab@aborgeval.fr','aalves@aborgeval.fr'];
 let relations={};
-const ETUDES_EMAILS=['obarbosa@aborgeval.fr','tbarreteau@aborgeval.fr']; // adresses du service Études : seules à pouvoir créer / modifier les bureaux d'études
+/* ===== QUI PEUT MODIFIER QUOI =====
+   ACHATS_EMAILS (ci-dessus) : responsables — modifient fournisseurs, sous-traitants ET bureaux d'études, voient « Nouveau / à consulter ».
+   ETUDES_EMAILS             : service Études — modifient uniquement les bureaux d'études.
+   FOURNISSEURS_EMAILS       : modifient uniquement les fournisseurs.
+   Tous les autres comptes (conducteurs de travaux…) : lecture seule. */
+const ETUDES_EMAILS=['obarbosa@aborgeval.fr','tbarreteau@aborgeval.fr'];
+const FOURNISSEURS_EMAILS=['amouchel@aborgeval.fr','solsen@aborgeval.fr'];
+function estRefFournisseurs(){ const m=(auth&&auth.currentUser&&auth.currentUser.email||'').toLowerCase(); return FOURNISSEURS_EMAILS.includes(m); }
 function estEtudes(){ const m=(auth&&auth.currentUser&&auth.currentUser.email||'').toLowerCase(); return ETUDES_EMAILS.includes(m); }
 function accesBE(){ return estEtudes()||estAchats(); }
 function estAchats(){ const m=(auth&&auth.currentUser&&auth.currentUser.email||'').toLowerCase(); return ACHATS_EMAILS.includes(m); }
 function idSst(e){ if(!e) return ''; if(e.id) return e.id; const s=entreprises.soustraitants||{}; return Object.keys(s).find(k=>s[k]===e)||''; }
 function relation(e){ return relations[idSst(e)]==='nouveau'?'nouveau':'habitue'; }
-function peutModifier(type){ type=type||ongletActif; if(estBE(type)) return estEtudes(); if(type==='dashboard') return estAchats()||estEtudes(); return estAchats(); }
+function peutModifier(type){ type=type||ongletActif;
+  if(type==='dashboard') return TYPES.some(t=>peutModifier(t));
+  if(estAchats()) return true;
+  if(estBE(type)) return estEtudes();
+  if(type==='fournisseurs') return estRefFournisseurs();
+  return false; }
 function majVisibiliteAchats(){ const a=estAchats(), st=(ongletActif==='soustraitants'); document.body.classList.toggle('lecture-seule',!peutModifier());
   document.getElementById('btn-consult').style.display=(a&&st)?'':'none';
   const fr=document.getElementById('filtre-rel'); fr.style.display=(a&&st)?'':'none'; if(!(a&&st)){ fr.value='tous'; fr.classList.remove('actif'); } }
 function estHabitue(e){ return relation(e)==='habitue'; }
-function libRelation(e){ return estHabitue(e)?'Habitué':'Nouveau'; }
+function libRelation(e){ return estHabitue(e)?'Partenaire':'Nouveau'; }
 const ICO_HAB='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5"/></svg>';
 const ICO_NEW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>';
 function pastilleRel(e,lecture){ if(!estAchats()) return ''; const h=estHabitue(e);
-  const titre=lecture?libRelation(e):(h?'Déjà connu de LAB. Cliquer pour le passer en « Nouveau / à consulter »':'Nouveau / à consulter : jamais travaillé avec LAB. Cliquer pour le passer en « Habitué »');
-  return `<button type="button" class="rel ${h?'habitue':'nouveau'}${lecture?' lecture':''}" title="${esc(titre)}" ${lecture?'':`onclick="event.stopPropagation();basculerRelation('${e.id}')"`}>${h?ICO_HAB:ICO_NEW}${h?'Habitué':'Nouveau'}</button>`; }
+  const titre=lecture?libRelation(e):(h?'Déjà connu de LAB. Cliquer pour le passer en « Nouveau / à consulter »':'Nouveau / à consulter : jamais travaillé avec LAB. Cliquer pour le passer en « Partenaire »');
+  return `<button type="button" class="rel ${h?'habitue':'nouveau'}${lecture?' lecture':''}" title="${esc(titre)}" ${lecture?'':`onclick="event.stopPropagation();basculerRelation('${e.id}')"`}>${h?ICO_HAB:ICO_NEW}${h?'Partenaire':'Nouveau'}</button>`; }
 function basculerRelation(id){ const e=entreprises.soustraitants&&entreprises.soustraitants[id]; if(!e) return;
   if(!estAchats()) return; const val=estHabitue(e)?'nouveau':'habitue';
   if(db){ db.ref('achats/relation/'+id).set(val==='nouveau'?'nouveau':null).catch(erreurAchats); } else { relations[id]=val; rendre(); }
-  toast(`« ${e.raisonSociale} » passé en ${val==='habitue'?'Habitué':'Nouveau'}`); }
+  toast(`« ${e.raisonSociale} » passé en ${val==='habitue'?'Partenaire':'Nouveau'}`); }
 function erreurAchats(err){ console.warn(err); alert("Enregistrement de « Nouveau / à consulter » refusé par Firebase.\nVérifie que les règles de sécurité « achats » ont bien été publiées."); }
 function majFiltreRel(){ const s=document.getElementById('filtre-rel'); s.classList.toggle('actif',s.value!=='tous'); rendre(); }
 function majCompteursRel(){ const s=document.getElementById('filtre-rel'); if(!s) return;
   const l=Object.entries(entreprises.soustraitants||{}).map(([id,e])=>({id,...e})), nh=l.filter(estHabitue).length;
-  s.options[1].textContent=`Habitués · ${nh}`; s.options[2].textContent=`Nouveaux · ${l.length-nh}`; }
+  s.options[1].textContent=`Partenaires · ${nh}`; s.options[2].textContent=`Nouveaux · ${l.length-nh}`; }
 function comptesRel(grp){ if(!estAchats()) return ''; const nh=grp.filter(e=>estHabitue(e)&&!estEvite(e)).length, nn=grp.filter(e=>!estHabitue(e)&&!estEvite(e)).length;
-  return `<span class="rel-compte habitue" title="Habitués disponibles">${nh} habitué${nh>1?'s':''}</span><span class="rel-compte nouveau" title="Nouveaux disponibles">${nn} nouveau${nn>1?'x':''}</span>`; }
+  return `<span class="rel-compte habitue" title="Partenaires disponibles">${nh} partenaire${nh>1?'s':''}</span><span class="rel-compte nouveau" title="Nouveaux disponibles">${nn} nouveau${nn>1?'x':''}</span>`; }
 
-/* ===== PRÉPARER UNE CONSULTATION : 2 habitués + 2 nouveaux par lot ===== */
+/* ===== PRÉPARER UNE CONSULTATION : 2 partenaires + 2 nouveaux par lot ===== */
 function ouvrirConsultationLot(lotId){ if(!estAchats()) return; const sel=document.getElementById('cs-lot');
   sel.innerHTML='<option value="">— Choisir un lot —</option>'+lotsTries('soustraitants').map(l=>`<option value="${l.id}">${esc(l.num)} – ${esc(l.libelle)}</option>`).join('');
   const fl=document.getElementById('filtre-lot').value;
@@ -1006,15 +1026,15 @@ function rendreConsultation(preselection){ const lotId=document.getElementById('
   const ligne=e=>`<label class="cs-ligne"><input type="checkbox" value="${e.id}" ${coches.has(e.id)?'checked':''} onchange="majTotalConsultation()"><div style="min-width:0"><div class="nom">${esc(e.raisonSociale)}${e.favori?' <span style="color:var(--or)">★</span>':''}</div>
     <div class="meta">${[noteMoyenne(e)?etoiles(Math.round(noteMoyenne(e)))+' '+noteMoyenne(e).toFixed(1):'',nbChantiers(e)?nbChantiers(e)+' chantier'+(nbChantiers(e)>1?'s':''):'',esc(e.contact||''),esc(e.tel||''),e.email?'':'<span style="color:#b45309">pas d\'email</span>'].filter(Boolean).join(' · ')}</div></div></label>`;
   const vide=t=>`<div class="cs-vide">${lotId?`Aucun ${t} sur ce lot.`:'Choisis un lot.'}</div>`;
-  document.getElementById('cs-habitues').innerHTML=hab.length?hab.map(ligne).join(''):vide('habitué');
+  document.getElementById('cs-habitues').innerHTML=hab.length?hab.map(ligne).join(''):vide('partenaire');
   document.getElementById('cs-nouveaux').innerHTML=nou.length?nou.map(ligne).join(''):vide('nouveau');
   document.getElementById('cs-cpt-h').textContent=hab.length?hab.length+' dispo':''; document.getElementById('cs-cpt-n').textContent=nou.length?nou.length+' dispo':'';
-  const manque=[]; if(lotId&&hab.length<2) manque.push(`${hab.length} habitué${hab.length>1?'s':''}`); if(lotId&&nou.length<2) manque.push(`${nou.length} nouveau${nou.length>1?'x':''}`);
+  const manque=[]; if(lotId&&hab.length<2) manque.push(`${hab.length} partenaire${hab.length>1?'s':''}`); if(lotId&&nou.length<2) manque.push(`${nou.length} nouveau${nou.length>1?'x':''}`);
   document.getElementById('cs-alerte').innerHTML=manque.length?`<div class="cs-alerte">⚠️ Seulement ${manque.join(' et ')} sur ce lot : pense à enrichir la base pour respecter la règle 2 + 2.</div>`:'';
   majTotalConsultation(); }
 function selectionConsultation(){ return [...document.querySelectorAll('#overlay-consult .cs-liste input:checked')].map(i=>entreprises.soustraitants[i.value]).filter(Boolean); }
 function majTotalConsultation(){ const s=selectionConsultation(), nh=s.filter(estHabitue).length;
-  document.getElementById('cs-total').textContent=s.length?`${s.length} sélectionné${s.length>1?'s':''} : ${nh} habitué${nh>1?'s':''} + ${s.length-nh} nouveau${s.length-nh>1?'x':''}`:'Aucune sélection'; }
+  document.getElementById('cs-total').textContent=s.length?`${s.length} sélectionné${s.length>1?'s':''} : ${nh} partenaire${nh>1?'s':''} + ${s.length-nh} nouveau${s.length-nh>1?'x':''}`:'Aucune sélection'; }
 function mailsSelection(){ return [...new Set(selectionConsultation().map(e=>(e.email||'').trim()).filter(Boolean))]; }
 function copierMailsConsultation(){ const m=mailsSelection(); if(!m.length){ alert('Aucun email parmi les entreprises sélectionnées.'); return; }
   const txt=m.join('; '), ok=()=>toast(`${m.length} email${m.length>1?'s':''} copié${m.length>1?'s':''}`);
@@ -1128,7 +1148,7 @@ function listeFiltree(){
     if(fl!=='tous'&&!lotsIds(e).includes(fl)) return false;
     if(ongletActif==='soustraitants'&&estAchats()){ const fr=document.getElementById('filtre-rel').value; if(fr!=='tous'&&relation(e)!==fr) return false; }
     if(!q) return true; const lot=lotDe(ongletActif,e.lotId);
-    return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),estEvite(e)?'à éviter eviter '+(e.motifEvite||''):'',(e.type||ongletActif)==='soustraitants'&&estAchats()?(estHabitue(e)?'habitué habitue':'nouveau à consulter'):'',texteTailles(e.qualites),texteTravaux(e.qualites),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q);
+    return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),estEvite(e)?'à éviter eviter '+(e.motifEvite||''):'',(e.type||ongletActif)==='soustraitants'&&estAchats()?(estHabitue(e)?'partenaire habitue':'nouveau à consulter'):'',texteTailles(e.qualites),texteTravaux(e.qualites),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q);
   }).sort(triNom);
 }
 function toggleFiltreFavori(){ filtreFavori=!filtreFavori; document.getElementById('btn-favoris').classList.toggle('actif',filtreFavori); rendre(); }
@@ -1255,7 +1275,7 @@ function ouvrirFiche(arg){
   let e={type:ongletActif, lotId:document.getElementById('filtre-lot').value!=='tous'?document.getElementById('filtre-lot').value:''};
   if(modif) e={id:arg.id, type:ongletActif, ...entreprises[ongletActif][arg.id]};
   document.getElementById('fiche-titre').textContent=modif?'Modifier l\u2019entreprise':'Nouvelle entreprise';
-  document.getElementById('f-type').innerHTML=estBE(ongletActif)?'<option value="bureauxetudes">Bureau d\u2019études</option>':'<option value="fournisseurs">Fournisseur</option><option value="soustraitants">Sous-traitant</option>';
+  document.getElementById('f-type').innerHTML=estBE(ongletActif)?'<option value="bureauxetudes">Bureau d\u2019études</option>':((peutModifier('fournisseurs')?'<option value="fournisseurs">Fournisseur</option>':'')+(peutModifier('soustraitants')?'<option value="soustraitants">Sous-traitant</option>':''));
   document.getElementById('f-id').value=modif?arg.id:''; document.getElementById('f-type').value=e.type||ongletActif;
   document.getElementById('f-raison').value=e.raisonSociale||''; document.getElementById('f-contact').value=e.contact||'';
   document.getElementById('f-tel').value=e.tel||''; document.getElementById('f-email').value=e.email||'';
@@ -1279,6 +1299,7 @@ function enregistrerFiche(){
   if(!db){ alert('Firebase non connecté. Complète la config en haut du fichier.'); return; }
   const raison=document.getElementById('f-raison').value.trim(); if(!raison){ alert('La raison sociale est obligatoire.'); return; }
   const id=document.getElementById('f-id').value, typeCible=document.getElementById('f-type').value;
+  if(!peutModifier(typeCible)){ refusLecture(typeCible); return; }
   // Contrôles de saisie
   const statut=document.getElementById('f-statut').value, motif=document.getElementById('f-motif').value.trim();
   if(statut==='eviter'&&!motif){ alert('Indique le motif pour lequel cette entreprise est « À éviter ».'); document.getElementById('f-motif').focus(); return; }
@@ -1301,7 +1322,7 @@ function enregistrerFiche(){
     tel:document.getElementById('f-c2-tel').value.trim(), email:document.getElementById('f-c2-email').value.trim() };
   fiche.contact2=(c2.nom||c2.role||c2.tel||c2.email)?c2:null;
   if(aNotes(typeCible)){
-    const obj={}; interventionsForm.forEach(i=>{ const k=i.id||('iv'+Math.random().toString(36).slice(2,9)); obj[k]={chantier:i.chantier||'',date:i.date||'',commentaire:i.commentaire||'',note:Number(i.note)||0}; });
+    const obj={}; interventionsForm.forEach(i=>{ const k=i.id||('iv'+Math.random().toString(36).slice(2,9)); obj[k]={chantier:i.chantier||'',date:i.date||'',commentaire:i.commentaire||'',note:Number(i.note)||0}; if(i.criteres&&Object.keys(i.criteres).length) obj[k].criteres=i.criteres; });
     fiche.interventions=obj;
     fiche.qualites=typeCible==='soustraitants'?lireQualitesForm():null;
     const ns=interventionsForm.map(i=>Number(i.note)||0).filter(n=>n>0);
@@ -1506,7 +1527,7 @@ function toutesLesEntreprises(){ const r=[]; ['fournisseurs','soustraitants'].fo
 function rechercheGlobale(){
   const q=document.getElementById('recherche-globale').value.trim().toLowerCase(), dd=document.getElementById('dropdown-globale');
   if(!q){ dd.classList.remove('ouvert'); return; }
-  const res=toutesAvecBE().filter(e=>{ const lot=lotDe(e.type,e.lotId); return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),estEvite(e)?'à éviter eviter '+(e.motifEvite||''):'',(e.type||ongletActif)==='soustraitants'&&estAchats()?(estHabitue(e)?'habitué habitue':'nouveau à consulter'):'',texteTailles(e.qualites),texteTravaux(e.qualites),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q); }).slice(0,8);
+  const res=toutesAvecBE().filter(e=>{ const lot=lotDe(e.type,e.lotId); return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),estEvite(e)?'à éviter eviter '+(e.motifEvite||''):'',(e.type||ongletActif)==='soustraitants'&&estAchats()?(estHabitue(e)?'partenaire habitue':'nouveau à consulter'):'',texteTailles(e.qualites),texteTravaux(e.qualites),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q); }).slice(0,8);
   dd.innerHTML=res.length?res.map(e=>{ const lot=lotDe(e.type,e.lotId), t=libType(e.type), a=avatar(e.raisonSociale);
     return `<div class="dd-item" onclick="allerVers('${e.type}','${e.id}')"><div style="background:${a.coul};height:30px;width:30px;border-radius:50%;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${esc(a.init)}</div><div><div class="dd-nom">${esc(e.raisonSociale)}</div><div class="dd-meta">${t}${texteLots(e.type,e)?' · Lot '+esc(texteLots(e.type,e)):''}</div></div></div>`; }).join('') : '<div class="dd-vide">Aucun résultat</div>';
   dd.classList.add('ouvert');
@@ -1593,7 +1614,14 @@ function feuilleHTML(e,type){
   const ligne=(lab,val,mono)=> val?`<div class="f-ligne"><div class="lab">${lab}</div><div class="val ${mono?'mono':''}">${esc(val)}</div></div>`:'';
   const moy=noteMoyenne(e), arr=interventionsArr(e);
   const ligneNote = nt?`<div class="f-ligne"><div class="lab">Note moyenne</div><div class="val">${etoiles(Math.round(moy))} <span style="color:#6b7280;font-size:13px">${moy?moy.toFixed(1)+'/5 sur '+arr.length+' chantier'+(arr.length>1?'s':''):'Non noté'}</span></div></div>`:'';
-  const histoHtml = (nt && arr.length)?`<div class="f-notes-bloc"><div class="lab">Historique des chantiers (${arr.length})</div><div class="f-grille">${arr.map(i=>`<div class="f-ligne"><div class="lab" style="width:auto;flex:1;background:#fff;text-transform:none;color:#1f2937;font-weight:600">${esc(i.chantier)}${i.date?' <span style=\"color:#9ca3af;font-weight:400\">· '+esc(i.date)+'</span>':''}${i.commentaire?'<div style=\"font-weight:400;color:#6b7280;font-size:12px;margin-top:3px\">'+esc(i.commentaire)+'</div>':''}${i.criteres?'<div style=\"font-weight:400;color:#1f5fae;font-size:11.5px;margin-top:3px\">'+esc(resumeCriteres(i.criteres))+'</div>':''}</div><div class="val" style="white-space:nowrap">${etoiles(Math.round(i.note))}</div></div>`).join('')}</div></div>`:'';
+  // Historique des chantiers : toujours affiché pour les sous-traitants / BE, du plus récent au plus ancien
+  const cleDate=d=>{ const s=String(d||''); let m=s.match(/(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})/); if(m) return m[3]+m[2].padStart(2,'0')+m[1].padStart(2,'0');
+    m=s.match(/(\d{1,2})[\/.\-](\d{4})/); if(m) return m[2]+m[1].padStart(2,'0')+'00'; m=s.match(/(\d{4})/); return m?m[1]+'0000':''; };
+  const histo=arr.map((i,k)=>({i,k,d:cleDate(i.date)})).sort((a,b)=>(b.d||'').localeCompare(a.d||'')||a.k-b.k).map(x=>x.i);
+  const nbNotes=arr.filter(i=>Number(i.note)>0).length;
+  const histoHtml = nt?`<div class="f-notes-bloc f-histo"><div class="lab">${be?'Références chantiers':'Historique des chantiers réalisés pour LAB'}${arr.length?` <span class="f-histo-resume">${arr.length} chantier${arr.length>1?'s':''}${moy?' · note moyenne '+moy.toFixed(1)+'/5'+(nbNotes<arr.length?' sur '+nbNotes+' noté'+(nbNotes>1?'s':''):''):''}</span>`:''}</div>
+    ${arr.length?`<div class="f-grille">${histo.map(i=>`<div class="f-ligne f-chantier"><div class="f-ch-info"><div class="f-ch-nom">${esc(i.chantier||'Chantier sans nom')}${i.date?`<span class="f-ch-date">${esc(i.date)}</span>`:''}</div>${i.commentaire?`<div class="f-ch-com">${esc(i.commentaire)}</div>`:''}${i.criteres?`<div class="f-ch-crit">${esc(resumeCriteres(i.criteres))}</div>`:''}</div><div class="f-ch-note">${Number(i.note)>0?etoiles(Math.round(i.note))+`<span>${(Math.round(Number(i.note)*10)/10).toString().replace('.',',')}/5</span>`:'<span class="mut">Non noté</span>'}</div></div>`).join('')}</div>`
+      :`<div class="txt f-histo-vide">${be?'Aucune référence chantier enregistrée pour l’instant.':'Aucun chantier enregistré avec LAB pour l’instant.'}</div>`}</div>`:'';
   return `<div class="feuille">
       <div class="f-entete">
         <svg class="mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 24 20 12l14 12" stroke="#2b82d9" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 31 20 19l14 12" stroke="#c7ced8" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1615,15 +1643,15 @@ function feuilleHTML(e,type){
         ${ligne(type!=='fournisseurs'?'Adresse':'Agence référente',e.adresse)}
         ${estEvite(e)?`<div class="f-ligne"><div class="lab">Statut</div><div class="val" style="color:#b91c1c;font-weight:700">À éviter — ${esc(e.motifEvite||'motif non précisé')}</div></div>`:''}
         ${ligne('SIRET',e.siret,true)}
-        ${st&&estAchats()?ligne('Relation avec LAB',estHabitue(e)?'Habitué (déjà travaillé ensemble)':'Nouveau (jamais travaillé ensemble)'):''}
+        ${st&&estAchats()?ligne('Relation avec LAB',estHabitue(e)?'Partenaire (déjà travaillé ensemble)':'Nouveau (jamais travaillé ensemble)'):''}
         ${st?ligne('Service Commercial',e.consultAO?'Oui':'Non'):''}
         ${st?ligne('Chantiers luxe',e.chantiersLuxe?'Oui':'Non'):''}
       </div>
+      ${histoHtml}
       ${(st&&e.qualites)?`<div class="f-notes-bloc"><div class="lab">Qualités</div><div class="f-grille">
         ${ligne('Taille de chantiers',texteTailles(e.qualites))}${ligne('Type de travaux',texteTravaux(e.qualites))}${ligne('Milieu occupé',texteOuiNon(e.qualites.milieuOccupe))}${ligne('Études',texteOuiNon(e.qualites.etudes))}</div></div>`:''}
       ${(e.contact2&&(e.contact2.nom||e.contact2.role||e.contact2.tel||e.contact2.email))?`<div class="f-notes-bloc"><div class="lab">Second contact</div><div class="f-grille">
         ${ligne('Nom',e.contact2.nom)}${ligne('Rôle',e.contact2.role)}${ligne('Téléphone',e.contact2.tel,true)}${ligne('Email',e.contact2.email)}</div></div>`:''}
-      ${histoHtml}
       ${e.notes?`<div class="f-notes-bloc"><div class="lab">Notes</div><div class="txt">${esc(e.notes)}</div></div>`:''}
       <div class="f-pied"><span>Document interne — Les Artisans Bâtisseurs · Orgeval (78)</span><span>${e.modifieLe?'Modifiée le '+dateFr(e.modifieLe).split(' à')[0]+' par '+esc(e.modifiePar||'—')+' · ':''}Édité le ${dateStr}</span></div>
     </div>`;
@@ -1942,7 +1970,7 @@ document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{
 /* ===== LECTURE SEULE =====
    Fournisseurs / sous-traitants : seuls les comptes Achats modifient. Bureaux d'études : seuls les comptes Études.
    (doublé par les règles Firebase : les écritures des autres comptes sont refusées côté serveur) */
-function refusLecture(type){ toast(estBE(type)?"Lecture seule : seul le service Études peut modifier les bureaux d'études.":'Lecture seule : seul le service Achats peut modifier ces fiches.'); }
+function refusLecture(type){ toast('Lecture seule : tu n\u2019as pas les droits pour modifier '+(estBE(type)?'les bureaux d\u2019études.':type==='fournisseurs'?'les fournisseurs.':type==='soustraitants'?'les sous-traitants.':'ces fiches.')); }
 // Fonctions qui agissent sur l'onglet affiché
 ['ouvrirFiche','enregistrerFiche','supprimer','toggleFavori','toggleCase','toggleAO','ouvrirLots','ajouterLot','renommerLot','supprimerLot','ajouterLotDepuisFiche','basculerRelation'].forEach(n=>{
   const f=window[n]; if(typeof f!=='function') return;
