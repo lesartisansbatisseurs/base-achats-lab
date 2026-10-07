@@ -605,7 +605,7 @@
       <div class="sb-item" onclick="exporterCSV()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg><span>Exporter CSV</span></div>
       <div class="sb-item" onclick="exporterExcel()" title="Toute la base dans un fichier Excel : fournisseurs, sous-traitants et évaluations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg><span id="txt-excel">Exporter Excel</span></div>
     </div>
-    <div class="sb-foot"><div id="user-mail" style="color:#c7d2de;margin-bottom:4px;word-break:break-all;font-size:11px"></div><div class="badge-lecture" title="Tu peux consulter ces fiches mais pas les modifier">Lecture seule</div>Entreprise générale · TCE — Orgeval (78)<br><button class="sb-logout" onclick="exporterBase()" title="Télécharger une sauvegarde complète de la base (JSON)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Exporter la base</button><br><button class="sb-logout" style="margin-top:6px" onclick="seDeconnecter()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Se déconnecter</button></div>
+    <div class="sb-foot"><div id="user-mail" style="color:#c7d2de;margin-bottom:4px;word-break:break-all;font-size:11px"></div><div class="badge-lecture" title="Tu peux consulter ces fiches mais pas les modifier">Lecture seule</div>Entreprise générale · TCE — Orgeval (78)<br><span title="Version de l'outil — recharge la page (Ctrl+F5) si ce numéro n'est pas le dernier" style="font-size:11px;opacity:.75">Version <span class="num-version">v27</span></span><br><button class="sb-logout" onclick="exporterBase()" title="Télécharger une sauvegarde complète de la base (JSON)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Exporter la base</button><br><button class="sb-logout" style="margin-top:6px" onclick="seDeconnecter()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Se déconnecter</button></div>
   </aside>
 
   <div class="main">
@@ -625,7 +625,7 @@
     <div class="content">
       <div class="hero">
         <span class="coin c-tl"></span><span class="coin c-tr"></span><span class="coin c-bl"></span><span class="coin c-br"></span>
-        <div class="filigrane">LES ARTISANS BÂTISSEURS<br>BASE ACHATS · v1.0<br>DOC. INTERNE</div>
+        <div class="filigrane">LES ARTISANS BÂTISSEURS<br>BASE ACHATS · <span class="num-version">v27</span><br>DOC. INTERNE</div>
         <div class="surtitre">PILOTAGE ACHATS</div>
         <div class="bonjour">Bonjour 👋</div>
         <div class="date" id="date-jour"></div>
@@ -698,7 +698,15 @@
         <div class="ms-puces" id="ms-lots-puces"></div>
       </div></div>
     <label class="champ" id="champ-intervention"><span>Type d'intervention</span><select id="f-intervention"><option value="">— Non renseigné —</option><option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option></select></label>
-    <label class="champ" id="champ-offre"><span>Achat ou location</span><select id="f-offre"><option value="achat">Achat</option><option value="location">Location</option><option value="les2">Achat et location</option></select></label>
+    <label class="champ" id="champ-offre"><span>Achat ou location</span><select id="f-offre" onchange="majChampsLocation()"><option value="achat">Achat</option><option value="location">Location</option><option value="les2">Achat et location</option></select></label>
+    <div class="bloc-contact2" id="champ-location">
+      <div class="titre-bloc">Location</div>
+      <label class="champ"><span>Matériel loué</span><input id="f-loc-materiel" placeholder="Ex : nacelle, mini-pelle, échafaudage, base vie…" /></label>
+      <div class="duo">
+        <label class="champ"><span>Livraison sur chantier</span><select id="f-loc-livraison"><option value="">— Non renseigné —</option><option value="oui">Oui</option><option value="non">Non (à retirer en agence)</option></select></label>
+        <label class="champ"><span>Délai habituel</span><input id="f-loc-delai" placeholder="Ex : 24 h, 48 h, 1 semaine…" /></label>
+      </div>
+    </div>
     <div class="champ" id="champ-relation"><span class="champ-lab">Relation avec LAB</span>
       <label class="ao-case case-nouveau" id="lbl-nouveau"><input type="checkbox" id="f-nouveau" onchange="this.parentNode.classList.toggle('oui',this.checked)" />Nouveau / à consulter <span class="mut" style="font-weight:400">— jamais travaillé avec LAB</span></label>
       <div class="mut" style="font-size:11.5px;margin-top:5px">Case non cochée = sous-traitant déjà connu (partenaire).</div></div>
@@ -852,6 +860,7 @@ function aNotes(t){ return t==='soustraitants'||t==='bureauxetudes'; }
 /* ===== FOURNISSEURS : ACHAT / LOCATION =====
    Champ "offre" sur la fiche fournisseur : 'achat' (défaut si absent), 'location' ou 'les2'.
    Un fournisseur 'les2' apparaît dans les deux sous-onglets. */
+const VERSION='v27'; // à incrémenter à chaque mise en ligne
 let sousOngletF='achat';
 const LIB_OFFRE={achat:'Achat',location:'Location',les2:'Achat et location'};
 function offreDe(e){ return (e&&(e.offre==='location'||e.offre==='les2'))?e.offre:'achat'; }
@@ -859,8 +868,13 @@ function libOffre(e){ return LIB_OFFRE[offreDe(e)]; }
 function dansSousOnglet(e,so){ so=so||sousOngletF; const o=offreDe(e); return o==='les2'||o===so; }
 function chipOffre(e,seulementLes2){ const o=offreDe(e); if(seulementLes2&&o!=='les2') return '';
   return `<span class="chip ${o==='achat'?'ach':'loc'}">${o==='les2'?(sousOngletF==='achat'?'Loue aussi':'Vend aussi'):LIB_OFFRE[o]}</span>`; }
+function infosLoc(e){ return (e&&offreDe(e)!=='achat'&&e.location)||{}; }
+function texteLivraison(e){ const v=infosLoc(e).livraison; return v===true?'Oui':v===false?'Non':''; }
+function majChampsLocation(){ const t=document.getElementById('f-type').value, o=document.getElementById('f-offre').value;
+  document.getElementById('champ-location').style.display=(t==='fournisseurs'&&o!=='achat')?'':'none'; }
 function changerSousOnglet(so){ sousOngletF=(so==='location')?'location':'achat'; rendre(); }
 function majSousOnglets(){ const z=document.getElementById('sous-onglets'); if(!z) return;
+  document.querySelectorAll('.num-version').forEach(n=>{ if(n.textContent!==VERSION) n.textContent=VERSION; });
   z.style.display=(ongletActif==='fournisseurs')?'':'none';
   const l=Object.values(entreprises.fournisseurs||{});
   document.getElementById('so-nb-achat').textContent=l.filter(e=>dansSousOnglet(e,'achat')).length;
@@ -1178,7 +1192,7 @@ function listeFiltree(){
     if(fl!=='tous'&&!lotsIds(e).includes(fl)) return false;
     if(ongletActif==='soustraitants'&&estAchats()){ const fr=document.getElementById('filtre-rel').value; if(fr!=='tous'&&relation(e)!==fr) return false; }
     if(!q) return true; const lot=lotDe(ongletActif,e.lotId);
-    return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),(e.type||ongletActif)==='fournisseurs'?libOffre(e):'',estEvite(e)?'à éviter eviter '+(e.motifEvite||''):'',(e.type||ongletActif)==='soustraitants'&&estAchats()?(estHabitue(e)?'partenaire habitue':'nouveau à consulter'):'',texteTailles(e.qualites),texteTravaux(e.qualites),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q);
+    return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),(e.type||ongletActif)==='fournisseurs'?libOffre(e)+' '+(infosLoc(e).materiel||''):'',estEvite(e)?'à éviter eviter '+(e.motifEvite||''):'',(e.type||ongletActif)==='soustraitants'&&estAchats()?(estHabitue(e)?'partenaire habitue':'nouveau à consulter'):'',texteTailles(e.qualites),texteTravaux(e.qualites),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q);
   }).sort(triNom);
 }
 function toggleFiltreFavori(){ filtreFavori=!filtreFavori; document.getElementById('btn-favoris').classList.toggle('actif',filtreFavori); rendre(); }
@@ -1252,16 +1266,17 @@ function carte(e){
       ${e.email?`<a class="info" href="mailto:${esc(e.email)}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>${esc(e.email)}</a>`:''}
       ${e.adresse?`<div class="info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>${esc(e.adresse)}</div>`:''}
       ${e.siteweb?`<a class="info" href="${lienWeb(e.siteweb)}" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20Z"/></svg>${esc(e.siteweb)}</a>`:''}
+      ${ongletActif==='fournisseurs'&&(infosLoc(e).materiel||texteLivraison(e)||infosLoc(e).delai)?`<div class="info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg><span>${esc([infosLoc(e).materiel?'Loue : '+infosLoc(e).materiel:'',texteLivraison(e)?'Livraison chantier : '+texteLivraison(e).toLowerCase():'',infosLoc(e).delai?'Délai : '+infosLoc(e).delai:''].filter(Boolean).join(' · '))}</span></div>`:''}
       ${e.notes?`<div class="note">${esc(e.notes)}</div>`:''}
     </div>
     ${st?`<div class="carte-ao">${estAchats()?`<div style="margin-bottom:9px">${pastilleRel(e)}</div>`:''}${caseAO(e,true)}<div style="height:7px"></div>${caseLuxe(e,true)}</div>`:''}</div>`;
 }
 
 /* ===== TABLEAU ===== */
-function valTri(e){ if(tri.col==='lot'){ const l=lotsObjs(ongletActif,e)[0]; return l?String(l.libelle).toLowerCase():'~'; } if(tri.col==='note') return String(noteMoyenne(e)); if(tri.col==='consultAO') return e.consultAO?'1':'0'; if(tri.col==='chantiersLuxe') return e.chantiersLuxe?'1':'0'; if(tri.col==='relation') return estHabitue(e)?'1':'2'; return String(e[tri.col]||'').toLowerCase(); }
+function valTri(e){ if(tri.col==='lot'){ const l=lotsObjs(ongletActif,e)[0]; return l?String(l.libelle).toLowerCase():'~'; } if(tri.col==='note') return String(noteMoyenne(e)); if(tri.col==='consultAO') return e.consultAO?'1':'0'; if(tri.col==='chantiersLuxe') return e.chantiersLuxe?'1':'0'; if(tri.col==='relation') return estHabitue(e)?'1':'2'; if(tri.col==='materielLoue') return String(infosLoc(e).materiel||'').toLowerCase(); return String(e[tri.col]||'').toLowerCase(); }
 function trier(col){ if(tri.col===col) tri.dir*=-1; else { tri.col=col; tri.dir=1; } rendre(); }
 function rendreTableau(liste){
-  const zone=document.getElementById('contenu'), st=(ongletActif==='soustraitants'), nt=aNotes(ongletActif), be=estBE(ongletActif);
+  const zone=document.getElementById('contenu'), st=(ongletActif==='soustraitants'), nt=aNotes(ongletActif), be=estBE(ongletActif), loc=(ongletActif==='fournisseurs'&&sousOngletF==='location');
   if(!liste.length){ zone.innerHTML=videHtml(); return; }
   liste.sort((a,b)=>{ if(tri.col==='note'){ return (noteMoyenne(a)-noteMoyenne(b))*tri.dir; } const va=valTri(a),vb=valTri(b); if(!va&&vb) return 1; if(va&&!vb) return -1; return va.localeCompare(vb,'fr',{numeric:true})*tri.dir; });
   const fleche=col=>tri.col===col?(tri.dir>0?'▲':'▼'):'⇅';
@@ -1270,7 +1285,7 @@ function rendreTableau(liste){
     return `<tr id="ligne-${e.id}" class="cliquable${estEvite(e)?' evite':''}" onclick="clicFiche(event,'${e.id}')" title="Voir la fiche">
       <td><div class="tbl-nom"><div class="tbl-av" style="background:${a.coul}">${esc(a.init)}</div>${esc(e.raisonSociale)}${ongletActif==='fournisseurs'?' '+chipOffre(e,true):''}${estEvite(e)?' '+badgeStatut(e):''}</div></td>
       <td>${celluleLots(ongletActif,e)}</td>
-      ${be?'':`<td>${chipIntervention(e)||'<span class="mut">—</span>'}</td>`}
+      ${be?'':(loc?`<td>${infosLoc(e).materiel?`<span class="tbl-adr">${esc(infosLoc(e).materiel)}</span>`:'<span class="mut">—</span>'}${texteLivraison(e)==='Oui'?' <span class="chip loc" title="Livre sur chantier">Livre</span>':''}</td>`:`<td>${chipIntervention(e)||'<span class="mut">—</span>'}</td>`)}
       <td>${e.contact?esc(e.contact):'<span class="mut">—</span>'}</td>
       <td>${e.tel?`<a class="info" href="tel:${esc(e.tel)}"><span class="tbl-mono">${esc(e.tel)}</span></a>`:'<span class="mut">—</span>'}</td>
       <td>${e.email?`<a class="info" href="mailto:${esc(e.email)}">${esc(e.email)}</a>`:'<span class="mut">—</span>'}</td>
@@ -1281,7 +1296,7 @@ function rendreTableau(liste){
         <button class="ico-btn suppr" onclick="supprimer('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div></td></tr>`;
   }).join('');
   zone.innerHTML=`<div class="tableau-wrap"><table class="tbl"><thead><tr>
-    ${th('raisonSociale','Raison sociale')}${th('lot',be?"Corps d'état":'Lots')}${be?'':th('typeIntervention','Intervention')}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${st?(estAchats()?th('relation','Relation'):'')+th('consultAO','Service Commercial')+th('chantiersLuxe','Luxe'):th('adresse',be?'Adresse':'Agence référente')}${nt?th('note','Note'):''}<th></th>
+    ${th('raisonSociale','Raison sociale')}${th('lot',be?"Corps d'état":'Lots')}${be?'':(loc?th('materielLoue','Matériel loué'):th('typeIntervention','Intervention'))}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${st?(estAchats()?th('relation','Relation'):'')+th('consultAO','Service Commercial')+th('chantiersLuxe','Luxe'):th('adresse',be?'Adresse':'Agence référente')}${nt?th('note','Note'):''}<th></th>
   </tr></thead><tbody>${lignes}</tbody></table></div>`;
 }
 
@@ -1289,7 +1304,7 @@ function rendreTableau(liste){
 function majTypeFiche(){ const t=document.getElementById('f-type').value;
   document.getElementById('champ-chantiers').style.display=aNotes(t)?'':'none';
   document.getElementById('champ-intervention').style.display=estBE(t)?'none':'';
-  document.getElementById('champ-offre').style.display=(t==='fournisseurs')?'':'none';
+  document.getElementById('champ-offre').style.display=(t==='fournisseurs')?'':'none'; majChampsLocation();
   document.querySelector('#champ-chantiers > span').textContent=estBE(t)?'Références chantiers & notes':'Chantiers réalisés & notes';
   document.querySelector('#champ-lots-multi .champ-lab').textContent=estBE(t)?"Corps d'état (plusieurs choix possibles)":'Lots (plusieurs choix possibles)';
   document.getElementById('champ-qualites').style.display=(t==='soustraitants')?'':'none';
@@ -1315,6 +1330,7 @@ function ouvrirFiche(arg){
   document.getElementById('f-intervention').value=e.typeIntervention||'';
   document.getElementById('f-contact-role').value=e.contactRole||'';
   document.getElementById('f-offre').value=modif?offreDe(e):(ongletActif==='fournisseurs'?sousOngletF:'achat');
+  { const lc=e.location||{}; document.getElementById('f-loc-materiel').value=lc.materiel||''; document.getElementById('f-loc-livraison').value=lc.livraison===true?'oui':lc.livraison===false?'non':''; document.getElementById('f-loc-delai').value=lc.delai||''; }
   const c2=e.contact2||{}; document.getElementById('f-c2-nom').value=c2.nom||''; document.getElementById('f-c2-role').value=c2.role||'';
   document.getElementById('f-c2-tel').value=c2.tel||''; document.getElementById('f-c2-email').value=c2.email||'';
   document.getElementById('f-lots').innerHTML='';
@@ -1351,6 +1367,8 @@ function enregistrerFiche(){
   fiche.typeIntervention=document.getElementById('f-intervention').value||null;
   fiche.contactRole=document.getElementById('f-contact-role').value.trim()||null;
   fiche.offre=(typeCible==='fournisseurs')?(document.getElementById('f-offre').value||'achat'):null;
+  { const lv=document.getElementById('f-loc-livraison').value, lc={ materiel:document.getElementById('f-loc-materiel').value.trim()||null, livraison:lv==='oui'?true:lv==='non'?false:null, delai:document.getElementById('f-loc-delai').value.trim()||null };
+    fiche.location=(typeCible==='fournisseurs'&&(lc.materiel||lc.livraison!==null||lc.delai))?lc:null; } // conservé même si la fiche repasse en Achat (masqué à l'affichage)
   const c2={ nom:document.getElementById('f-c2-nom').value.trim(), role:document.getElementById('f-c2-role').value.trim(),
     tel:document.getElementById('f-c2-tel').value.trim(), email:document.getElementById('f-c2-email').value.trim() };
   fiche.contact2=(c2.nom||c2.role||c2.tel||c2.email)?c2:null;
@@ -1483,9 +1501,9 @@ function supprimerLot(id){ if(!confirm('Supprimer ce lot ? Les entreprises ratta
 function exporterCSV(){
   if(ongletActif==='dashboard'){ alert('Ouvre l\u2019onglet Fournisseurs ou Sous-traitants pour exporter.'); return; }
   const source=entreprises[ongletActif]||{}, st=(ongletActif==='soustraitants'), echap=v=>`"${String(v||'').replace(/"/g,'""')}"`;
-  const entete=[st?'Lots':'Lot','Raison sociale','Contact','Téléphone','Email','Site web',st?'Adresse':'Adresse agence référente','SIRET','Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention',...(ongletActif==='fournisseurs'?['Achat / Location']:[]),'Statut','Motif','Modifiée le','Modifiée par',...(st?['Note moy /5','Nb chantiers',...(estAchats()?['Relation']:[]),'Service Commercial','Chantiers luxe','Taille de chantiers','Type de travaux','Milieu occupé','Études']:(estBE(ongletActif)?['Note moy /5','Nb références']:[])),'Favori','Notes'];
+  const entete=[st?'Lots':'Lot','Raison sociale','Contact','Téléphone','Email','Site web',st?'Adresse':'Adresse agence référente','SIRET','Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention',...(ongletActif==='fournisseurs'?['Achat / Location','Matériel loué','Livraison chantier','Délai location']:[]),'Statut','Motif','Modifiée le','Modifiée par',...(st?['Note moy /5','Nb chantiers',...(estAchats()?['Relation']:[]),'Service Commercial','Chantiers luxe','Taille de chantiers','Type de travaux','Milieu occupé','Études']:(estBE(ongletActif)?['Note moy /5','Nb références']:[])),'Favori','Notes'];
   const lignes=Object.values(source).map(e=>{ const lot=lotDe(ongletActif,e.lotId);
-    return [texteLots(ongletActif,e,' / ')||'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),...(ongletActif==='fournisseurs'?[libOffre(e)]:[]),estEvite(e)?'À éviter':'Actif',e.motifEvite||'',dateFr(e.modifieLe),e.modifiePar||'',...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),...(estAchats()?[libRelation(e)]:[]),e.consultAO?'Oui':'Non',e.chantiersLuxe?'Oui':'Non',texteTailles(e.qualites),texteTravaux(e.qualites),texteOuiNon(e.qualites&&e.qualites.milieuOccupe),texteOuiNon(e.qualites&&e.qualites.etudes)]:(estBE(ongletActif)?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e)]:[])),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
+    return [texteLots(ongletActif,e,' / ')||'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),...(ongletActif==='fournisseurs'?[libOffre(e),infosLoc(e).materiel,texteLivraison(e),infosLoc(e).delai]:[]),estEvite(e)?'À éviter':'Actif',e.motifEvite||'',dateFr(e.modifieLe),e.modifiePar||'',...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),...(estAchats()?[libRelation(e)]:[]),e.consultAO?'Oui':'Non',e.chantiersLuxe?'Oui':'Non',texteTailles(e.qualites),texteTravaux(e.qualites),texteOuiNon(e.qualites&&e.qualites.milieuOccupe),texteOuiNon(e.qualites&&e.qualites.etudes)]:(estBE(ongletActif)?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e)]:[])),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+[entete.join(';'),...lignes].join('\n')],{type:'text/csv;charset=utf-8;'})); a.download=`${ongletActif}-lab.csv`; a.click();
 }
 
@@ -1499,7 +1517,7 @@ function colonnesExcel(type){ const st=type==='soustraitants', q=e=>e.qualites||
     ['Statut',e=>estEvite(e)?'À éviter':'Actif',11],
     [st?'Lots':'Lots',e=>texteLots(type,e,'\n'),34],
     ['Type d\'intervention',e=>libIntervention(e),19],
-    ...(type==='fournisseurs'?[['Achat / Location',e=>libOffre(e),18]]:[]),
+    ...(type==='fournisseurs'?[['Achat / Location',e=>libOffre(e),18],['Matériel loué',e=>infosLoc(e).materiel,30],['Livraison chantier',e=>texteLivraison(e),17],['Délai location',e=>infosLoc(e).delai,16]]:[]),
     ...(st?[['Note moy. /5',e=>noteMoyenne(e)?Math.round(noteMoyenne(e)*10)/10:'',12],['Nb chantiers',e=>nbChantiers(e)||'',12],
       ...(estAchats()?[['Relation',e=>libRelation(e),12]]:[]),['Service Commercial',e=>e.consultAO?'Oui':'Non',17],['Chantiers luxe',e=>e.chantiersLuxe?'Oui':'Non',14],
       ['Taille de chantiers',e=>listeQ(q(e).tailles).map(k=>Q_TAILLES[k]?Q_TAILLES[k][0]:'').filter(Boolean).join(', '),26],
@@ -1563,7 +1581,7 @@ function toutesLesEntreprises(){ const r=[]; ['fournisseurs','soustraitants'].fo
 function rechercheGlobale(){
   const q=document.getElementById('recherche-globale').value.trim().toLowerCase(), dd=document.getElementById('dropdown-globale');
   if(!q){ dd.classList.remove('ouvert'); return; }
-  const res=toutesAvecBE().filter(e=>{ const lot=lotDe(e.type,e.lotId); return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),(e.type||ongletActif)==='fournisseurs'?libOffre(e):'',estEvite(e)?'à éviter eviter '+(e.motifEvite||''):'',(e.type||ongletActif)==='soustraitants'&&estAchats()?(estHabitue(e)?'partenaire habitue':'nouveau à consulter'):'',texteTailles(e.qualites),texteTravaux(e.qualites),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q); }).slice(0,8);
+  const res=toutesAvecBE().filter(e=>{ const lot=lotDe(e.type,e.lotId); return [e.raisonSociale,e.contact,e.email,e.tel,e.adresse,e.siret,e.siteweb,libLots(e.type||ongletActif,e),libIntervention(e),(e.type||ongletActif)==='fournisseurs'?libOffre(e)+' '+(infosLoc(e).materiel||''):'',estEvite(e)?'à éviter eviter '+(e.motifEvite||''):'',(e.type||ongletActif)==='soustraitants'&&estAchats()?(estHabitue(e)?'partenaire habitue':'nouveau à consulter'):'',texteTailles(e.qualites),texteTravaux(e.qualites),e.contactRole,e.contact2&&e.contact2.nom,e.contact2&&e.contact2.role].filter(Boolean).join(' ').toLowerCase().includes(q); }).slice(0,8);
   dd.innerHTML=res.length?res.map(e=>{ const lot=lotDe(e.type,e.lotId), t=libType(e.type), a=avatar(e.raisonSociale);
     return `<div class="dd-item" onclick="allerVers('${e.type}','${e.id}')"><div style="background:${a.coul};height:30px;width:30px;border-radius:50%;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${esc(a.init)}</div><div><div class="dd-nom">${esc(e.raisonSociale)}</div><div class="dd-meta">${t}${texteLots(e.type,e)?' · Lot '+esc(texteLots(e.type,e)):''}</div></div></div>`; }).join('') : '<div class="dd-vide">Aucun résultat</div>';
   dd.classList.add('ouvert');
@@ -1671,7 +1689,7 @@ function feuilleHTML(e,type){
       </div>
       <div class="f-grille">
         ${be?'':ligne('Type d\u2019intervention',libIntervention(e)||'Non renseigné')}
-        ${type==='fournisseurs'?ligne('Achat / Location',libOffre(e)):''}
+        ${type==='fournisseurs'?ligne('Achat / Location',libOffre(e))+ligne('Matériel loué',infosLoc(e).materiel)+ligne('Livraison sur chantier',texteLivraison(e))+ligne('Délai de location',infosLoc(e).delai):''}
         ${ligne('Contact référent',e.contact)}
         ${ligne('Rôle',e.contactRole)}
         ${ligneNote}
@@ -1899,7 +1917,7 @@ function passeFiltres(e,c){ const q=e.qualites||{}, liste=v=>v?(Array.isArray(v)
   if(aDesLots(c)&&!lotsIds(e).some(id=>c.lots[e.type]&&c.lots[e.type].has(id))) return false;
   if(c.veutEvites!==estEvite(e)) return false;
   return true; }
-function texteEntreprise(e){ return norm([e.raisonSociale,e.contact,e.contactRole,e.adresse,e.notes,e.email,e.siteweb,e.contact2&&e.contact2.nom,libLots(e.type,e),(e.type==='fournisseurs'&&offreDe(e)!=='achat')?'location louer loueur':'',interventionsArr(e).map(i=>i.chantier+' '+(i.commentaire||'')).join(' ')].filter(Boolean).join(' ')); }
+function texteEntreprise(e){ return norm([e.raisonSociale,e.contact,e.contactRole,e.adresse,e.notes,e.email,e.siteweb,e.contact2&&e.contact2.nom,libLots(e.type,e),(e.type==='fournisseurs'&&offreDe(e)!=='achat')?'location louer loueur '+(infosLoc(e).materiel||''):'',interventionsArr(e).map(i=>i.chantier+' '+(i.commentaire||'')).join(' ')].filter(Boolean).join(' ')); }
 function estTermeMetier(t){ return IA_METIERS.some(([,termes])=>termes.some(x=>!x.includes(' ')&&motProche(t,x))); }
 // Score de correspondance sur le nom de l'entreprise / des contacts : {s, tous, exact}
 function scoreNom(e,tokens){ const r={s:0,tous:false,exact:true}; if(!tokens.length) return r;
