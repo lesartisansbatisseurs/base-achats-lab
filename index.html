@@ -187,6 +187,14 @@
   .interv-row .ch .n { font-size:13px; font-weight:600; }
   .interv-row .ch .d { font-size:11.5px; color:var(--gris); }
   .interv-row .ch .cm { font-size:11.5px; color:var(--gris); margin-top:2px; }
+  .interv-ajout select { padding:9px 11px; font-size:14px; border:1px solid #d1d5db; border-radius:9px; width:100%; font-family:inherit; background:#fff; color:var(--ink); }
+  .interv-row .ch .mt { font-size:11.5px; color:#1f5fae; font-weight:600; margin-top:2px; }
+  .f-volume { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:10px; }
+  .f-volume div { border:1px solid var(--bord); border-radius:10px; padding:10px 12px; background:#fafbfc; }
+  .f-volume b { display:block; font-size:16px; color:#1f2937; } .f-volume span { font-size:11px; color:var(--gris); text-transform:uppercase; letter-spacing:.03em; font-weight:600; }
+  .f-parlot { font-size:12.5px; color:#4b5563; margin:-2px 0 10px; line-height:1.6; }
+  .f-ch-mt { color:#1f5fae; font-weight:600; font-size:12.5px; margin-top:3px; }
+  @media (max-width:700px){ .f-volume { grid-template-columns:1fr; } }
   .interv-ajout { border:1px dashed #cbd5e1; border-radius:10px; padding:11px; display:flex; flex-direction:column; gap:8px; }
   .interv-ajout .rowin { display:flex; gap:8px; }
   .interv-ajout input { padding:9px 11px; font-size:14px; border:1px solid #d1d5db; border-radius:9px; width:100%; font-family:inherit; background:#fff; }
@@ -388,6 +396,13 @@
   .f-ligne .lab { width:175px; flex-shrink:0; background:#f7f8fa; padding:13px 16px; font-size:11.5px; font-weight:600; color:var(--gris); text-transform:uppercase; letter-spacing:.03em; }
   .f-ligne .val { padding:13px 16px; font-size:14px; } .f-ligne .val.mono { font-family:var(--mono); }
   .f-notes-bloc { margin-top:20px; }
+  .bloc-fin { display:flex; flex-direction:column; gap:12px; border:1px solid var(--bord); border-radius:11px; padding:13px 14px; background:#fafbfc; }
+  .bloc-fin .titre-bloc { font-size:12px; font-weight:600; color:var(--gris); text-transform:uppercase; letter-spacing:.03em; }
+  .bloc-fin .fin-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  #fin-info { font-size:12.5px; color:var(--gris); line-height:1.45; } #fin-info.ok { color:#15803d; } #fin-info.ko { color:#b45309; }
+  .ca-info { font-weight:600; color:#1f2937; }
+  .cap { display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; white-space:nowrap; }
+  .cap.vert { background:#e7f6ee; color:#15803d; } .cap.orange { background:#fff4e5; color:#b45309; } .cap.rouge { background:#fde8e8; color:#b91c1c; } .cap.gris { background:#f1f2f4; color:#6b7280; }
   .f-histo-resume { text-transform:none; letter-spacing:0; font-weight:500; color:var(--accent); margin-left:8px; }
   .f-chantier { align-items:center; gap:14px; padding:12px 16px; }
   .f-ch-info { flex:1; min-width:0; } .f-ch-nom { font-size:14px; font-weight:600; color:#1f2937; }
@@ -722,6 +737,7 @@
       <div class="interv-liste" id="interv-liste"></div>
       <div class="interv-ajout">
         <input id="iv-chantier" placeholder="Nom du chantier / affaire" />
+        <div class="rowin"><select id="iv-lot" onfocus="majIvLots()" title="Lot réalisé sur ce chantier"><option value="">Lot (optionnel)</option></select><input id="iv-montant" inputmode="decimal" placeholder="Montant HT du marché (ex : 85 000)" /></div>
         <div class="rowin"><input id="iv-date" placeholder="Date / période (ex : 06/2026)" /><input id="iv-comment" placeholder="Commentaire (optionnel)" /></div>
         <div class="rowin" style="align-items:center;justify-content:space-between"><div class="note-edit" id="iv-note-edit"></div><button type="button" class="btn btn-primaire" onclick="ajouterIntervention()">+ Ajouter ce chantier</button></div>
         <details class="crit-det" id="iv-crit-det"><summary>Noter par critère (fiche d'évaluation de fin de chantier)</summary>
@@ -746,6 +762,13 @@
     <label class="champ"><span id="lbl-adresse">Adresse</span><input id="f-adresse" /></label>
     <label class="champ"><span>Site web</span><input id="f-siteweb" placeholder="ex : entreprise.fr" /></label>
     <label class="champ"><span>SIRET</span><input id="f-siret" /></label>
+    <div class="bloc-fin" id="champ-finances"><div class="titre-bloc">Données financières</div>
+      <div class="fin-actions"><button type="button" class="btn" onclick="recupererFinances()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>Récupérer avec le SIRET</button><span id="fin-info">Source : annuaire officiel des entreprises (data.gouv). Sinon, saisis à la main.</span></div>
+      <div class="duo"><label class="champ"><span>Chiffre d'affaires (€ HT)</span><input id="f-ca" inputmode="decimal" placeholder="ex : 1 250 000 ou 1,25 M" oninput="finManuel()" /></label>
+        <label class="champ"><span>Exercice</span><input id="f-ca-annee" inputmode="numeric" placeholder="ex : 2024" oninput="finManuel()" /></label></div>
+      <div class="duo"><label class="champ"><span>Résultat net (€)</span><input id="f-rn" inputmode="decimal" placeholder="ex : 85 000 ou -20 000" oninput="finManuel()" /></label>
+        <label class="champ"><span>Effectif</span><input id="f-effectif" placeholder="ex : 10 à 19 salariés" oninput="finManuel()" /></label></div>
+      <input type="hidden" id="f-fin-source" /></div>
     <label class="champ"><span>Notes</span><textarea id="f-notes" rows="2"></textarea></label>
     <div class="f-trace" id="f-trace"></div>
   </div>
@@ -758,6 +781,7 @@
   <div class="modale-corps">
     <div class="mut" style="font-size:12.5px;line-height:1.5">Choisis le lot : la base te propose <b>2 partenaires</b> (les mieux notés) et <b>2 nouveaux</b>. Tu peux cocher / décocher librement. Les entreprises « à éviter » sont exclues.</div>
     <label class="champ"><span>Lot à consulter</span><select id="cs-lot" onchange="rendreConsultation(true)"></select></label>
+    <label class="champ"><span>Montant estimé du lot (€ HT) — facultatif, pour vérifier si chaque entreprise a les épaules</span><input id="cs-montant" inputmode="decimal" placeholder="ex : 180 000 ou 1,2 M" oninput="rendreConsultation(false)" /></label>
     <div id="cs-alerte"></div>
     <div class="cs-cols">
       <div class="cs-col"><div class="cs-col-titre habitue">Partenaires<span class="cpt" id="cs-cpt-h"></span></div><div class="cs-liste" id="cs-habitues"></div></div>
@@ -860,7 +884,7 @@ function aNotes(t){ return t==='soustraitants'||t==='bureauxetudes'; }
 /* ===== FOURNISSEURS : ACHAT / LOCATION =====
    Champ "offre" sur la fiche fournisseur : 'achat' (défaut si absent), 'location' ou 'les2'.
    Un fournisseur 'les2' apparaît dans les deux sous-onglets. */
-const VERSION='v27'; // à incrémenter à chaque mise en ligne
+const VERSION='v28'; // à incrémenter à chaque mise en ligne
 let sousOngletF='achat';
 const LIB_OFFRE={achat:'Achat',location:'Location',les2:'Achat et location'};
 function offreDe(e){ return (e&&(e.offre==='location'||e.offre==='les2'))?e.offre:'achat'; }
@@ -1008,6 +1032,41 @@ function etoiles(note){ note=Number(note)||0; let s='<span class="note-etoiles">
 let interventionsForm=[];
 // ===== Statut, traçabilité, doublons, contrôles de saisie =====
 function estEvite(e){ return e&&e.statut==='eviter'; }
+/* ===== DONNÉES FINANCIÈRES (CA) =====
+   finances = { ca, annee, resultatNet, effectif, source:'annuaire'|'manuel', majLe }
+   Récupération automatique : API publique gratuite recherche-entreprises.api.gouv.fr (comptes publiés au greffe). */
+// Repères « a-t-il les épaules ? » : part du montant du lot dans le CA annuel de l'entreprise
+const CAPACITE_SEUILS={ aise:0.25, vigilance:0.50 }; // ≤ 25 % : à l'aise · 25–50 % : vigilance · > 50 % : risqué
+const TRANCHES_EFFECTIF={NN:'Non renseigné','00':'0 salarié','01':'1 ou 2 salariés','02':'3 à 5 salariés','03':'6 à 9 salariés','11':'10 à 19 salariés','12':'20 à 49 salariés','21':'50 à 99 salariés','22':'100 à 199 salariés','31':'200 à 249 salariés','32':'250 à 499 salariés','41':'500 à 999 salariés','42':'1 000 à 1 999 salariés','51':'2 000 à 4 999 salariés','52':'5 000 à 9 999 salariés','53':'10 000 salariés et plus'};
+function lireMontant(v){ let s=String(v==null?'':v).trim().toLowerCase().replace(/€|eur|euros?|ht/g,'').replace(/\s| | /g,''); if(!s) return null;
+  let mult=1; if(/(m|millions?|mio)$/.test(s)){ mult=1e6; s=s.replace(/(m|millions?|mio)$/,''); } else if(/(k|ke|milliers?)$/.test(s)){ mult=1e3; s=s.replace(/(k|ke|milliers?)$/,''); }
+  s=s.replace(/,/g,'.'); if((s.match(/\./g)||[]).length>1) s=s.replace(/\./g,''); const n=parseFloat(s); return isFinite(n)?Math.round(n*mult):null; }
+function fmtMontant(n){ if(n==null||!isFinite(n)) return ''; const a=Math.abs(n), sg=n<0?'-':'';
+  if(a>=1e6) return sg+(a/1e6).toLocaleString('fr-FR',{maximumFractionDigits:a>=1e7?1:2})+' M€';
+  if(a>=1e3) return sg+Math.round(a/1e3).toLocaleString('fr-FR')+' k€'; return sg+Math.round(a).toLocaleString('fr-FR')+' €'; }
+function finDe(e){ const f=e&&e.finances; return f&&(f.ca!=null||f.resultatNet!=null||f.effectif)?f:null; }
+function libCA(e){ const f=finDe(e); return f&&f.ca!=null?fmtMontant(f.ca)+(f.annee?' ('+f.annee+')':''):''; }
+function capacite(e,montant){ const f=finDe(e); if(!montant) return null; if(!f||!f.ca) return {cls:'gris',txt:'CA inconnu'};
+  const r=montant/f.ca, pct=Math.round(r*100)+' % du CA';
+  if(r<=CAPACITE_SEUILS.aise) return {cls:'vert',txt:'À l’aise · '+pct}; if(r<=CAPACITE_SEUILS.vigilance) return {cls:'orange',txt:'Vigilance · '+pct}; return {cls:'rouge',txt:'Risqué · '+pct}; }
+function badgeCapacite(e,montant){ const c=capacite(e,montant); return c?`<span class="cap ${c.cls}" title="Montant du lot rapporté au chiffre d'affaires annuel">${esc(c.txt)}</span>`:''; }
+function finManuel(){ document.getElementById('f-fin-source').value='manuel'; }
+function infoFin(txt,cls){ const i=document.getElementById('fin-info'); i.textContent=txt; i.className=cls||''; }
+async function recupererFinances(){ const siren=(document.getElementById('f-siret').value||'').replace(/\D/g,'').slice(0,9);
+  if(siren.length!==9){ infoFin('Renseigne d’abord le SIRET (14 chiffres) ou le SIREN (9 chiffres) de l’entreprise.','ko'); document.getElementById('f-siret').focus(); return; }
+  infoFin('Recherche en cours…');
+  try{ const r=await fetch('https://recherche-entreprises.api.gouv.fr/search?q='+siren+'&per_page=1'); if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json(), x=(d.results||[]).find(z=>z.siren===siren);
+    if(!x){ infoFin('Aucune entreprise trouvée pour ce SIREN ('+siren+'). Vérifie le SIRET ou saisis le CA à la main.','ko'); return; }
+    const annees=Object.keys(x.finances||{}).sort(), an=annees[annees.length-1], fi=an?x.finances[an]:null;
+    const eff=TRANCHES_EFFECTIF[x.tranche_effectif_salarie]||''; if(eff&&x.tranche_effectif_salarie!=='NN') document.getElementById('f-effectif').value=eff+(x.annee_tranche_effectif_salarie?' ('+x.annee_tranche_effectif_salarie+')':'');
+    const ferme=x.etat_administratif==='F'?' ⚠️ Attention : entreprise fermée selon l’INSEE.':'';
+    if(fi&&fi.ca!=null){ document.getElementById('f-ca').value=String(fi.ca); document.getElementById('f-ca-annee').value=an;
+      document.getElementById('f-rn').value=fi.resultat_net!=null?String(fi.resultat_net):'';
+      document.getElementById('f-fin-source').value='annuaire';
+      infoFin(`✓ ${x.nom_complet} — CA ${an} : ${fmtMontant(fi.ca)}${fi.resultat_net!=null?' · résultat net : '+fmtMontant(fi.resultat_net):''}. Pense à enregistrer.${ferme}`,ferme?'ko':'ok'); }
+    else infoFin(`${x.nom_complet} trouvée, mais ses comptes ne sont pas publiés (souvent confidentiels pour les petites entreprises). Demande le CA à l’entreprise et saisis-le à la main.${ferme}`,'ko');
+  }catch(err){ console.warn(err); infoFin('Annuaire injoignable pour le moment (connexion ou réseau de l’entreprise). Saisis le CA à la main ou réessaie plus tard.','ko'); } }
 /* ===== RELATION AVEC LAB : HABITUÉ / NOUVEAU (sous-traitants) =====
    Case « Nouveau / à consulter » cochée => relation:'nouveau'. Non cochée => sous-traitant déjà connu (partenaire). */
 /* Info RÉSERVÉE AU SERVICE ACHATS : stockée à part dans achats/relation/{id} (lisible uniquement par ces comptes,
@@ -1061,13 +1120,13 @@ function ouvrirConsultationLot(lotId){ if(!estAchats()) return; const sel=docume
   const fl=document.getElementById('filtre-lot').value;
   sel.value=lotId||(ongletActif==='soustraitants'&&fl!=='tous'?fl:'');
   rendreConsultation(true); document.getElementById('overlay-consult').classList.add('ouvert'); }
-function rendreConsultation(preselection){ const lotId=document.getElementById('cs-lot').value;
+function rendreConsultation(preselection){ const lotId=document.getElementById('cs-lot').value, montantLot=lireMontant(document.getElementById('cs-montant').value);
   const tous=Object.entries(entreprises.soustraitants||{}).map(([id,e])=>({id,...e})).filter(e=>!estEvite(e)&&lotId&&lotsIds(e).includes(lotId));
   const hab=tous.filter(estHabitue).sort((a,b)=>(noteMoyenne(b)-noteMoyenne(a))||(nbChantiers(b)-nbChantiers(a))||triNom(a,b));
   const nou=tous.filter(e=>!estHabitue(e)).sort((a,b)=>(b.favori?1:0)-(a.favori?1:0)||(b.email?1:0)-(a.email?1:0)||triNom(a,b));
   const coches=new Set(preselection?[...hab.slice(0,2),...nou.slice(0,2)].map(e=>e.id):[...document.querySelectorAll('#overlay-consult .cs-liste input:checked')].map(i=>i.value));
   const ligne=e=>`<label class="cs-ligne"><input type="checkbox" value="${e.id}" ${coches.has(e.id)?'checked':''} onchange="majTotalConsultation()"><div style="min-width:0"><div class="nom">${esc(e.raisonSociale)}${e.favori?' <span style="color:var(--or)">★</span>':''}</div>
-    <div class="meta">${[noteMoyenne(e)?etoiles(Math.round(noteMoyenne(e)))+' '+noteMoyenne(e).toFixed(1):'',nbChantiers(e)?nbChantiers(e)+' chantier'+(nbChantiers(e)>1?'s':''):'',esc(e.contact||''),esc(e.tel||''),e.email?'':'<span style="color:#b45309">pas d\'email</span>'].filter(Boolean).join(' · ')}</div></div></label>`;
+    <div class="meta">${[noteMoyenne(e)?etoiles(Math.round(noteMoyenne(e)))+' '+noteMoyenne(e).toFixed(1):'',nbChantiers(e)?nbChantiers(e)+' chantier'+(nbChantiers(e)>1?'s':''):'',esc(e.contact||''),esc(e.tel||''),e.email?'':'<span style="color:#b45309">pas d\'email</span>',libCA(e)?'CA '+esc(libCA(e)):'',volumeLAB('soustraitants',e).max?'plus gros marché LAB '+fmtMontant(volumeLAB('soustraitants',e).max):''].filter(Boolean).join(' · ')}</div>${montantLot?`<div style="margin-top:5px">${badgeCapacite(e,montantLot)}</div>`:''}</div></label>`;
   const vide=t=>`<div class="cs-vide">${lotId?`Aucun ${t} sur ce lot.`:'Choisis un lot.'}</div>`;
   document.getElementById('cs-habitues').innerHTML=hab.length?hab.map(ligne).join(''):vide('partenaire');
   document.getElementById('cs-nouveaux').innerHTML=nou.length?nou.map(ligne).join(''):vide('nouveau');
@@ -1141,22 +1200,35 @@ function noteMoyenne(e){ const a=interventionsArr(e).map(i=>Number(i.note)||0).f
 function nbChantiers(e){ return interventionsArr(e).length; }
 function rendreIvNote(){ const n=Number(document.getElementById('iv-note').value)||0; let h=''; for(let i=1;i<=5;i++) h+=`<button type="button" class="etoile-btn" onclick="setIvNote(${i})">${etoileSVG(i<=n)}</button>`; document.getElementById('iv-note-edit').innerHTML=h; }
 function setIvNote(n){ document.getElementById('iv-note').value=n; rendreIvNote(); }
+/* Volume d'affaires réalisé avec LAB (à partir des chantiers saisis) */
+function majIvLots(){ const s=document.getElementById('iv-lot'), t=document.getElementById('f-type').value, cur=s.value;
+  const coches=lotsCochesForm(), l=lotsTries(t).filter(x=>!coches.length||coches.includes(x.id));
+  s.innerHTML='<option value="">Lot (optionnel)</option>'+l.map(x=>`<option value="${x.id}">${esc(x.libelle)}</option>`).join('');
+  s.value=[...s.options].some(o=>o.value===cur)?cur:(l.length===1?l[0].id:''); }
+function libLotIv(type,i){ const l=i&&i.lotId?lotDe(type,i.lotId):null; return l?l.libelle:''; }
+function volumeLAB(type,e){ const arr=interventionsArr(e), m=arr.map(i=>Number(i.montant)||0);
+  const total=m.reduce((a,b)=>a+b,0), max=Math.max(0,...m), nbM=m.filter(x=>x>0).length, parLot={};
+  arr.forEach(i=>{ if(!i.lotId&&!(Number(i.montant)>0)) return; const k=libLotIv(type,i)||'Lot non précisé'; const o=parLot[k]=parLot[k]||{n:0,m:0}; o.n++; o.m+=Number(i.montant)||0; });
+  return {total,max,nbM,parLot}; }
 function ajouterIntervention(){
   const ch=document.getElementById('iv-chantier').value.trim(); if(!ch){ alert('Indique le nom du chantier.'); return; }
   const nbC=Object.keys(ivCriteres).length, mC=moyCriteres(ivCriteres);
   const iv={ id:'iv'+Math.random().toString(36).slice(2,9), chantier:ch, date:document.getElementById('iv-date').value.trim(), commentaire:document.getElementById('iv-comment').value.trim(), note:nbC?Math.round(mC*10)/10:(Number(document.getElementById('iv-note').value)||0) };
+  const mt=lireMontant(document.getElementById('iv-montant').value); if(document.getElementById('iv-montant').value.trim()&&mt==null){ alert('Montant du marché illisible. Exemple : 85 000 ou 1,2 M'); return; }
+  if(mt!=null) iv.montant=mt; if(document.getElementById('iv-lot').value) iv.lotId=document.getElementById('iv-lot').value;
   if(nbC) iv.criteres=Object.assign({},ivCriteres);
   interventionsForm.push(iv);
-  document.getElementById('iv-chantier').value=''; document.getElementById('iv-date').value=''; document.getElementById('iv-comment').value=''; document.getElementById('iv-note').value=0;
+  document.getElementById('iv-chantier').value=''; document.getElementById('iv-date').value=''; document.getElementById('iv-comment').value=''; document.getElementById('iv-note').value=0; document.getElementById('iv-montant').value=''; majIvLots();
   ivCriteres={}; document.getElementById('iv-crit-det').open=false;
   rendreIvNote(); rendreIvCriteres(); rendreInterventionsForm();
 }
 function supprimerInterventionForm(id){ interventionsForm=interventionsForm.filter(i=>i.id!==id); rendreInterventionsForm(); }
 function rendreInterventionsForm(){
   const z=document.getElementById('interv-liste'); document.getElementById('interv-vide').style.display=interventionsForm.length?'none':'block';
-  z.innerHTML=interventionsForm.map(i=>`<div class="interv-row"><div class="ch"><div class="n">${esc(i.chantier)}</div>${i.date?`<div class="d">${esc(i.date)}</div>`:''}${i.commentaire?`<div class="cm">${esc(i.commentaire)}</div>`:''}${i.criteres?`<div class="cm crit-res">${esc(resumeCriteres(i.criteres))}</div>`:''}</div>${etoiles(Math.round(i.note))}${i.criteres?`<span class="mut" style="font-size:12px;font-family:var(--mono)">${Number(i.note).toFixed(1)}</span>`:''}<button type="button" class="ico-btn suppr" onclick="supprimerInterventionForm('${i.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div>`).join('');
+  z.innerHTML=interventionsForm.map(i=>`<div class="interv-row"><div class="ch"><div class="n">${esc(i.chantier)}</div>${i.date?`<div class="d">${esc(i.date)}</div>`:''}${(i.lotId||i.montant)?`<div class="mt">${[libLotIv(document.getElementById('f-type').value,i),i.montant?fmtMontant(i.montant)+' HT':''].filter(Boolean).map(esc).join(' · ')}</div>`:''}${i.commentaire?`<div class="cm">${esc(i.commentaire)}</div>`:''}${i.criteres?`<div class="cm crit-res">${esc(resumeCriteres(i.criteres))}</div>`:''}</div>${etoiles(Math.round(i.note))}${i.criteres?`<span class="mut" style="font-size:12px;font-family:var(--mono)">${Number(i.note).toFixed(1)}</span>`:''}<button type="button" class="ico-btn suppr" onclick="supprimerInterventionForm('${i.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div>`).join('');
   const ns=interventionsForm.map(i=>Number(i.note)||0).filter(n=>n>0); const moy=ns.length?ns.reduce((a,b)=>a+b,0)/ns.length:0;
-  document.getElementById('interv-moy').innerHTML = ns.length ? `${etoiles(Math.round(moy))} <span><strong>Moyenne : ${moy.toFixed(1)}/5</strong> sur ${ns.length} chantier${ns.length>1?'s':''} noté${ns.length>1?'s':''}</span>` : "Moyenne : non notée pour l'instant";
+  const tot=interventionsForm.reduce((a,i)=>a+(Number(i.montant)||0),0);
+  document.getElementById('interv-moy').innerHTML = (ns.length ? `${etoiles(Math.round(moy))} <span><strong>Moyenne : ${moy.toFixed(1)}/5</strong> sur ${ns.length} chantier${ns.length>1?'s':''} noté${ns.length>1?'s':''}</span>` : "Moyenne : non notée pour l'instant")+(tot?` <span style="margin-left:auto"><strong>${fmtMontant(tot)} HT</strong> réalisés avec LAB</span>`:'');
 }
 
 /* ===== DASHBOARD ===== */
@@ -1264,6 +1336,7 @@ function carte(e){
       ${e.contact?`<div class="info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${esc(e.contact)}</div>`:''}
       ${e.tel?`<a class="info" href="tel:${esc(e.tel)}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12 12 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4 12 12 0 0 0 2.8.7 2 2 0 0 1 1.7 2Z"/></svg><span class="mono">${esc(e.tel)}</span></a>`:''}
       ${e.email?`<a class="info" href="mailto:${esc(e.email)}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>${esc(e.email)}</a>`:''}
+      ${libCA(e)?`<div class="info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg><span>CA <span class="ca-info">${esc(libCA(e))}</span></span></div>`:''}
       ${e.adresse?`<div class="info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>${esc(e.adresse)}</div>`:''}
       ${e.siteweb?`<a class="info" href="${lienWeb(e.siteweb)}" target="_blank" rel="noopener"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20Z"/></svg>${esc(e.siteweb)}</a>`:''}
       ${ongletActif==='fournisseurs'&&(infosLoc(e).materiel||texteLivraison(e)||infosLoc(e).delai)?`<div class="info"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg><span>${esc([infosLoc(e).materiel?'Loue : '+infosLoc(e).materiel:'',texteLivraison(e)?'Livraison chantier : '+texteLivraison(e).toLowerCase():'',infosLoc(e).delai?'Délai : '+infosLoc(e).delai:''].filter(Boolean).join(' · '))}</span></div>`:''}
@@ -1273,7 +1346,7 @@ function carte(e){
 }
 
 /* ===== TABLEAU ===== */
-function valTri(e){ if(tri.col==='lot'){ const l=lotsObjs(ongletActif,e)[0]; return l?String(l.libelle).toLowerCase():'~'; } if(tri.col==='note') return String(noteMoyenne(e)); if(tri.col==='consultAO') return e.consultAO?'1':'0'; if(tri.col==='chantiersLuxe') return e.chantiersLuxe?'1':'0'; if(tri.col==='relation') return estHabitue(e)?'1':'2'; if(tri.col==='materielLoue') return String(infosLoc(e).materiel||'').toLowerCase(); return String(e[tri.col]||'').toLowerCase(); }
+function valTri(e){ if(tri.col==='lot'){ const l=lotsObjs(ongletActif,e)[0]; return l?String(l.libelle).toLowerCase():'~'; } if(tri.col==='note') return String(noteMoyenne(e)); if(tri.col==='consultAO') return e.consultAO?'1':'0'; if(tri.col==='chantiersLuxe') return e.chantiersLuxe?'1':'0'; if(tri.col==='relation') return estHabitue(e)?'1':'2'; if(tri.col==='ca'){ const f=finDe(e); return f&&f.ca!=null?String(Math.round(f.ca)).padStart(15,'0'):''; } if(tri.col==='materielLoue') return String(infosLoc(e).materiel||'').toLowerCase(); return String(e[tri.col]||'').toLowerCase(); }
 function trier(col){ if(tri.col===col) tri.dir*=-1; else { tri.col=col; tri.dir=1; } rendre(); }
 function rendreTableau(liste){
   const zone=document.getElementById('contenu'), st=(ongletActif==='soustraitants'), nt=aNotes(ongletActif), be=estBE(ongletActif), loc=(ongletActif==='fournisseurs'&&sousOngletF==='location');
@@ -1289,6 +1362,7 @@ function rendreTableau(liste){
       <td>${e.contact?esc(e.contact):'<span class="mut">—</span>'}</td>
       <td>${e.tel?`<a class="info" href="tel:${esc(e.tel)}"><span class="tbl-mono">${esc(e.tel)}</span></a>`:'<span class="mut">—</span>'}</td>
       <td>${e.email?`<a class="info" href="mailto:${esc(e.email)}">${esc(e.email)}</a>`:'<span class="mut">—</span>'}</td>
+      <td>${libCA(e)?`<span class="ca-info" style="white-space:nowrap">${esc(fmtMontant(finDe(e).ca))}</span>${finDe(e).annee?`<div class="mut" style="font-size:11.5px">${esc(finDe(e).annee)}</div>`:''}`:'<span class="mut">—</span>'}</td>
       ${st?`${estAchats()?`<td>${pastilleRel(e)}</td>`:''}<td>${caseAO(e,false)}</td><td>${caseLuxe(e,false)}</td>`:`<td>${e.adresse?`<span class="tbl-adr">${esc(e.adresse)}</span>`:'<span class="mut">—</span>'}</td>`}
       ${nt?`<td>${noteMoyenne(e)?etoiles(Math.round(noteMoyenne(e)))+' <span class="tbl-mono">'+noteMoyenne(e).toFixed(1)+'</span>'+(nbChantiers(e)?' <span class="mut">('+nbChantiers(e)+')</span>':''):'<span class="mut">—</span>'}</td>`:''}
       <td><div class="tbl-actions"><button class="ico-btn fav" title="Favori" onclick="toggleFavori('${e.id}')">${etoileSVG(!!e.favori)}</button><button class="ico-btn" title="Fiche PDF" onclick="ouvrirFichePDF('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
@@ -1296,7 +1370,7 @@ function rendreTableau(liste){
         <button class="ico-btn suppr" onclick="supprimer('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div></td></tr>`;
   }).join('');
   zone.innerHTML=`<div class="tableau-wrap"><table class="tbl"><thead><tr>
-    ${th('raisonSociale','Raison sociale')}${th('lot',be?"Corps d'état":'Lots')}${be?'':(loc?th('materielLoue','Matériel loué'):th('typeIntervention','Intervention'))}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${st?(estAchats()?th('relation','Relation'):'')+th('consultAO','Service Commercial')+th('chantiersLuxe','Luxe'):th('adresse',be?'Adresse':'Agence référente')}${nt?th('note','Note'):''}<th></th>
+    ${th('raisonSociale','Raison sociale')}${th('lot',be?"Corps d'état":'Lots')}${be?'':(loc?th('materielLoue','Matériel loué'):th('typeIntervention','Intervention'))}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${th('ca','CA')}${st?(estAchats()?th('relation','Relation'):'')+th('consultAO','Service Commercial')+th('chantiersLuxe','Luxe'):th('adresse',be?'Adresse':'Agence référente')}${nt?th('note','Note'):''}<th></th>
   </tr></thead><tbody>${lignes}</tbody></table></div>`;
 }
 
@@ -1325,7 +1399,10 @@ function ouvrirFiche(arg){
   document.getElementById('f-id').value=modif?arg.id:''; document.getElementById('f-type').value=e.type||ongletActif;
   document.getElementById('f-raison').value=e.raisonSociale||''; document.getElementById('f-contact').value=e.contact||'';
   document.getElementById('f-tel').value=e.tel||''; document.getElementById('f-email').value=e.email||'';
-  document.getElementById('f-adresse').value=e.adresse||''; document.getElementById('f-siret').value=e.siret||''; document.getElementById('f-siteweb').value=e.siteweb||''; document.getElementById('f-notes').value=e.notes||'';
+  document.getElementById('f-adresse').value=e.adresse||''; document.getElementById('f-siret').value=e.siret||'';
+  { const f=e.finances||{}; document.getElementById('f-ca').value=f.ca!=null?String(f.ca):''; document.getElementById('f-ca-annee').value=f.annee||'';
+    document.getElementById('f-rn').value=f.resultatNet!=null?String(f.resultatNet):''; document.getElementById('f-effectif').value=f.effectif||''; document.getElementById('f-fin-source').value=f.source||'';
+    infoFin(f.majLe?`Dernière mise à jour : ${dateFr(f.majLe).split(' à')[0]} (${f.source==='annuaire'?'annuaire officiel':'saisie manuelle'}).`:'Source : annuaire officiel des entreprises (data.gouv). Sinon, saisis à la main.'); } document.getElementById('f-siteweb').value=e.siteweb||''; document.getElementById('f-notes').value=e.notes||'';
   interventionsForm = e.interventions ? Object.entries(e.interventions).map(([id,i])=>({id,...i})) : [];
   document.getElementById('f-intervention').value=e.typeIntervention||'';
   document.getElementById('f-contact-role').value=e.contactRole||'';
@@ -1339,6 +1416,7 @@ function ouvrirFiche(arg){
   { const cn=document.getElementById('f-nouveau'); cn.checked=!!(modif&&relations[arg.id]==='nouveau'); document.getElementById('lbl-nouveau').classList.toggle('oui',cn.checked); }
   remplirQualitesForm(e.qualites);
   majTypeFiche(); document.getElementById('f-intervention').value=e.typeIntervention||''; document.getElementById('f-lot').value=e.lotId||''; cocherLotsForm(lotsIds(e));
+  document.getElementById('iv-montant').value=''; majIvLots();
   basculerMsLots(false); document.getElementById('overlay-fiche').classList.add('ouvert');
 }
 function majRelationApresEnreg(id){ if(!estAchats()||!id||!db) return; const n=document.getElementById('f-nouveau').checked;
@@ -1361,7 +1439,9 @@ function enregistrerFiche(){
   if(doublons.length&&!confirm(`Attention, cette entreprise semble déjà exister :\n${doublons.join('\n')}\n\nEnregistrer quand même ?`)) return;
   const fiche={ raisonSociale:raison, lotId:document.getElementById('f-lot').value, contact:document.getElementById('f-contact').value.trim(),
     tel:document.getElementById('f-tel').value.trim(), email:document.getElementById('f-email').value.trim(),
-    adresse:document.getElementById('f-adresse').value.trim(), siret:document.getElementById('f-siret').value.trim(), siteweb:document.getElementById('f-siteweb').value.trim(), notes:document.getElementById('f-notes').value.trim() };
+    adresse:document.getElementById('f-adresse').value.trim(), siret:document.getElementById('f-siret').value.trim(),
+    finances:(()=>{ const ca=lireMontant(document.getElementById('f-ca').value), rn=lireMontant(document.getElementById('f-rn').value), an=(document.getElementById('f-ca-annee').value.match(/\d{4}/)||[''])[0], ef=document.getElementById('f-effectif').value.trim();
+      if(ca==null&&rn==null&&!ef) return null; return { ca, annee:an||null, resultatNet:rn, effectif:ef||null, source:document.getElementById('f-fin-source').value||'manuel', majLe:new Date().toISOString() }; })(), siteweb:document.getElementById('f-siteweb').value.trim(), notes:document.getElementById('f-notes').value.trim() };
   const ids=lotsTries(typeCible).map(l=>l.id).filter(id=>lotsCochesForm().includes(id));
   fiche.lotIds=ids.length?ids:null; fiche.lotId=ids[0]||'';
   fiche.typeIntervention=document.getElementById('f-intervention').value||null;
@@ -1373,7 +1453,7 @@ function enregistrerFiche(){
     tel:document.getElementById('f-c2-tel').value.trim(), email:document.getElementById('f-c2-email').value.trim() };
   fiche.contact2=(c2.nom||c2.role||c2.tel||c2.email)?c2:null;
   if(aNotes(typeCible)){
-    const obj={}; interventionsForm.forEach(i=>{ const k=i.id||('iv'+Math.random().toString(36).slice(2,9)); obj[k]={chantier:i.chantier||'',date:i.date||'',commentaire:i.commentaire||'',note:Number(i.note)||0}; if(i.criteres&&Object.keys(i.criteres).length) obj[k].criteres=i.criteres; });
+    const obj={}; interventionsForm.forEach(i=>{ const k=i.id||('iv'+Math.random().toString(36).slice(2,9)); obj[k]={chantier:i.chantier||'',date:i.date||'',commentaire:i.commentaire||'',note:Number(i.note)||0}; if(i.criteres&&Object.keys(i.criteres).length) obj[k].criteres=i.criteres; if(Number(i.montant)>0) obj[k].montant=Number(i.montant); if(i.lotId) obj[k].lotId=i.lotId; });
     fiche.interventions=obj;
     fiche.qualites=typeCible==='soustraitants'?lireQualitesForm():null;
     const ns=interventionsForm.map(i=>Number(i.note)||0).filter(n=>n>0);
@@ -1501,9 +1581,9 @@ function supprimerLot(id){ if(!confirm('Supprimer ce lot ? Les entreprises ratta
 function exporterCSV(){
   if(ongletActif==='dashboard'){ alert('Ouvre l\u2019onglet Fournisseurs ou Sous-traitants pour exporter.'); return; }
   const source=entreprises[ongletActif]||{}, st=(ongletActif==='soustraitants'), echap=v=>`"${String(v||'').replace(/"/g,'""')}"`;
-  const entete=[st?'Lots':'Lot','Raison sociale','Contact','Téléphone','Email','Site web',st?'Adresse':'Adresse agence référente','SIRET','Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention',...(ongletActif==='fournisseurs'?['Achat / Location','Matériel loué','Livraison chantier','Délai location']:[]),'Statut','Motif','Modifiée le','Modifiée par',...(st?['Note moy /5','Nb chantiers',...(estAchats()?['Relation']:[]),'Service Commercial','Chantiers luxe','Taille de chantiers','Type de travaux','Milieu occupé','Études']:(estBE(ongletActif)?['Note moy /5','Nb références']:[])),'Favori','Notes'];
+  const entete=[st?'Lots':'Lot','Raison sociale','Contact','Téléphone','Email','Site web',st?'Adresse':'Adresse agence référente','SIRET','Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention',...(ongletActif==='fournisseurs'?['Achat / Location','Matériel loué','Livraison chantier','Délai location']:[]),'Statut','Motif','Modifiée le','Modifiée par',...(st?['Note moy /5','Nb chantiers',...(estAchats()?['Relation']:[]),'Service Commercial','Chantiers luxe','Taille de chantiers','Type de travaux','Milieu occupé','Études']:(estBE(ongletActif)?['Note moy /5','Nb références']:[])),'Favori','Notes','CA (€)','Exercice CA','Résultat net (€)','Effectif'];
   const lignes=Object.values(source).map(e=>{ const lot=lotDe(ongletActif,e.lotId);
-    return [texteLots(ongletActif,e,' / ')||'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),...(ongletActif==='fournisseurs'?[libOffre(e),infosLoc(e).materiel,texteLivraison(e),infosLoc(e).delai]:[]),estEvite(e)?'À éviter':'Actif',e.motifEvite||'',dateFr(e.modifieLe),e.modifiePar||'',...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),...(estAchats()?[libRelation(e)]:[]),e.consultAO?'Oui':'Non',e.chantiersLuxe?'Oui':'Non',texteTailles(e.qualites),texteTravaux(e.qualites),texteOuiNon(e.qualites&&e.qualites.milieuOccupe),texteOuiNon(e.qualites&&e.qualites.etudes)]:(estBE(ongletActif)?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e)]:[])),e.favori?'Oui':'',e.notes].map(echap).join(';'); });
+    return [texteLots(ongletActif,e,' / ')||'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),...(ongletActif==='fournisseurs'?[libOffre(e),infosLoc(e).materiel,texteLivraison(e),infosLoc(e).delai]:[]),estEvite(e)?'À éviter':'Actif',e.motifEvite||'',dateFr(e.modifieLe),e.modifiePar||'',...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),...(estAchats()?[libRelation(e)]:[]),e.consultAO?'Oui':'Non',e.chantiersLuxe?'Oui':'Non',texteTailles(e.qualites),texteTravaux(e.qualites),texteOuiNon(e.qualites&&e.qualites.milieuOccupe),texteOuiNon(e.qualites&&e.qualites.etudes)]:(estBE(ongletActif)?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e)]:[])),e.favori?'Oui':'',e.notes,...(f=>[f.ca!=null?f.ca:'',f.annee||'',f.resultatNet!=null?f.resultatNet:'',f.effectif||''])(finDe(e)||{})].map(echap).join(';'); });
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+[entete.join(';'),...lignes].join('\n')],{type:'text/csv;charset=utf-8;'})); a.download=`${ongletActif}-lab.csv`; a.click();
 }
 
@@ -1524,7 +1604,7 @@ function colonnesExcel(type){ const st=type==='soustraitants', q=e=>e.qualites||
       ['Type de travaux',e=>texteTravaux(q(e)),24],['Milieu occupé',e=>texteOuiNon(q(e).milieuOccupe),13],['Études',e=>texteOuiNon(q(e).etudes),10]]:(estBE(type)?[['Note moy. /5',e=>noteMoyenne(e)?Math.round(noteMoyenne(e)*10)/10:'',12],['Nb références',e=>nbChantiers(e)||'',13]]:[])),
     ['Contact référent',e=>e.contact,20],['Rôle',e=>e.contactRole,18],['Téléphone',e=>e.tel,15],['Email',e=>e.email,28],
     ['Contact 2',e=>(e.contact2||{}).nom,18],['Rôle contact 2',e=>(e.contact2||{}).role,18],['Tél. contact 2',e=>(e.contact2||{}).tel,15],['Email contact 2',e=>(e.contact2||{}).email,26],
-    [st?'Adresse':'Agence référente',e=>e.adresse,34],['SIRET',e=>e.siret,17],['Site web',e=>e.siteweb,24],
+    [st?'Adresse':'Agence référente',e=>e.adresse,34],['SIRET',e=>e.siret,17],['CA (€)',e=>finDe(e)&&finDe(e).ca!=null?finDe(e).ca:'',14],['Exercice CA',e=>finDe(e)&&finDe(e).annee||'',11],['Résultat net (€)',e=>finDe(e)&&finDe(e).resultatNet!=null?finDe(e).resultatNet:'',15],...(aNotes(type)?[['Volume avec LAB (€ HT)',e=>volumeLAB(type,e).total||'',17],['Plus gros marché LAB (€ HT)',e=>volumeLAB(type,e).max||'',18]]:[]),['Effectif',e=>finDe(e)&&finDe(e).effectif||'',18],['Site web',e=>e.siteweb,24],
     ['Motif (à éviter)',e=>e.motifEvite,26],['Favori',e=>e.favori?'★':'',8],['Notes',e=>e.notes,40],
     ['Modifiée le',e=>dateFr(e.modifieLe),18],['Modifiée par',e=>e.modifiePar,24]
   ]; }
@@ -1546,15 +1626,15 @@ function feuilleExcel(wb,nom,type,coul){
   return liste.length; }
 function feuilleEvaluations(wb){
   const ws=wb.addWorksheet('Évaluations',{views:[{state:'frozen',xSplit:2,ySplit:1}]});
-  ws.columns=[{header:'Sous-traitant',width:26},{header:'Chantier',width:30},{header:'Date',width:12},
+  ws.columns=[{header:'Sous-traitant',width:26},{header:'Chantier',width:30},{header:'Date',width:12},{header:'Lot',width:22},{header:'Montant HT (€)',width:15},
     ...CRITERES.map(([,lib])=>({header:lib,width:14})),{header:'Note /5',width:10},{header:'Commentaire',width:44}];
   let n=0;
   Object.values(entreprises.soustraitants||{}).sort((a,b)=>String(a.raisonSociale).localeCompare(String(b.raisonSociale),'fr')).forEach(e=>{
     interventionsArr(e).forEach(i=>{ const c=i.criteres||{}; n++;
-      const r=ws.addRow([e.raisonSociale,i.chantier,i.date||'',...CRITERES.map(([k])=>c[k]||''),Number(i.note)||'',i.commentaire||'']);
+      const r=ws.addRow([e.raisonSociale,i.chantier,i.date||'',libLotIv('soustraitants',i),Number(i.montant)||'',...CRITERES.map(([k])=>c[k]||''),Number(i.note)||'',i.commentaire||'']);
       r.eachCell({includeEmpty:true},x=>{ x.alignment={vertical:'top',wrapText:true}; x.border={bottom:{style:'hair',color:{argb:'FFD5DBE3'}}}; });
-      for(let k=4;k<=4+CRITERES.length;k++) r.getCell(k).alignment={vertical:'top',horizontal:'center'};
-      r.getCell(4+CRITERES.length).font={bold:true,color:{argb:'FF1F5FAE'}}; }); });
+      for(let k=6;k<=6+CRITERES.length;k++) r.getCell(k).alignment={vertical:'top',horizontal:'center'};
+      r.getCell(6+CRITERES.length).font={bold:true,color:{argb:'FF1F5FAE'}}; }); });
   styleEntete(ws,'FF1F2937'); ws.autoFilter={from:{row:1,column:1},to:{row:1,column:ws.columns.length}};
   ws.pageSetup={orientation:'landscape',paperSize:9,fitToPage:true,fitToWidth:1,fitToHeight:0,printTitlesRow:'1:1'};
   return n; }
@@ -1673,9 +1753,11 @@ function feuilleHTML(e,type){
   const cleDate=d=>{ const s=String(d||''); let m=s.match(/(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})/); if(m) return m[3]+m[2].padStart(2,'0')+m[1].padStart(2,'0');
     m=s.match(/(\d{1,2})[\/.\-](\d{4})/); if(m) return m[2]+m[1].padStart(2,'0')+'00'; m=s.match(/(\d{4})/); return m?m[1]+'0000':''; };
   const histo=arr.map((i,k)=>({i,k,d:cleDate(i.date)})).sort((a,b)=>(b.d||'').localeCompare(a.d||'')||a.k-b.k).map(x=>x.i);
-  const nbNotes=arr.filter(i=>Number(i.note)>0).length;
+  const nbNotes=arr.filter(i=>Number(i.note)>0).length, vol=volumeLAB(type,e);
+  const volHtml=(nt&&vol.total)?`<div class="f-volume"><div><span>Total réalisé avec LAB</span><b>${fmtMontant(vol.total)} HT</b></div><div><span>Plus gros marché</span><b>${fmtMontant(vol.max)} HT</b></div><div><span>Chantiers chiffrés</span><b>${vol.nbM} / ${arr.length}</b></div></div>
+    ${Object.keys(vol.parLot).length?`<div class="f-parlot"><b>Par lot :</b> ${Object.entries(vol.parLot).sort((a,b)=>b[1].m-a[1].m).map(([l,o])=>`${esc(l)} — ${o.n} chantier${o.n>1?'s':''}${o.m?', '+fmtMontant(o.m):''}`).join(' · ')}</div>`:''}`:'';
   const histoHtml = nt?`<div class="f-notes-bloc f-histo"><div class="lab">${be?'Références chantiers':'Historique des chantiers réalisés pour LAB'}${arr.length?` <span class="f-histo-resume">${arr.length} chantier${arr.length>1?'s':''}${moy?' · note moyenne '+moy.toFixed(1)+'/5'+(nbNotes<arr.length?' sur '+nbNotes+' noté'+(nbNotes>1?'s':''):''):''}</span>`:''}</div>
-    ${arr.length?`<div class="f-grille">${histo.map(i=>`<div class="f-ligne f-chantier"><div class="f-ch-info"><div class="f-ch-nom">${esc(i.chantier||'Chantier sans nom')}${i.date?`<span class="f-ch-date">${esc(i.date)}</span>`:''}</div>${i.commentaire?`<div class="f-ch-com">${esc(i.commentaire)}</div>`:''}${i.criteres?`<div class="f-ch-crit">${esc(resumeCriteres(i.criteres))}</div>`:''}</div><div class="f-ch-note">${Number(i.note)>0?etoiles(Math.round(i.note))+`<span>${(Math.round(Number(i.note)*10)/10).toString().replace('.',',')}/5</span>`:'<span class="mut">Non noté</span>'}</div></div>`).join('')}</div>`
+    ${volHtml}${arr.length?`<div class="f-grille">${histo.map(i=>`<div class="f-ligne f-chantier"><div class="f-ch-info"><div class="f-ch-nom">${esc(i.chantier||'Chantier sans nom')}${i.date?`<span class="f-ch-date">${esc(i.date)}</span>`:''}</div>${(i.lotId||Number(i.montant)>0)?`<div class="f-ch-mt">${[libLotIv(type,i),Number(i.montant)>0?fmtMontant(i.montant)+' HT':''].filter(Boolean).map(esc).join(' · ')}</div>`:''}${i.commentaire?`<div class="f-ch-com">${esc(i.commentaire)}</div>`:''}${i.criteres?`<div class="f-ch-crit">${esc(resumeCriteres(i.criteres))}</div>`:''}</div><div class="f-ch-note">${Number(i.note)>0?etoiles(Math.round(i.note))+`<span>${(Math.round(Number(i.note)*10)/10).toString().replace('.',',')}/5</span>`:'<span class="mut">Non noté</span>'}</div></div>`).join('')}</div>`
       :`<div class="txt f-histo-vide">${be?'Aucune référence chantier enregistrée pour l’instant.':'Aucun chantier enregistré avec LAB pour l’instant.'}</div>`}</div>`:'';
   return `<div class="feuille">
       <div class="f-entete">
@@ -1699,6 +1781,9 @@ function feuilleHTML(e,type){
         ${ligne(type!=='fournisseurs'?'Adresse':'Agence référente',e.adresse)}
         ${estEvite(e)?`<div class="f-ligne"><div class="lab">Statut</div><div class="val" style="color:#b91c1c;font-weight:700">À éviter — ${esc(e.motifEvite||'motif non précisé')}</div></div>`:''}
         ${ligne('SIRET',e.siret,true)}
+        ${finDe(e)&&finDe(e).ca!=null?ligne('Chiffre d\u2019affaires',fmtMontant(finDe(e).ca)+(finDe(e).annee?' (exercice '+finDe(e).annee+')':'')+(finDe(e).source==='annuaire'?' — source : annuaire officiel':'')):''}
+        ${finDe(e)&&finDe(e).resultatNet!=null?ligne('Résultat net',fmtMontant(finDe(e).resultatNet)):''}
+        ${finDe(e)&&finDe(e).effectif?ligne('Effectif',finDe(e).effectif):''}
         ${st&&estAchats()?ligne('Relation avec LAB',estHabitue(e)?'Partenaire (déjà travaillé ensemble)':'Nouveau (jamais travaillé ensemble)'):''}
         ${st?ligne('Service Commercial',e.consultAO?'Oui':'Non'):''}
         ${st?ligne('Chantiers luxe',e.chantiersLuxe?'Oui':'Non'):''}
@@ -1787,6 +1872,7 @@ function carteIA(e){
       <div class="nom">${esc(e.raisonSociale)}${e.favori?' <span class="fav-ia">★</span>':''}${estEvite(e)?' <span class="ev-ia">À éviter</span>':''}</div>
       <div class="meta">${esc(badges.join(' · '))}</div>
       ${nt?`<div class="meta">${moy?etoiles(Math.round(moy))+' <b>'+moy.toFixed(1)+'/5</b>'+(nbChantiers(e)?' · '+nbChantiers(e)+(st?' chantier':' référence')+(nbChantiers(e)>1?'s':''):''):'Pas encore noté'}</div>`:''}
+      ${libCA(e)?`<div class="meta">💶 CA ${esc(libCA(e))}</div>`:''}
       ${e.contact?`<div class="meta">👤 ${esc(e.contact)}${e.contactRole?' ('+esc(e.contactRole)+')':''}</div>`:''}
       ${estEvite(e)&&e.motifEvite?`<div class="meta" style="color:#b91c1c">Motif : ${esc(e.motifEvite)}</div>`:''}</div></div>
     <div class="res-actions">
