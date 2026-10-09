@@ -886,7 +886,7 @@ function aNotes(t){ return t==='soustraitants'||t==='bureauxetudes'; }
 /* ===== FOURNISSEURS : ACHAT / LOCATION =====
    Champ "offre" sur la fiche fournisseur : 'achat' (défaut si absent), 'location' ou 'les2'.
    Un fournisseur 'les2' apparaît dans les deux sous-onglets. */
-const VERSION='v31'; // à incrémenter à chaque mise en ligne
+const VERSION='v32'; // à incrémenter à chaque mise en ligne
 let sousOngletF='achat';
 const LIB_OFFRE={achat:'Achat',location:'Location',les2:'Achat et location'};
 function offreDe(e){ return (e&&(e.offre==='location'||e.offre==='les2'))?e.offre:'achat'; }
@@ -1943,6 +1943,13 @@ function distance(a,b){ if(Math.abs(a.length-b.length)>2) return 9; const d=Arra
   return d[a.length][b.length]; }
 function motProche(t,w){ if(t===w) return true; if(t.length<5||w.length<5) return false; return distance(t,w)<=(w.length>=9?2:1); }
 function contientMot(txt,terme){ return (' '+txt+' ').includes(' '+terme+' '); }
+// Comparaison tolérante aux pluriels / singuliers (« ascenseurs » ↔ lot « Ascenseur »)
+function racine(w){ w=String(w||''); if(w.length>4) w=w.replace(/(eaux|aux)$/,'al').replace(/[sx]$/,''); return w; }
+function motsLibelle(lib){ return norm(lib).split(/[^a-z0-9]+/).filter(Boolean); }
+function libelleContient(lib,k){ const n=norm(lib), r=racine(k); if(n.includes(k)||n.includes(r)) return true; return motsLibelle(lib).some(x=>racine(x)===r); }
+function lotsParMots(c,mots){ let ok=false; mots.forEach(w=>{ if(w.length<3) return; const rw=racine(w);
+    TYPES.forEach(ty=>lotsTries(ty).forEach(l=>{ if(motsLibelle(l.libelle).some(x=>{ const rx=racine(x); return x.length>=3&&(rx===rw||(rw.length>=4&&rx.length>=4&&(motProche(rw,rx)||rx.startsWith(rw)||rw.startsWith(rx)))); })){ c.lots[ty].add(l.id); ok=true; if(!c.metiers.includes(l.libelle)) c.metiers.push(l.libelle); } })); });
+  return ok; }
 function analyserQuestion(q){
   let n=' '+norm(q).replace(/[^a-z0-9/]+/g,' ')+' ';
   const brut=norm(q).replace(/[^a-z0-9]+/g,' ').trim().split(' ').filter(w=>w.length>1&&!IA_STOP.has(w));
@@ -1977,12 +1984,14 @@ function analyserQuestion(q){
   IA_METIERS.forEach(([nom,termes,cles])=>{ let ok=false;
     termes.forEach(t=>{ if(t.includes(' ')){ if(contientMot(n.trim(),t)){ ok=true; n=n.replace(' '+t+' ',' '); } } });
     n.trim().split(' ').forEach(w=>{ if(termes.some(t=>!t.includes(' ')&&motProche(w,t))){ ok=true; n=(' '+n+' ').replace(' '+w+' ',' '); } });
-    if(ok){ c.metiers.push(nom); TYPES.forEach(ty=>lotsTries(ty).forEach(l=>{ if(cles.some(k=>norm(l.libelle).includes(k))) c.lots[ty].add(l.id); })); } });
+    if(ok){ c.metiers.push(nom); TYPES.forEach(ty=>lotsTries(ty).forEach(l=>{ if(cles.some(k=>libelleContient(l.libelle,k))) c.lots[ty].add(l.id); })); } });
+  // Métier reconnu mais aucun lot trouvé avec ses mots-clés : on compare directement les mots tapés aux noms des lots
+  if(c.metiers.length&&!aDesLots(c)) lotsParMots(c,brut);
   // Mots restants : comparés aux libellés de lots (lots ajoutés à la main compris)
   const restants=n.trim().split(/\s+/).filter(w=>w.length>1&&!IA_STOP.has(w));
   const libres=[];
   restants.forEach(w=>{ let lot=false; if(c.metiers.length){ libres.push(w); return; }
-    TYPES.forEach(ty=>lotsTries(ty).forEach(l=>{ if(w.length>=4&&norm(l.libelle).split(/[^a-z0-9]+/).some(x=>x.length>=4&&motProche(w,x))){ c.lots[ty].add(l.id); lot=true; if(!c.metiers.includes(l.libelle)) c.metiers.push(l.libelle); } }));
+    if(w.length>=4) lot=lotsParMots(c,[w]);
     if(!lot) libres.push(w); });
   c.tokens=libres;
   if(!c.type&&c.lots.soustraitants.size&&c.lots.fournisseurs.size) c.type='soustraitants';
