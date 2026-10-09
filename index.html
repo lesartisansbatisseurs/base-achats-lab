@@ -396,7 +396,7 @@
   .f-ligne .lab { width:175px; flex-shrink:0; background:#f7f8fa; padding:13px 16px; font-size:11.5px; font-weight:600; color:var(--gris); text-transform:uppercase; letter-spacing:.03em; }
   .f-ligne .val { padding:13px 16px; font-size:14px; } .f-ligne .val.mono { font-family:var(--mono); }
   .f-notes-bloc { margin-top:20px; }
-  .bloc-fin { display:flex; flex-direction:column; gap:12px; border:1px solid var(--bord); border-radius:11px; padding:13px 14px; background:#fafbfc; }
+  .bloc-fin { display:flex; flex-direction:column; gap:14px; background:#fff; }
   .bloc-fin .titre-bloc { font-size:12px; font-weight:600; color:var(--gris); text-transform:uppercase; letter-spacing:.03em; }
   .bloc-fin .fin-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   #fin-info { font-size:12.5px; color:var(--gris); line-height:1.45; } #fin-info.ok { color:#15803d; } #fin-info.ko { color:#b45309; }
@@ -766,8 +766,7 @@
       <div class="fin-actions"><button type="button" class="btn" onclick="recupererFinances()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>Récupérer avec le SIRET</button><span id="fin-info">Source : annuaire officiel des entreprises (data.gouv). Sinon, saisis à la main.</span></div>
       <div class="duo"><label class="champ"><span>Chiffre d'affaires (€ HT)</span><input id="f-ca" inputmode="decimal" placeholder="ex : 1 250 000 ou 1,25 M" oninput="finManuel()" /></label>
         <label class="champ"><span>Exercice</span><input id="f-ca-annee" inputmode="numeric" placeholder="ex : 2024" oninput="finManuel()" /></label></div>
-      <div class="duo"><label class="champ"><span>Résultat net (€)</span><input id="f-rn" inputmode="decimal" placeholder="ex : 85 000 ou -20 000" oninput="finManuel()" /></label>
-        <label class="champ"><span>Effectif</span><input id="f-effectif" placeholder="ex : 10 à 19 salariés" oninput="finManuel()" /></label></div>
+      <label class="champ"><span>Effectif</span><input id="f-effectif" placeholder="ex : 10 à 19 salariés" oninput="finManuel()" /></label>
       <input type="hidden" id="f-fin-source" /></div>
     <label class="champ"><span>Notes</span><textarea id="f-notes" rows="2"></textarea></label>
     <div class="f-trace" id="f-trace"></div>
@@ -884,7 +883,7 @@ function aNotes(t){ return t==='soustraitants'||t==='bureauxetudes'; }
 /* ===== FOURNISSEURS : ACHAT / LOCATION =====
    Champ "offre" sur la fiche fournisseur : 'achat' (défaut si absent), 'location' ou 'les2'.
    Un fournisseur 'les2' apparaît dans les deux sous-onglets. */
-const VERSION='v28'; // à incrémenter à chaque mise en ligne
+const VERSION='v29'; // à incrémenter à chaque mise en ligne
 let sousOngletF='achat';
 const LIB_OFFRE={achat:'Achat',location:'Location',les2:'Achat et location'};
 function offreDe(e){ return (e&&(e.offre==='location'||e.offre==='les2'))?e.offre:'achat'; }
@@ -1033,7 +1032,7 @@ let interventionsForm=[];
 // ===== Statut, traçabilité, doublons, contrôles de saisie =====
 function estEvite(e){ return e&&e.statut==='eviter'; }
 /* ===== DONNÉES FINANCIÈRES (CA) =====
-   finances = { ca, annee, resultatNet, effectif, source:'annuaire'|'manuel', majLe }
+   finances = { ca, annee, effectif, source:'annuaire'|'manuel', majLe }
    Récupération automatique : API publique gratuite recherche-entreprises.api.gouv.fr (comptes publiés au greffe). */
 // Repères « a-t-il les épaules ? » : part du montant du lot dans le CA annuel de l'entreprise
 const CAPACITE_SEUILS={ aise:0.25, vigilance:0.50 }; // ≤ 25 % : à l'aise · 25–50 % : vigilance · > 50 % : risqué
@@ -1044,7 +1043,7 @@ function lireMontant(v){ let s=String(v==null?'':v).trim().toLowerCase().replace
 function fmtMontant(n){ if(n==null||!isFinite(n)) return ''; const a=Math.abs(n), sg=n<0?'-':'';
   if(a>=1e6) return sg+(a/1e6).toLocaleString('fr-FR',{maximumFractionDigits:a>=1e7?1:2})+' M€';
   if(a>=1e3) return sg+Math.round(a/1e3).toLocaleString('fr-FR')+' k€'; return sg+Math.round(a).toLocaleString('fr-FR')+' €'; }
-function finDe(e){ const f=e&&e.finances; return f&&(f.ca!=null||f.resultatNet!=null||f.effectif)?f:null; }
+function finDe(e){ const f=e&&e.finances; return f&&(f.ca!=null||f.effectif)?f:null; }
 function libCA(e){ const f=finDe(e); return f&&f.ca!=null?fmtMontant(f.ca)+(f.annee?' ('+f.annee+')':''):''; }
 function capacite(e,montant){ const f=finDe(e); if(!montant) return null; if(!f||!f.ca) return {cls:'gris',txt:'CA inconnu'};
   const r=montant/f.ca, pct=Math.round(r*100)+' % du CA';
@@ -1062,9 +1061,8 @@ async function recupererFinances(){ const siren=(document.getElementById('f-sire
     const eff=TRANCHES_EFFECTIF[x.tranche_effectif_salarie]||''; if(eff&&x.tranche_effectif_salarie!=='NN') document.getElementById('f-effectif').value=eff+(x.annee_tranche_effectif_salarie?' ('+x.annee_tranche_effectif_salarie+')':'');
     const ferme=x.etat_administratif==='F'?' ⚠️ Attention : entreprise fermée selon l’INSEE.':'';
     if(fi&&fi.ca!=null){ document.getElementById('f-ca').value=String(fi.ca); document.getElementById('f-ca-annee').value=an;
-      document.getElementById('f-rn').value=fi.resultat_net!=null?String(fi.resultat_net):'';
       document.getElementById('f-fin-source').value='annuaire';
-      infoFin(`✓ ${x.nom_complet} — CA ${an} : ${fmtMontant(fi.ca)}${fi.resultat_net!=null?' · résultat net : '+fmtMontant(fi.resultat_net):''}. Pense à enregistrer.${ferme}`,ferme?'ko':'ok'); }
+      infoFin(`✓ ${x.nom_complet} — CA ${an} : ${fmtMontant(fi.ca)}. Pense à enregistrer.${ferme}`,ferme?'ko':'ok'); }
     else infoFin(`${x.nom_complet} trouvée, mais ses comptes ne sont pas publiés (souvent confidentiels pour les petites entreprises). Demande le CA à l’entreprise et saisis-le à la main.${ferme}`,'ko');
   }catch(err){ console.warn(err); infoFin('Annuaire injoignable pour le moment (connexion ou réseau de l’entreprise). Saisis le CA à la main ou réessaie plus tard.','ko'); } }
 /* ===== RELATION AVEC LAB : HABITUÉ / NOUVEAU (sous-traitants) =====
@@ -1365,7 +1363,7 @@ function rendreTableau(liste){
       <td>${libCA(e)?`<span class="ca-info" style="white-space:nowrap">${esc(fmtMontant(finDe(e).ca))}</span>${finDe(e).annee?`<div class="mut" style="font-size:11.5px">${esc(finDe(e).annee)}</div>`:''}`:'<span class="mut">—</span>'}</td>
       ${st?`${estAchats()?`<td>${pastilleRel(e)}</td>`:''}<td>${caseAO(e,false)}</td><td>${caseLuxe(e,false)}</td>`:`<td>${e.adresse?`<span class="tbl-adr">${esc(e.adresse)}</span>`:'<span class="mut">—</span>'}</td>`}
       ${nt?`<td>${noteMoyenne(e)?etoiles(Math.round(noteMoyenne(e)))+' <span class="tbl-mono">'+noteMoyenne(e).toFixed(1)+'</span>'+(nbChantiers(e)?' <span class="mut">('+nbChantiers(e)+')</span>':''):'<span class="mut">—</span>'}</td>`:''}
-      <td><div class="tbl-actions"><button class="ico-btn fav" title="Favori" onclick="toggleFavori('${e.id}')">${etoileSVG(!!e.favori)}</button><button class="ico-btn" title="Fiche PDF" onclick="ouvrirFichePDF('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
+      <td><div class="tbl-actions"><button class="ico-btn fav" title="Favori" onclick="toggleFavori('${e.id}')">${etoileSVG(!!e.favori)}</button>
         <button class="ico-btn" title="Modifier" onclick='ouvrirFiche(${JSON.stringify({id:e.id})})'><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
         <button class="ico-btn suppr" onclick="supprimer('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div></td></tr>`;
   }).join('');
@@ -1401,7 +1399,7 @@ function ouvrirFiche(arg){
   document.getElementById('f-tel').value=e.tel||''; document.getElementById('f-email').value=e.email||'';
   document.getElementById('f-adresse').value=e.adresse||''; document.getElementById('f-siret').value=e.siret||'';
   { const f=e.finances||{}; document.getElementById('f-ca').value=f.ca!=null?String(f.ca):''; document.getElementById('f-ca-annee').value=f.annee||'';
-    document.getElementById('f-rn').value=f.resultatNet!=null?String(f.resultatNet):''; document.getElementById('f-effectif').value=f.effectif||''; document.getElementById('f-fin-source').value=f.source||'';
+    document.getElementById('f-effectif').value=f.effectif||''; document.getElementById('f-fin-source').value=f.source||'';
     infoFin(f.majLe?`Dernière mise à jour : ${dateFr(f.majLe).split(' à')[0]} (${f.source==='annuaire'?'annuaire officiel':'saisie manuelle'}).`:'Source : annuaire officiel des entreprises (data.gouv). Sinon, saisis à la main.'); } document.getElementById('f-siteweb').value=e.siteweb||''; document.getElementById('f-notes').value=e.notes||'';
   interventionsForm = e.interventions ? Object.entries(e.interventions).map(([id,i])=>({id,...i})) : [];
   document.getElementById('f-intervention').value=e.typeIntervention||'';
@@ -1440,8 +1438,8 @@ function enregistrerFiche(){
   const fiche={ raisonSociale:raison, lotId:document.getElementById('f-lot').value, contact:document.getElementById('f-contact').value.trim(),
     tel:document.getElementById('f-tel').value.trim(), email:document.getElementById('f-email').value.trim(),
     adresse:document.getElementById('f-adresse').value.trim(), siret:document.getElementById('f-siret').value.trim(),
-    finances:(()=>{ const ca=lireMontant(document.getElementById('f-ca').value), rn=lireMontant(document.getElementById('f-rn').value), an=(document.getElementById('f-ca-annee').value.match(/\d{4}/)||[''])[0], ef=document.getElementById('f-effectif').value.trim();
-      if(ca==null&&rn==null&&!ef) return null; return { ca, annee:an||null, resultatNet:rn, effectif:ef||null, source:document.getElementById('f-fin-source').value||'manuel', majLe:new Date().toISOString() }; })(), siteweb:document.getElementById('f-siteweb').value.trim(), notes:document.getElementById('f-notes').value.trim() };
+    finances:(()=>{ const ca=lireMontant(document.getElementById('f-ca').value), an=(document.getElementById('f-ca-annee').value.match(/\d{4}/)||[''])[0], ef=document.getElementById('f-effectif').value.trim();
+      if(ca==null&&!ef) return null; return { ca, annee:an||null, effectif:ef||null, source:document.getElementById('f-fin-source').value||'manuel', majLe:new Date().toISOString() }; })(), siteweb:document.getElementById('f-siteweb').value.trim(), notes:document.getElementById('f-notes').value.trim() };
   const ids=lotsTries(typeCible).map(l=>l.id).filter(id=>lotsCochesForm().includes(id));
   fiche.lotIds=ids.length?ids:null; fiche.lotId=ids[0]||'';
   fiche.typeIntervention=document.getElementById('f-intervention').value||null;
@@ -1581,9 +1579,9 @@ function supprimerLot(id){ if(!confirm('Supprimer ce lot ? Les entreprises ratta
 function exporterCSV(){
   if(ongletActif==='dashboard'){ alert('Ouvre l\u2019onglet Fournisseurs ou Sous-traitants pour exporter.'); return; }
   const source=entreprises[ongletActif]||{}, st=(ongletActif==='soustraitants'), echap=v=>`"${String(v||'').replace(/"/g,'""')}"`;
-  const entete=[st?'Lots':'Lot','Raison sociale','Contact','Téléphone','Email','Site web',st?'Adresse':'Adresse agence référente','SIRET','Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention',...(ongletActif==='fournisseurs'?['Achat / Location','Matériel loué','Livraison chantier','Délai location']:[]),'Statut','Motif','Modifiée le','Modifiée par',...(st?['Note moy /5','Nb chantiers',...(estAchats()?['Relation']:[]),'Service Commercial','Chantiers luxe','Taille de chantiers','Type de travaux','Milieu occupé','Études']:(estBE(ongletActif)?['Note moy /5','Nb références']:[])),'Favori','Notes','CA (€)','Exercice CA','Résultat net (€)','Effectif'];
+  const entete=[st?'Lots':'Lot','Raison sociale','Contact','Téléphone','Email','Site web',st?'Adresse':'Adresse agence référente','SIRET','Rôle contact référent','Contact 2','Rôle contact 2','Tél. contact 2','Email contact 2','Type d\'intervention',...(ongletActif==='fournisseurs'?['Achat / Location','Matériel loué','Livraison chantier','Délai location']:[]),'Statut','Motif','Modifiée le','Modifiée par',...(st?['Note moy /5','Nb chantiers',...(estAchats()?['Relation']:[]),'Service Commercial','Chantiers luxe','Taille de chantiers','Type de travaux','Milieu occupé','Études']:(estBE(ongletActif)?['Note moy /5','Nb références']:[])),'Favori','Notes','CA (€)','Exercice CA','Effectif'];
   const lignes=Object.values(source).map(e=>{ const lot=lotDe(ongletActif,e.lotId);
-    return [texteLots(ongletActif,e,' / ')||'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),...(ongletActif==='fournisseurs'?[libOffre(e),infosLoc(e).materiel,texteLivraison(e),infosLoc(e).delai]:[]),estEvite(e)?'À éviter':'Actif',e.motifEvite||'',dateFr(e.modifieLe),e.modifiePar||'',...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),...(estAchats()?[libRelation(e)]:[]),e.consultAO?'Oui':'Non',e.chantiersLuxe?'Oui':'Non',texteTailles(e.qualites),texteTravaux(e.qualites),texteOuiNon(e.qualites&&e.qualites.milieuOccupe),texteOuiNon(e.qualites&&e.qualites.etudes)]:(estBE(ongletActif)?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e)]:[])),e.favori?'Oui':'',e.notes,...(f=>[f.ca!=null?f.ca:'',f.annee||'',f.resultatNet!=null?f.resultatNet:'',f.effectif||''])(finDe(e)||{})].map(echap).join(';'); });
+    return [texteLots(ongletActif,e,' / ')||'Sans lot',e.raisonSociale,e.contact,e.tel,e.email,e.siteweb,e.adresse,e.siret,e.contactRole,...(c=>[c.nom,c.role,c.tel,c.email])(e.contact2||{}),libIntervention(e),...(ongletActif==='fournisseurs'?[libOffre(e),infosLoc(e).materiel,texteLivraison(e),infosLoc(e).delai]:[]),estEvite(e)?'À éviter':'Actif',e.motifEvite||'',dateFr(e.modifieLe),e.modifiePar||'',...(st?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e),...(estAchats()?[libRelation(e)]:[]),e.consultAO?'Oui':'Non',e.chantiersLuxe?'Oui':'Non',texteTailles(e.qualites),texteTravaux(e.qualites),texteOuiNon(e.qualites&&e.qualites.milieuOccupe),texteOuiNon(e.qualites&&e.qualites.etudes)]:(estBE(ongletActif)?[noteMoyenne(e)?noteMoyenne(e).toFixed(2):'',nbChantiers(e)]:[])),e.favori?'Oui':'',e.notes,...(f=>[f.ca!=null?f.ca:'',f.annee||'',f.effectif||''])(finDe(e)||{})].map(echap).join(';'); });
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\uFEFF'+[entete.join(';'),...lignes].join('\n')],{type:'text/csv;charset=utf-8;'})); a.download=`${ongletActif}-lab.csv`; a.click();
 }
 
@@ -1604,7 +1602,7 @@ function colonnesExcel(type){ const st=type==='soustraitants', q=e=>e.qualites||
       ['Type de travaux',e=>texteTravaux(q(e)),24],['Milieu occupé',e=>texteOuiNon(q(e).milieuOccupe),13],['Études',e=>texteOuiNon(q(e).etudes),10]]:(estBE(type)?[['Note moy. /5',e=>noteMoyenne(e)?Math.round(noteMoyenne(e)*10)/10:'',12],['Nb références',e=>nbChantiers(e)||'',13]]:[])),
     ['Contact référent',e=>e.contact,20],['Rôle',e=>e.contactRole,18],['Téléphone',e=>e.tel,15],['Email',e=>e.email,28],
     ['Contact 2',e=>(e.contact2||{}).nom,18],['Rôle contact 2',e=>(e.contact2||{}).role,18],['Tél. contact 2',e=>(e.contact2||{}).tel,15],['Email contact 2',e=>(e.contact2||{}).email,26],
-    [st?'Adresse':'Agence référente',e=>e.adresse,34],['SIRET',e=>e.siret,17],['CA (€)',e=>finDe(e)&&finDe(e).ca!=null?finDe(e).ca:'',14],['Exercice CA',e=>finDe(e)&&finDe(e).annee||'',11],['Résultat net (€)',e=>finDe(e)&&finDe(e).resultatNet!=null?finDe(e).resultatNet:'',15],...(aNotes(type)?[['Volume avec LAB (€ HT)',e=>volumeLAB(type,e).total||'',17],['Plus gros marché LAB (€ HT)',e=>volumeLAB(type,e).max||'',18]]:[]),['Effectif',e=>finDe(e)&&finDe(e).effectif||'',18],['Site web',e=>e.siteweb,24],
+    [st?'Adresse':'Agence référente',e=>e.adresse,34],['SIRET',e=>e.siret,17],['CA (€)',e=>finDe(e)&&finDe(e).ca!=null?finDe(e).ca:'',14],['Exercice CA',e=>finDe(e)&&finDe(e).annee||'',11],...(aNotes(type)?[['Volume avec LAB (€ HT)',e=>volumeLAB(type,e).total||'',17],['Plus gros marché LAB (€ HT)',e=>volumeLAB(type,e).max||'',18]]:[]),['Effectif',e=>finDe(e)&&finDe(e).effectif||'',18],['Site web',e=>e.siteweb,24],
     ['Motif (à éviter)',e=>e.motifEvite,26],['Favori',e=>e.favori?'★':'',8],['Notes',e=>e.notes,40],
     ['Modifiée le',e=>dateFr(e.modifieLe),18],['Modifiée par',e=>e.modifiePar,24]
   ]; }
@@ -1782,7 +1780,6 @@ function feuilleHTML(e,type){
         ${estEvite(e)?`<div class="f-ligne"><div class="lab">Statut</div><div class="val" style="color:#b91c1c;font-weight:700">À éviter — ${esc(e.motifEvite||'motif non précisé')}</div></div>`:''}
         ${ligne('SIRET',e.siret,true)}
         ${finDe(e)&&finDe(e).ca!=null?ligne('Chiffre d\u2019affaires',fmtMontant(finDe(e).ca)+(finDe(e).annee?' (exercice '+finDe(e).annee+')':'')+(finDe(e).source==='annuaire'?' — source : annuaire officiel':'')):''}
-        ${finDe(e)&&finDe(e).resultatNet!=null?ligne('Résultat net',fmtMontant(finDe(e).resultatNet)):''}
         ${finDe(e)&&finDe(e).effectif?ligne('Effectif',finDe(e).effectif):''}
         ${st&&estAchats()?ligne('Relation avec LAB',estHabitue(e)?'Partenaire (déjà travaillé ensemble)':'Nouveau (jamais travaillé ensemble)'):''}
         ${st?ligne('Service Commercial',e.consultAO?'Oui':'Non'):''}
