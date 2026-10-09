@@ -298,7 +298,10 @@
   table.tbl th:hover { color:var(--ink); }
   table.tbl th .fl { font-size:10px; margin-left:4px; opacity:.4; }
   table.tbl th.tri .fl { opacity:1; color:var(--accent); }
-  table.tbl td { padding:11px 16px; border-bottom:1px solid #f1f2f4; vertical-align:middle; }
+  table.tbl td { padding:11px 10px; border-bottom:1px solid #f1f2f4; vertical-align:middle; }
+  table.tbl th { padding:12px 10px !important; } table.tbl th:first-child, table.tbl td:first-child { padding-left:16px; }
+  table.tbl td.c-tel { white-space:nowrap; }
+  table.tbl td.c-email { max-width:190px; } table.tbl td.c-email a { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   table.tbl tbody tr:last-child td { border-bottom:none; }
   table.tbl tbody tr:hover td { background:#fafbfc; }
   .cliquable { cursor:pointer; }
@@ -883,7 +886,7 @@ function aNotes(t){ return t==='soustraitants'||t==='bureauxetudes'; }
 /* ===== FOURNISSEURS : ACHAT / LOCATION =====
    Champ "offre" sur la fiche fournisseur : 'achat' (défaut si absent), 'location' ou 'les2'.
    Un fournisseur 'les2' apparaît dans les deux sous-onglets. */
-const VERSION='v29'; // à incrémenter à chaque mise en ligne
+const VERSION='v30'; // à incrémenter à chaque mise en ligne
 let sousOngletF='achat';
 const LIB_OFFRE={achat:'Achat',location:'Location',les2:'Achat et location'};
 function offreDe(e){ return (e&&(e.offre==='location'||e.offre==='les2'))?e.offre:'achat'; }
@@ -1351,15 +1354,15 @@ function rendreTableau(liste){
   if(!liste.length){ zone.innerHTML=videHtml(); return; }
   liste.sort((a,b)=>{ if(tri.col==='note'){ return (noteMoyenne(a)-noteMoyenne(b))*tri.dir; } const va=valTri(a),vb=valTri(b); if(!va&&vb) return 1; if(va&&!vb) return -1; return va.localeCompare(vb,'fr',{numeric:true})*tri.dir; });
   const fleche=col=>tri.col===col?(tri.dir>0?'▲':'▼'):'⇅';
-  const th=(col,l)=>`<th class="${tri.col===col?'tri':''}" onclick="trier('${col}')">${l}<span class="fl">${fleche(col)}</span></th>`;
+  const th=(col,l,titre)=>`<th class="${tri.col===col?'tri':''}" onclick="trier('${col}')"${titre?` title="${titre}"`:''}>${l}<span class="fl">${fleche(col)}</span></th>`;
   const lignes=liste.map(e=>{ const lot=lotDe(ongletActif,e.lotId), a=avatar(e.raisonSociale);
     return `<tr id="ligne-${e.id}" class="cliquable${estEvite(e)?' evite':''}" onclick="clicFiche(event,'${e.id}')" title="Voir la fiche">
       <td><div class="tbl-nom"><div class="tbl-av" style="background:${a.coul}">${esc(a.init)}</div>${esc(e.raisonSociale)}${ongletActif==='fournisseurs'?' '+chipOffre(e,true):''}${estEvite(e)?' '+badgeStatut(e):''}</div></td>
       <td>${celluleLots(ongletActif,e)}</td>
       ${be?'':(loc?`<td>${infosLoc(e).materiel?`<span class="tbl-adr">${esc(infosLoc(e).materiel)}</span>`:'<span class="mut">—</span>'}${texteLivraison(e)==='Oui'?' <span class="chip loc" title="Livre sur chantier">Livre</span>':''}</td>`:`<td>${chipIntervention(e)||'<span class="mut">—</span>'}</td>`)}
       <td>${e.contact?esc(e.contact):'<span class="mut">—</span>'}</td>
-      <td>${e.tel?`<a class="info" href="tel:${esc(e.tel)}"><span class="tbl-mono">${esc(e.tel)}</span></a>`:'<span class="mut">—</span>'}</td>
-      <td>${e.email?`<a class="info" href="mailto:${esc(e.email)}">${esc(e.email)}</a>`:'<span class="mut">—</span>'}</td>
+      <td class="c-tel">${e.tel?`<a class="info" href="tel:${esc(e.tel)}"><span class="tbl-mono">${esc(e.tel)}</span></a>`:'<span class="mut">—</span>'}</td>
+      <td class="c-email">${e.email?`<a class="info" href="mailto:${esc(e.email)}" title="${esc(e.email)}">${esc(e.email)}</a>`:'<span class="mut">—</span>'}</td>
       <td>${libCA(e)?`<span class="ca-info" style="white-space:nowrap">${esc(fmtMontant(finDe(e).ca))}</span>${finDe(e).annee?`<div class="mut" style="font-size:11.5px">${esc(finDe(e).annee)}</div>`:''}`:'<span class="mut">—</span>'}</td>
       ${st?`${estAchats()?`<td>${pastilleRel(e)}</td>`:''}<td>${caseAO(e,false)}</td><td>${caseLuxe(e,false)}</td>`:`<td>${e.adresse?`<span class="tbl-adr">${esc(e.adresse)}</span>`:'<span class="mut">—</span>'}</td>`}
       ${nt?`<td>${noteMoyenne(e)?etoiles(Math.round(noteMoyenne(e)))+' <span class="tbl-mono">'+noteMoyenne(e).toFixed(1)+'</span>'+(nbChantiers(e)?' <span class="mut">('+nbChantiers(e)+')</span>':''):'<span class="mut">—</span>'}</td>`:''}
@@ -1368,7 +1371,7 @@ function rendreTableau(liste){
         <button class="ico-btn suppr" onclick="supprimer('${e.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg></button></div></td></tr>`;
   }).join('');
   zone.innerHTML=`<div class="tableau-wrap"><table class="tbl"><thead><tr>
-    ${th('raisonSociale','Raison sociale')}${th('lot',be?"Corps d'état":'Lots')}${be?'':(loc?th('materielLoue','Matériel loué'):th('typeIntervention','Intervention'))}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${th('ca','CA')}${st?(estAchats()?th('relation','Relation'):'')+th('consultAO','Service Commercial')+th('chantiersLuxe','Luxe'):th('adresse',be?'Adresse':'Agence référente')}${nt?th('note','Note'):''}<th></th>
+    ${th('raisonSociale','Raison sociale')}${th('lot',be?"Corps d'état":'Lots')}${be?'':(loc?th('materielLoue','Matériel loué'):th('typeIntervention','Intervention'))}${th('contact','Contact')}${th('tel','Téléphone')}${th('email','Email')}${th('ca','CA')}${st?(estAchats()?th('relation','Relation'):'')+th('consultAO','S. Com.','Service Commercial')+th('chantiersLuxe','Luxe'):th('adresse',be?'Adresse':'Agence référente')}${nt?th('note','Note'):''}<th></th>
   </tr></thead><tbody>${lignes}</tbody></table></div>`;
 }
 
