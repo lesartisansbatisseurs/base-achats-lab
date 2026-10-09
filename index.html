@@ -886,7 +886,7 @@ function aNotes(t){ return t==='soustraitants'||t==='bureauxetudes'; }
 /* ===== FOURNISSEURS : ACHAT / LOCATION =====
    Champ "offre" sur la fiche fournisseur : 'achat' (défaut si absent), 'location' ou 'les2'.
    Un fournisseur 'les2' apparaît dans les deux sous-onglets. */
-const VERSION='v30'; // à incrémenter à chaque mise en ligne
+const VERSION='v31'; // à incrémenter à chaque mise en ligne
 let sousOngletF='achat';
 const LIB_OFFRE={achat:'Achat',location:'Location',les2:'Achat et location'};
 function offreDe(e){ return (e&&(e.offre==='location'||e.offre==='les2'))?e.offre:'achat'; }
@@ -1897,7 +1897,7 @@ async function envoyerIA(){ const input=document.getElementById('ia-input'), q=i
 
 /* --- Compréhension de la question --- */
 function norm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/œ/g,'oe').replace(/[’']/g,' '); }
-const IA_STOP=new Set(('un une des les le la de du d l a au aux en et ou pour sur sous dans par avec sans qui que quoi quel quelle quels quelles est sont il elle ils on je j tu me m moi nous vous ton ta tes mon ma mes ses son sa leur leurs ce c cet cette ces ca y ai as a avez ont faut peux peut pouvez pourrais pourrait donne donnes donner trouve trouves trouver cherche cherches chercher besoin veux voudrais aimerais svp stp merci bonjour salut hello coucou liste lister montre montrer affiche afficher recherche rechercher quelqu entreprise entreprises boite boites societe societes gars mec type personne quelqu contact contacts coordonnees coordonnee infos info information informations dispo disponible disponibles bon bonne bons bonnes chantier chantiers lot lots urgent urgence vite rapide rapidement asap ici tout tous toutes quelque chose truc plus moins tres bien fait font faire qu n ne pas oui non numero numeros tel telephone portable mail email mails emails courriel appeler joindre joignable mobile adresse siret fiche fiches aussi encore maintenant aujourd hui demain alors voila connais connait as tu il y').split(' '));
+const IA_STOP=new Set(('un une des les le la de du d l a au aux en et ou pour sur sous dans par avec sans qui que quoi quel quelle quels quelles est sont il elle ils on je j tu me m moi nous vous ton ta tes mon ma mes ses son sa leur leurs ce c cet cette ces ca y ai as a avez ont faut peux peut pouvez pourrais pourrait donne donnes donner trouve trouves trouver cherche cherches chercher besoin veux voudrais aimerais svp stp merci bonjour salut hello coucou liste lister montre montrer affiche afficher recherche rechercher quelqu entreprise entreprises boite boites societe societes gars mec type personne quelqu contact contacts coordonnees coordonnee infos info information informations dispo disponible disponibles bon bonne bons bonnes chantier chantiers lot lots urgent urgence vite rapide rapidement asap ici tout tous toutes quelque chose truc plus moins tres bien fait font faire qu n ne pas oui non num nums numero numeros tel tels telephone portable portables coordonnees chez dispo dispos dispon cherche cherches trouve trouves trouver besoin faut il me moi stp svp sil plait merci bonjour salut bjr slt yo hello qqn quelqu quelqun quelquun mec gars type types boite boites societe societes entreprise entreprises artisan mail email mails emails courriel appeler joindre joignable mobile adresse siret fiche fiches aussi encore maintenant aujourd hui demain alors voila connais connait as tu il y').split(' '));
 const IA_METIERS=[
  // --- Bureaux d'études (corps d'état) ---
  ['structure',['structure','structures','beton arme'],['structure']],
@@ -1911,15 +1911,18 @@ const IA_METIERS=[
  ['contrôle technique',['controle technique','controleur technique','bureau de controle'],['controle']],
  ['sécurité incendie',['ssi','incendie','securite incendie','desenfumage'],['incendie','ssi']],
  ['environnement',['hqe','environnement','environnemental','breeam'],['environnement','hqe']],
- ['façades',['facade','facades','facadier','enveloppe'],['facades','enveloppe']],
- ['diagnostics',['diagnostic','diagnostics','diagnostiqueur','amiante'],['diagnostics','amiante']],
+ ['façades / ravalement',['facade','facades','facadier','facadiers','ravalement','ravaleur','enveloppe','bardage','bardeur','enduit facade','crepi','nettoyage facade'],['facades','enveloppe','ravalement','bardage']],
+ ['diagnostics',['diagnostic','diagnostics','diagnostiqueur','reperage amiante'],['diagnostics']],
  ['géomètre',['geometre','geometres','topographie','topographe','bornage'],['geometre','topographie']],
  ['cuisine professionnelle',['cuisine','cuisines','cuisiniste'],['cuisine']],
  ['plomberie',['plombier','plombiers','plomberie','plombie','sanitaire','sanitaires','chauffagiste','chauffage','chaudiere','cvc','clim','climatisation','ventilation','vmc','pac','ballon','cumulus','fuite','radiateur'],['plomberie','cvc','sanitaire']],
- ['électricité',['electricien','electriciens','electricite','elec','electrique','cfo','cfa','courant','eclairage','luminaire','prise','prises'],['electricite']],
- ['peinture',['peintre','peintres','peinture','peintures','peindre','papier peint','droguerie','enduit','enduits','ravalement'],['peinture']],
- ['gros œuvre',['macon','macons','maconnerie','gros oeuvre','beton','ciment','dalle','fondation','fondations','agglo','agglos','parpaing','parpaings','brique','briques','demolition'],['gros','maconnerie','beton','agglos']],
- ['menuiserie',['menuisier','menuisiers','menuiserie','menuiseries','fenetre','fenetres','porte','portes','volet','volets','fermeture','fermetures','placard','placards','huisserie'],['menuiseries','menuiserie']],
+ ['électricité',['electricien','electriciens','electricite','electricites','elec','elecs','electrique','cfo','cfa','courant','courant fort','courant faible','eclairage','luminaire','luminaires','prise','prises','tableau electrique','fibre','vdi','reseau','videophone','interphone','controle d acces','alarme','domotique','borne de recharge','irve','photovoltaique','panneaux solaires'],['electricite']],
+ ['peinture',['peintre','peintres','peinture','peintures','peindre','papier peint','tapisserie','tapissier','toile de verre','revetement mural','revetements muraux','droguerie','enduit','enduits','lasure','vernis','sol resine','resine'],['peinture']],
+ ['gros œuvre',['macon','macons','maconnerie','maconneries','gros oeuvre','go','beton','betons','ciment','dalle','dalles','fondation','fondations','agglo','agglos','parpaing','parpaings','brique','briques','coffrage','coffreur','ferraillage','ferrailleur','banche','banches','voile','voiles','linteau','reprise en sous oeuvre'],['gros','maconnerie','beton','agglos']],
+ ['démolition',['demolition','demolir','demolisseur','curage','cureur','desamiantage','desamianteur','amiante','deplombage','plomb','depose'],['demolition','desamiantage','curage']],
+ ['échafaudage',['echafaudage','echafaudages','echafaudeur','echafaudeurs','echaf','echafs','pied de biche'],['echafaudage']],
+ ['nettoyage',['nettoyage','nettoyeur','menage','fin de chantier','nettoyage de fin de chantier','vitrerie'],['nettoyage']],
+ ['menuiserie',['menuisier','menuisiers','menuiserie','menuiseries','fenetre','fenetres','porte','portes','bloc porte','blocs portes','volet','volets','volet roulant','volets roulants','fermeture','fermetures','placard','placards','huisserie','pvc','alu','aluminium','baie','baies','baie vitree','vitrage','double vitrage','store','stores','escalier','escaliers','plinthe','plinthes'],['menuiseries','menuiserie']],
  ['sols / carrelage',['carreleur','carreleurs','carrelleur','carrelage','faience','sol','sols','chape','parquet','sol souple','lino','moquette'],['carrelage','sols']],
  ['serrurerie',['serrurier','serrurerie','metallerie','metallier','garde corps','rampe','grille','portail'],['serrurerie','metallerie']],
  ['couverture',['couvreur','couvreurs','couverture','toiture','toit','tuile','tuiles','zinguerie','zingueur','gouttiere','etancheite','etancheur','terrasse'],['couverture','etancheite']],
@@ -1927,22 +1930,23 @@ const IA_METIERS=[
  ['charpente',['charpentier','charpente','structure','ossature','bois'],['charpente','bois','structure']],
  ['ascenseurs',['ascenseur','ascenseurs','ascensoriste','elevateur'],['ascenseurs']],
  ['plâtrerie',['platrier','platriers','plaquiste','plaquistes','platrerie','placo','platre','cloison','cloisons','doublage','doublages','faux plafond','faux plafonds','plafond'],['platre','placo','cloisons','platrerie']],
- ['isolation',['isolation','isolant','isolants','ite','iti','laine de verre','laine de roche'],['isolation']],
+ ['isolation',['isolation','isolant','isolants','ite','iti','isolation exterieure','isolation interieure','isolation thermique','laine de verre','laine de roche','polystyrene','soufflage','calorifugeage'],['isolation']],
  ['quincaillerie',['quincaillerie','visserie','vis','cheville','chevilles','boulon'],['quincaillerie','visserie']],
  ['outillage / EPI',['outillage','outil','outils','epi','casque','gants','chaussures de securite'],['outillage','epi']],
- ['location matériel',['location','louer','loue','nacelle','nacelles','echafaudage','echafaudages','benne','bennes','engin','engins','mini pelle','minipelle','pelle','grue','compacteur','groupe electrogene','materiel'],['location']],
+ ['location matériel',['location','louer','loue','nacelle','nacelles','benne','bennes','base vie','bungalow','wc chantier','manitou','telescopique','chariot','engin','engins','mini pelle','minipelle','pelle','grue','compacteur','groupe electrogene','materiel'],['location']],
  ['espaces verts',['paysagiste','paysagistes','espaces verts','jardin','jardinier','amenagement exterieur','cloture','clotures','gazon','plantation','elagage'],['espaces','verts']],
 ];
 function distance(a,b){ if(Math.abs(a.length-b.length)>2) return 9; const d=Array.from({length:a.length+1},(_,i)=>[i]);
   for(let j=1;j<=b.length;j++) d[0][j]=j;
-  for(let i=1;i<=a.length;i++) for(let j=1;j<=b.length;j++) d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  for(let i=1;i<=a.length;i++) for(let j=1;j<=b.length;j++){ d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+    if(i>1&&j>1&&a[i-1]===b[j-2]&&a[i-2]===b[j-1]) d[i][j]=Math.min(d[i][j],d[i-2][j-2]+1); }
   return d[a.length][b.length]; }
 function motProche(t,w){ if(t===w) return true; if(t.length<5||w.length<5) return false; return distance(t,w)<=(w.length>=9?2:1); }
 function contientMot(txt,terme){ return (' '+txt+' ').includes(' '+terme+' '); }
 function analyserQuestion(q){
   let n=' '+norm(q).replace(/[^a-z0-9/]+/g,' ')+' ';
   const brut=norm(q).replace(/[^a-z0-9]+/g,' ').trim().split(' ').filter(w=>w.length>1&&!IA_STOP.has(w));
-  const c={ brut, type:null, lots:{fournisseurs:new Set(),soustraitants:new Set(),bureauxetudes:new Set()}, metiers:[], filtres:[], f:{}, noteMin:0, tri:null, combien:false, veutEvites:false, tokens:[], infoVoulue:null };
+  const c={ brutTexte:q, brut, type:null, lots:{fournisseurs:new Set(),soustraitants:new Set(),bureauxetudes:new Set()}, metiers:[], filtres:[], f:{}, noteMin:0, tri:null, combien:false, veutEvites:false, tokens:[], infoVoulue:null };
   const prendre=(re,cb)=>{ const m=n.match(re); if(m){ cb(m); n=n.replace(re,' '); return true; } return false; };
   prendre(/\bcombien\b/,()=>c.combien=true);
   prendre(/\b(fournisseurs?|negoce|negociant|grossiste|magasin|acheter|commander|approvisionn\w*)\b/g,()=>c.type='fournisseurs');
@@ -1977,10 +1981,11 @@ function analyserQuestion(q){
   // Mots restants : comparés aux libellés de lots (lots ajoutés à la main compris)
   const restants=n.trim().split(/\s+/).filter(w=>w.length>1&&!IA_STOP.has(w));
   const libres=[];
-  restants.forEach(w=>{ let lot=false;
+  restants.forEach(w=>{ let lot=false; if(c.metiers.length){ libres.push(w); return; }
     TYPES.forEach(ty=>lotsTries(ty).forEach(l=>{ if(w.length>=4&&norm(l.libelle).split(/[^a-z0-9]+/).some(x=>x.length>=4&&motProche(w,x))){ c.lots[ty].add(l.id); lot=true; if(!c.metiers.includes(l.libelle)) c.metiers.push(l.libelle); } }));
     if(!lot) libres.push(w); });
   c.tokens=libres;
+  if(!c.type&&c.lots.soustraitants.size&&c.lots.fournisseurs.size) c.type='soustraitants';
   return c;
 }
 function aDesLots(c){ return TYPES.reduce((n,t)=>n+((c.lots[t]&&c.lots[t].size)||0),0)>0; }
@@ -2016,6 +2021,10 @@ function classer(liste,c){ return liste.sort((a,b)=>{
 const IA_PAGE=5;
 function repondre(c,textePrefixe){
   const toutes=toutesAvecBE();
+  // 0) Recherche par numéro de téléphone (au moins 6 chiffres tapés)
+  const chiffres=String(c.brutTexte||'').replace(/\D/g,'');
+  if(chiffres.length>=6){ const fin=chiffres.replace(/^33/,'0'); const parTel=toutes.filter(e=>[e.tel,e.contact2&&e.contact2.tel].some(t=>{ const d=String(t||'').replace(/\D/g,'').replace(/^33/,'0'); return d&&(d.includes(fin)||fin.includes(d)); }));
+    if(parTel.length){ iaContexte=null; return { texte:parTel.length===1?`Ce numéro, c’est **${parTel[0].raisonSociale}**${parTel[0].contact?' ('+parTel[0].contact+')':''}.`:`${parTel.length} entreprises ont ce numéro :`, resultats:parTel.slice(0,4) }; } }
   // 1) Recherche d'une entreprise / d'une personne par son nom
   const mots=c.brut||[], nonMetier=mots.some(t=>!estTermeMetier(t));
   // (une question faite uniquement de mots-métier qui correspondent à des lots, ex. « structure », est une recherche par lot, pas par nom)
@@ -2042,6 +2051,8 @@ function repondre(c,textePrefixe){
     else if(aDesLots(c)||Object.keys(c.f).length||c.type||c.tri) texteLieu=`Rien pour « ${c.tokens.join(' ')} » précisément, voici ce que j’ai de plus proche.\n`;
     else base=[]; }
   const rien=!aDesLots(c)&&!Object.keys(c.f).length&&!c.type&&!c.tri&&!c.noteMin&&!c.veutEvites&&!c.tokens.length;
+  if(rien&&c.metiers.length) return { texte:`Je n’ai aucun lot « ${c.metiers[0]} » dans la base pour l’instant 🤷 Essaie un métier voisin ou demande au service Achats de l’ajouter.`, exemples:["Un plombier","Un électricien","Aide"] };
+  if(rien&&/^(bonjour|salut|bjr|slt|yo|hello|coucou|bonsoir)\b/.test(norm(c.brutTexte||''))) return { texte:"Salut 👋 Dis-moi juste le métier ou le nom de l’entreprise, je te sors les contacts.", exemples:["Un plombier","Un couvreur","Numéro de…"] };
   if(rien) return { texte:"Je n’ai pas compris ce que tu cherches 🤔 Donne-moi un métier, un nom d’entreprise ou un critère.", exemples:["Un plombier","Peintre milieu occupé","Le mieux noté","Sous-traitants à éviter"] };
   if(c.tri==='note'&&!c.type) base=base.filter(e=>aNotes(e.type)||noteMoyenne(e));
   base=classer(base,c);
@@ -2071,7 +2082,7 @@ function rechercheLocale(q){
     if(/montre|affiche/.test(n)&&iaContexte){ const c=iaContexte.c; c.combien=false; return repondre(c); } return pageSuivante(); }
   if(/^(sans les criteres|reset|recommence|nouvelle recherche|on recommence)/.test(n)){ if(iaContexte){ const c=iaContexte.c; c.f={}; c.filtres=[]; c.noteMin=0; return repondre(c); } }
   if(/^voir les .*eviter/.test(n)&&iaContexte){ const c=iaContexte.c; c.veutEvites=true; return repondre(c); }
-  if(/^(merci|ok|super|parfait|top|nickel|genial|cool)\b/.test(n)&&n.split(' ').length<=3) return { texte:"Avec plaisir 👍 Autre chose ?" };
+  if(n&&n.split(/\s+/).every(w=>/^(merci|mercii+|ok|okay|okk+|super|parfait|top|nickel|genial|cool|bien|tres|beaucoup|thanks|thx|ca marche|impec|impeccable|nikel|parfait)$/.test(w))) return { texte:"Avec plaisir 👍 Autre chose ?" };
   if(/^(aide|help|que sais tu faire|tu sais faire quoi|comment ca marche)/.test(n)) return { texte:`Tu peux me demander :\n• un métier : « un couvreur », « plaquiste »\n• un nom : « numéro de Lider Sols », « mail de Serhat »\n• avec des critères : « peintre milieu occupé », « électricien 4 étoiles », « maçon grands chantiers »\n• le classement : « le meilleur carreleur »\n• un comptage : « combien de sous-traitants en peinture »\n${accesBE()?'• un bureau d’études : « BE structure », « le meilleur BE fluides », « un acousticien »\n':''}• puis affiner : « et avec email », « et en réhab »`, exemples:["Un plombier","Le meilleur peintre"] };
   const c=analyserQuestion(q);
   const relance=iaContexte&&(/^(et|mais|plutot|seulement|uniquement|juste|que|parmi eux|parmi)\b/.test(n)||(!aDesLots(c)&&!c.type&&!c.tokens.length&&(Object.keys(c.f).length||c.tri||c.noteMin||c.infoVoulue)));
