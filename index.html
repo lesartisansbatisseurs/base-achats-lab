@@ -67,7 +67,7 @@
   .hero .surtitre { font-size:11px; letter-spacing:.18em; color:var(--hero-accent); font-weight:600; }
   .hero .bonjour { font-size:30px; font-weight:700; margin:6px 0 3px; letter-spacing:-.01em; }
   .hero .date { font-size:13px; color:rgba(255,255,255,.6); }
-  .hero .kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:22px; }
+  .hero .kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:22px; }
   .kpi { border-left:2px solid rgba(74,159,224,.4); padding-left:14px; }
   .kpi .lbl { font-size:12px; color:rgba(255,255,255,.55); display:flex; align-items:center; gap:6px; }
   .kpi .val { font-family:var(--mono); font-size:26px; font-weight:700; margin-top:5px; }
@@ -438,7 +438,7 @@
   }
   @media (max-width:980px){ .tb-dash{grid-template-columns:1fr;} }
   @media (max-width:700px) and (min-width:0px){ .dash-grid{grid-template-columns:1fr;} }
-  @media (max-width:860px){ .sidebar{width:68px;} .sb-logo .txt,.sb-item span:not(.badge),.sb-section,.sb-foot{display:none;} .sb-item{justify-content:center;} .main{margin-left:68px;} .hero .kpis{grid-template-columns:repeat(3,1fr);} .rg input{width:200px;} .duo{grid-template-columns:1fr;} }
+  @media (max-width:860px){ .sidebar{width:68px;} .sb-logo .txt,.sb-item span:not(.badge),.sb-section,.sb-foot{display:none;} .sb-item{justify-content:center;} .main{margin-left:68px;} .hero .kpis{grid-template-columns:repeat(4,1fr);} .rg input{width:200px;} .duo{grid-template-columns:1fr;} }
 
   /* Assistant IA */
   .ia-bulle { position:fixed; bottom:24px; right:24px; height:56px; width:56px; border-radius:50%; background:linear-gradient(135deg,var(--accent),#1e6fc0); color:#fff; border:none; cursor:pointer; box-shadow:0 8px 24px rgba(43,130,217,.5); display:flex; align-items:center; justify-content:center; z-index:55; transition:transform .15s; }
@@ -528,7 +528,7 @@
     .hero { padding:18px 18px 16px; border-radius:14px; margin-bottom:14px; }
     .hero .filigrane, .hero .coin { display:none; }
     .hero .bonjour { font-size:22px; }
-    .hero .kpis { grid-template-columns:repeat(3,1fr) !important; gap:8px; margin-top:14px; }
+    .hero .kpis { grid-template-columns:repeat(2,1fr) !important; gap:10px 8px; margin-top:14px; }
     .kpi { padding-left:9px; } .kpi .lbl { font-size:11px; } .kpi .val { font-size:20px; }
     .tb-stats { gap:9px; } .stat { padding:12px 13px; } .stat .v { font-size:20px; }
     .barre-ligne .nom { width:110px; }
@@ -658,6 +658,7 @@
         <div class="kpis">
           <div class="kpi"><div class="lbl">🏭 Fournisseurs</div><div class="val" id="kpi-f">0</div></div>
           <div class="kpi"><div class="lbl">👷 Sous-traitants</div><div class="val" id="kpi-s">0</div></div>
+          <div class="kpi"><div class="lbl">📐 Bureaux d'études</div><div class="val" id="kpi-b">0</div></div>
           <div class="kpi"><div class="lbl">📇 Total contacts</div><div class="val" id="kpi-t">0</div></div>
         </div>
       </div>
@@ -723,7 +724,7 @@
         </div>
         <div class="ms-puces" id="ms-lots-puces"></div>
       </div></div>
-    <label class="champ" id="champ-intervention"><span>Type d'intervention</span><select id="f-intervention"><option value="">— Non renseigné —</option><option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option></select></label>
+    <label class="champ" id="champ-intervention"><span>Type d'intervention</span><select id="f-intervention"><option value="">— Non renseigné —</option><option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option><option value="fs">Fourniture seule</option></select></label>
     <label class="champ" id="champ-offre"><span>Achat ou location</span><select id="f-offre" onchange="majChampsLocation()"><option value="achat">Achat</option><option value="location">Location</option><option value="les2">Achat et location</option></select></label>
     <div class="bloc-contact2" id="champ-location">
       <div class="titre-bloc">Location</div>
@@ -894,7 +895,7 @@ function aNotes(t){ return t==='soustraitants'||t==='bureauxetudes'; }
 /* ===== FOURNISSEURS : ACHAT / LOCATION =====
    Champ "offre" sur la fiche fournisseur : 'achat' (défaut si absent), 'location' ou 'les2'.
    Un fournisseur 'les2' apparaît dans les deux sous-onglets. */
-const VERSION='v34'; // à incrémenter à chaque mise en ligne
+const VERSION='v36'; // à incrémenter à chaque mise en ligne
 let sousOngletF='achat';
 const LIB_OFFRE={achat:'Achat',location:'Location',les2:'Achat et location'};
 function offreDe(e){ return (e&&(e.offre==='location'||e.offre==='les2'))?e.offre:'achat'; }
@@ -987,7 +988,9 @@ function majKpis(){
   const nf=Object.keys(entreprises.fournisseurs).length, ns=Object.keys(entreprises.soustraitants).length;
   const lu=new Set(toutesLesEntreprises().flatMap(lotsIds)).size;
   document.getElementById('kpi-f').textContent=nf; document.getElementById('kpi-s').textContent=ns;
-  document.getElementById('kpi-t').textContent=nf+ns;
+  const nb=accesBE()?Object.keys(entreprises.bureauxetudes||{}).length:0;
+  document.getElementById('kpi-b').textContent=nb;
+  document.getElementById('kpi-t').textContent=nf+ns+nb;
   document.getElementById('badge-fournisseurs').textContent=nf; document.getElementById('badge-soustraitants').textContent=ns;
   document.getElementById('badge-bureauxetudes').textContent=Object.keys(entreprises.bureauxetudes).length;
 }
@@ -1302,29 +1305,34 @@ function rendre(){
 function videHtml(){ return `<div class="vide"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/></svg><p>${estBE(ongletActif)?"Aucun bureau d'études":(ongletActif==='fournisseurs'?'Aucun fournisseur':'Aucun sous-traitant')} pour l'instant.</p></div>`; }
 
 function rendreDashboard(){
-  const zone=document.getElementById('contenu'), all=toutesLesEntreprises();
-  const nf=Object.keys(entreprises.fournisseurs).length, ns=Object.keys(entreprises.soustraitants).length, total=nf+ns, maxRep=Math.max(1,nf,ns);
-  const tops=Object.entries(entreprises.soustraitants).map(([id,e])=>({id,type:'soustraitants',...e})).filter(e=>noteMoyenne(e)>0&&!estEvite(e)).sort((a,b)=>noteMoyenne(b)-noteMoyenne(a)).slice(0,5);
-  const usedF=new Set(Object.values(entreprises.fournisseurs).flatMap(lotsIds));
-  const usedS=new Set(Object.values(entreprises.soustraitants).flatMap(lotsIds));
-  const manqueF=lotsTries('fournisseurs').filter(l=>!usedF.has(l.id)), manqueS=lotsTries('soustraitants').filter(l=>!usedS.has(l.id));
+  const zone=document.getElementById('contenu'), be=accesBE(), all=be?toutesAvecBE():toutesLesEntreprises();
+  const nf=Object.keys(entreprises.fournisseurs).length, ns=Object.keys(entreprises.soustraitants).length, nb=be?Object.keys(entreprises.bureauxetudes||{}).length:0;
+  const total=nf+ns+nb, maxRep=Math.max(1,nf,ns,nb);
+  const topDe=t=>Object.entries(entreprises[t]||{}).map(([id,e])=>({id,type:t,...e})).filter(e=>noteMoyenne(e)>0&&!estEvite(e)).sort((a,b)=>noteMoyenne(b)-noteMoyenne(a)).slice(0,5);
+  const tops=topDe('soustraitants'), topsBE=be?topDe('bureauxetudes'):[];
+  const manque=t=>{ const used=new Set(Object.values(entreprises[t]||{}).flatMap(lotsIds)); return lotsTries(t).filter(l=>!used.has(l.id)); };
+  const chips=(t,liste)=>liste.length?liste.map(l=>`<span class="lot-chip" onclick="ajouterPourLot('${t}','${l.id}')">＋ ${esc(l.libelle)}</span>`).join(''):'<div class="d-vide">Tous les lots ont au moins un contact.</div>';
   const derniers=all.slice().sort((a,b)=>String(b.id).localeCompare(String(a.id))).slice(0,6);
   const favs=all.filter(e=>e.favori);
-  const rowEnt=e=>{ const a=avatar(e.raisonSociale), lot=lotDe(e.type,e.lotId), t=e.type==='fournisseurs'?'Fournisseur':'Sous-traitant';
-    return `<div class="d-row" onclick="allerVers('${e.type}','${e.id}')"><div class="d-av" style="background:${a.coul}">${esc(a.init)}</div><div style="min-width:0"><div class="nom">${esc(e.raisonSociale)}</div><div class="meta">${t}${resumeLots(e.type,e)?' · '+esc(resumeLots(e.type,e)):''}</div></div>${(e.type==='soustraitants'&&noteMoyenne(e))?`<div class="droite">${etoiles(Math.round(noteMoyenne(e)))}<span class="meta">${noteMoyenne(e).toFixed(1)}</span></div>`:''}</div>`; };
+  const rowEnt=e=>{ const a=avatar(e.raisonSociale), t=libType(e.type), nm=aNotes(e.type)?noteMoyenne(e):0;
+    return `<div class="d-row" onclick="allerVers('${e.type}','${e.id}')"><div class="d-av" style="background:${a.coul}">${esc(a.init)}</div><div style="min-width:0"><div class="nom">${esc(e.raisonSociale)}</div><div class="meta">${t}${resumeLots(e.type,e)?' · '+esc(resumeLots(e.type,e)):''}</div></div>${nm?`<div class="droite">${etoiles(Math.round(nm))}<span class="meta">${nm.toFixed(1)}</span></div>`:''}</div>`; };
+  const barre=(nom,n,coul)=>`<div class="barre-ligne"><div class="nom">${nom}</div><div class="piste"><div class="rempli" style="width:${Math.max(9,n/maxRep*100)}%${coul?';background:'+coul:''}">${n}</div></div></div>`;
+  const ico='<svg viewBox="0 0 24 24" fill="#f2a03d" stroke="none"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.8 5.9 20.4l1.5-6.8L2.2 9l6.9-.7z"/></svg>';
   zone.innerHTML=`<div class="dash-grid">
     <div class="panneau"><div class="panneau-titre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>Répartition du portefeuille</div>
-      <div class="barre-ligne"><div class="nom">Fournisseurs</div><div class="piste"><div class="rempli" style="width:${Math.max(9,nf/maxRep*100)}%">${nf}</div></div></div>
-      <div class="barre-ligne"><div class="nom">Sous-traitants</div><div class="piste"><div class="rempli" style="width:${Math.max(9,ns/maxRep*100)}%;background:var(--ambre)">${ns}</div></div></div>
+      ${barre('Fournisseurs',nf,'')}${barre('Sous-traitants',ns,'var(--ambre)')}${be?barre('Bureaux d’études',nb,'#0f766e'):''}
       <div style="margin-top:12px;font-size:13px;color:var(--gris)">Total : <strong style="color:var(--ink)">${total}</strong> contacts</div></div>
-    <div class="panneau"><div class="panneau-titre"><svg viewBox="0 0 24 24" fill="#f2a03d" stroke="none"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.8 5.9 20.4l1.5-6.8L2.2 9l6.9-.7z"/></svg>Top sous-traitants</div>
-      ${tops.length?tops.map(rowEnt).join(''):'<div class="d-vide">Aucun sous-traitant noté pour l\'instant.</div>'}</div>
-    <div class="panneau"><div class="panneau-titre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>Lots à compléter</div>
-      <div class="dash-sous">Fournisseurs</div>${manqueF.length?manqueF.map(l=>`<span class="lot-chip" onclick="ajouterPourLot('fournisseurs','${l.id}')">＋ ${esc(l.libelle)}</span>`).join(''):'<div class="d-vide">Tous les lots ont au moins un contact.</div>'}
-      <div class="dash-sous" style="margin-top:12px">Sous-traitants</div>${manqueS.length?manqueS.map(l=>`<span class="lot-chip" onclick="ajouterPourLot('soustraitants','${l.id}')">＋ ${esc(l.libelle)}</span>`).join(''):'<div class="d-vide">Tous les lots ont au moins un contact.</div>'}</div>
     <div class="panneau"><div class="panneau-titre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>Derniers ajouts</div>
       ${derniers.length?derniers.map(rowEnt).join(''):'<div class="d-vide">Aucun contact enregistré.</div>'}</div>
-    <div class="panneau large"><div class="panneau-titre"><svg viewBox="0 0 24 24" fill="#f2a03d" stroke="none"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17.8 5.9 20.4l1.5-6.8L2.2 9l6.9-.7z"/></svg>Favoris ${favs.length?'('+favs.length+')':''}</div>
+    <div class="panneau"><div class="panneau-titre">${ico}Top sous-traitants</div>
+      ${tops.length?tops.map(rowEnt).join(''):'<div class="d-vide">Aucun sous-traitant noté pour l\'instant.</div>'}</div>
+    ${be?`<div class="panneau"><div class="panneau-titre">${ico}Top bureaux d’études</div>
+      ${topsBE.length?topsBE.map(rowEnt).join(''):'<div class="d-vide">Aucun bureau d’études noté pour l\'instant.</div>'}</div>`:''}
+    <div class="panneau large"><div class="panneau-titre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>Lots à compléter</div>
+      <div class="dash-sous">Fournisseurs</div>${chips('fournisseurs',manque('fournisseurs'))}
+      <div class="dash-sous" style="margin-top:12px">Sous-traitants</div>${chips('soustraitants',manque('soustraitants'))}
+      ${be?`<div class="dash-sous" style="margin-top:12px">Bureaux d’études — corps d’état</div>${chips('bureauxetudes',manque('bureauxetudes'))}`:''}</div>
+    <div class="panneau large"><div class="panneau-titre">${ico}Favoris ${favs.length?'('+favs.length+')':''}</div>
       ${favs.length?favs.map(rowEnt).join(''):'<div class="d-vide">Aucun favori. Épingle tes partenaires clés avec l\'étoile sur leur fiche.</div>'}</div>
   </div>`;
 }
@@ -1395,7 +1403,7 @@ function majTypeFiche(){ const t=document.getElementById('f-type').value;
   document.getElementById('champ-lot-simple').style.display='none';
   // Options du type d'intervention selon le type d'entreprise
   const selI=document.getElementById('f-intervention'), valI=selI.value;
-  selI.innerHTML='<option value="">— Non renseigné —</option>'+(t==='soustraitants'?'<option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option>':'<option value="fs">Fourniture seule</option><option value="fp">Fourniture et pose</option>');
+  selI.innerHTML='<option value="">— Non renseigné —</option>'+(t==='soustraitants'?'<option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option><option value="fs">Fourniture seule</option>':'<option value="fs">Fourniture seule</option><option value="fp">Fourniture et pose</option>');
   selI.value=[...selI.options].some(o=>o.value===valI)?valI:'';
   document.getElementById('lbl-adresse').textContent=(t!=='fournisseurs')?'Adresse':'Adresse de l\u2019agence référente';
   remplirSelectLotsForm(t); ivCriteres={}; document.getElementById('iv-crit-det').open=false; rendreIvNote(); rendreIvCriteres(); rendreInterventionsForm(); }
