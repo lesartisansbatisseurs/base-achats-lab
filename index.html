@@ -724,7 +724,7 @@
         </div>
         <div class="ms-puces" id="ms-lots-puces"></div>
       </div></div>
-    <label class="champ" id="champ-intervention"><span>Type d'intervention</span><select id="f-intervention"><option value="">— Non renseigné —</option><option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option><option value="fs">Fourniture seule</option></select></label>
+    <label class="champ" id="champ-intervention"><span>Type d'intervention</span><select id="f-intervention"><option value="">— Non renseigné —</option><option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option></select></label>
     <label class="champ" id="champ-offre"><span>Achat ou location</span><select id="f-offre" onchange="majChampsLocation()"><option value="achat">Achat</option><option value="location">Location</option><option value="les2">Achat et location</option></select></label>
     <div class="bloc-contact2" id="champ-location">
       <div class="titre-bloc">Location</div>
@@ -895,7 +895,7 @@ function aNotes(t){ return t==='soustraitants'||t==='bureauxetudes'; }
 /* ===== FOURNISSEURS : ACHAT / LOCATION =====
    Champ "offre" sur la fiche fournisseur : 'achat' (défaut si absent), 'location' ou 'les2'.
    Un fournisseur 'les2' apparaît dans les deux sous-onglets. */
-const VERSION='v36'; // à incrémenter à chaque mise en ligne
+const VERSION='v37'; // à incrémenter à chaque mise en ligne
 let sousOngletF='achat';
 const LIB_OFFRE={achat:'Achat',location:'Location',les2:'Achat et location'};
 function offreDe(e){ return (e&&(e.offre==='location'||e.offre==='les2'))?e.offre:'achat'; }
@@ -1403,7 +1403,7 @@ function majTypeFiche(){ const t=document.getElementById('f-type').value;
   document.getElementById('champ-lot-simple').style.display='none';
   // Options du type d'intervention selon le type d'entreprise
   const selI=document.getElementById('f-intervention'), valI=selI.value;
-  selI.innerHTML='<option value="">— Non renseigné —</option>'+(t==='soustraitants'?'<option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option><option value="fs">Fourniture seule</option>':'<option value="fs">Fourniture seule</option><option value="fp">Fourniture et pose</option>');
+  selI.innerHTML='<option value="">— Non renseigné —</option>'+(t==='soustraitants'?'<option value="fp">Fourniture et pose</option><option value="ps">Pose seule</option>':'<option value="fs">Fourniture seule</option><option value="fp">Fourniture et pose</option>');
   selI.value=[...selI.options].some(o=>o.value===valI)?valI:'';
   document.getElementById('lbl-adresse').textContent=(t!=='fournisseurs')?'Adresse':'Adresse de l\u2019agence référente';
   remplirSelectLotsForm(t); ivCriteres={}; document.getElementById('iv-crit-det').open=false; rendreIvNote(); rendreIvCriteres(); rendreInterventionsForm(); }
