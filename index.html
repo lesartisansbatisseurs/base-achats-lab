@@ -769,7 +769,7 @@
       <div class="duo"><label class="champ"><span>Nom</span><input id="f-c2-nom" /></label>
         <label class="champ"><span>Rôle</span><input id="f-c2-role" list="roles-contact" placeholder="Choisir ou saisir…" /></label></div>
       <div class="duo"><label class="champ"><span>Téléphone</span><input id="f-c2-tel" /></label><label class="champ"><span>Email</span><input id="f-c2-email" /></label></div>
-      <datalist id="roles-contact"><option value="Gérant / Patron"><option value="Directeur général"><option value="Commercial(e)"><option value="Secrétaire"><option value="Assistant(e) administratif(ve)"><option value="Conducteur de travaux"><option value="Chef de chantier"><option value="Comptable"></datalist>
+      <datalist id="roles-contact"><option value="Gérant / Patron"><option value="Directeur général"><option value="Commercial(e)"><option value="Secrétaire"><option value="Assistant(e) administratif(ve)"><option value="Conducteur de travaux"><option value="Chef de chantier"><option value="Ingénieur études"><option value="Comptable"></datalist>
     </div>
     <label class="champ"><span id="lbl-adresse">Adresse</span><input id="f-adresse" /></label>
     <label class="champ"><span>Site web</span><input id="f-siteweb" placeholder="ex : entreprise.fr" /></label>
@@ -895,7 +895,7 @@ function aNotes(t){ return t==='soustraitants'||t==='bureauxetudes'; }
 /* ===== FOURNISSEURS : ACHAT / LOCATION =====
    Champ "offre" sur la fiche fournisseur : 'achat' (défaut si absent), 'location' ou 'les2'.
    Un fournisseur 'les2' apparaît dans les deux sous-onglets. */
-const VERSION='v37'; // à incrémenter à chaque mise en ligne
+const VERSION='v38'; // à incrémenter à chaque mise en ligne
 let sousOngletF='achat';
 const LIB_OFFRE={achat:'Achat',location:'Location',les2:'Achat et location'};
 function offreDe(e){ return (e&&(e.offre==='location'||e.offre==='les2'))?e.offre:'achat'; }
